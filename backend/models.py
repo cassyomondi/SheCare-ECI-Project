@@ -8,6 +8,7 @@ from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.associationproxy import association_proxy
 import re # for validation
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import JSON
 
 
 db = SQLAlchemy()
@@ -46,14 +47,14 @@ class UserMessage(db.Model, SerializerMixin):
     timestamp=db.Column(db.DateTime)
 
     user=db.relationship("User", back_populates='user_messages')
-    response=db.relationship("ResponseMessage", back_populates="user_messages")
+    response=db.relationship("ResponseMessage", back_populates="user_message")
 
     def __repr__(self):
         return f"<{self.id} {self.message} {self.user_id} {self.response_id} {self.timestamp}>"
 
 class ResponseMessage(db.Model, SerializerMixin):
     __tablename__="response_messages"
-    serialize_rules=('-messages.response','-user_messages.response',)
+    serialize_rules=('-messages.response',)
     id=db.Column(db.Integer, primary_key=True)
     response=db.Column(db.Text)
     input_token=db.Column(db.String(100))
@@ -61,7 +62,7 @@ class ResponseMessage(db.Model, SerializerMixin):
     timestamp=db.Column(db.DateTime)
 
     messages=db.relationship("Message", back_populates="response")
-    user_messages=db.relationship("UserMessage", back_populates="response")
+    user_message=db.relationship("UserMessage", useList=False, back_populates="response")
 
     def __repr__(self):
         return f"<{self.id} {self.response} {self.input_token} {self.output_token} {self.timestamp}>"
