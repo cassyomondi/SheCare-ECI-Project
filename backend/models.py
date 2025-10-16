@@ -6,3 +6,72 @@ from sqlalchemy.orm import validates
 
 db = SQLAlchemy()
 
+class User(db.model, SerializerMixin):
+    __tablename__ ='users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    phone = db.column(db.varchar, unique=True, nullable=False)
+    password = db.Column(db.varchar)
+    role= db.Column(db.String)
+    created_at =db.Column(db.DateTime, server_default=db.func.now())
+
+    medicalpractitioners= db.relationship('MedicalPractitioner', back_populates = 'user', cascade='all, delete-orphan')
+    admins = db.relationship('Admin', back_populates='user', cascade='all, delete-orphan')
+    associates = db.relationship('Associate', back_populates='user', cascade='all, delete')
+
+    def __repr__(self):
+        return f"<User phone={self.phone}, password={self.password}, role={self.role}, created_at={self.created_at}>"
+
+
+class MedicalPractitioner(db.model, SerializerMixin):
+    __tablename__ = 'medicalpractitioners'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    first_name = db.Column(db.String, nullable=False)
+    last_name = db.Column(db.String)
+    speciality = db.Column(db.String)
+    role= db.Column(db.String)
+    location = db.Column(db.String)
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    user = db.relationship('User', back_populates='medicalpactitioners', casacade='all, delete-orphan')
+
+    def __repr__(self):
+        return f"<Medicalpractitioner user_id={self.user_id}, first_name={self.first_name}, last_name={self.last_name},speciality={self.speciality}, role={self.role}, location={self.location}, description={self.description}, created_at={self.created_at}>"
+    
+
+class Admin(db.model, SerializerMixin):
+    __tablename__ = 'admins'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    first_name = db.Column(db.String)
+    last_name = db.Column(db.String)
+    designation= db.Column(db.String)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    user = db.relationship('User', back_populates='admins', casacade='all, delete-orphan')
+
+
+    def __repr__(self):
+        return f"<Admin  user_id={self.user_id}, first_name = {self.first_name}, last_name={self.last_name}, designation={self.designation}, created_at={self.created_at}>"
+    
+
+class Associate(db.model, SerializerMixin):
+    __tablename__ = 'associates'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    first_name = db.Column(db.String)
+    last_name = db.Column(db.String)
+    designation= db.Column(db.String)
+    decription = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    user = db.relationship('User', back_populates='associates', casacade='all, delete-orphan')
+
+
+    def __repr__(self):
+        return f"<Associate  user_id={self.user_id}, first_name = {self.first_name}, last_name={self.last_name}, designation={self.designation}, description={self.decription}, created_at={self.created_at}>"
