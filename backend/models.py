@@ -14,7 +14,8 @@ class User(db.model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     phone = db.column(db.varchar, unique=True, nullable=False)
     password = db.Column(db.varchar)
-    role= db.Column(db.String)
+    email = db.Column(db.String(120), unique=True, nullable=True)
+    role= db.Column(db.String, nullable=False)
     created_at =db.Column(db.DateTime, server_default=db.func.now())
 
     medicalpractitioners= db.relationship('MedicalPractitioner', back_populates = 'user', cascade='all, delete-orphan')
