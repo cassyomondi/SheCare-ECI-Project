@@ -22,18 +22,19 @@ class User(db.model, SerializerMixin):
     admins = db.relationship('Admin', back_populates='user', cascade='all, delete-orphan')
     associates = db.relationship('Associate', back_populates='user', cascade='all, delete')
 
+
     @validates('phone')
     def validate_phone(self, key, phone):
         if not phone:
             raise ValueError("Phone number required")
-        if phone < 10 :
+        if len(phone) < 10 :
             raise ValueError('Phone number must have ten digits')
 
     @validates('password')
     def validate_password(self, key, password):
         if not password:
             raise ValueError("Password is required")
-        if password < 8 :
+        if len(password) < 8 :
             raise ValueError("Password must have 8 characters")
 
     @validates('email')
