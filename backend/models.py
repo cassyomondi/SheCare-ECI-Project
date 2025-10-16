@@ -32,7 +32,7 @@ class Message(db.Model, SerializerMixin):
     timestamp=db.Column(db.DateTime)
     
     user=db.relationship("User", back_populates='messages')
-    response=db.relationship("ResponseMessage", back_populates="messages")
+    response=db.relationship("ResponseMessage", back_populates="message")
     
     def __repr__(self):
         return f"<{self.id} {self.user_id} {self.response_id} {self.timestamp}>"
@@ -54,15 +54,15 @@ class UserMessage(db.Model, SerializerMixin):
 
 class ResponseMessage(db.Model, SerializerMixin):
     __tablename__="response_messages"
-    serialize_rules=('-messages.response',)
+    serialize_rules = ('-message.response', '-user_message.response',)
     id=db.Column(db.Integer, primary_key=True)
     response=db.Column(db.Text)
     input_token=db.Column(db.String(100))
     output_token=db.Column(db.String(100))
-    timestamp=db.Column(db.DateTime)
+    timestamp=db.Column(db.DateTime) 
 
-    messages=db.relationship("Message", back_populates="response")
-    user_message=db.relationship("UserMessage", useList=False, back_populates="response")
+    message=db.relationship("Message", uselist=False, back_populates="response")
+    user_message=db.relationship("UserMessage", uselist=False, back_populates="response")
 
     def __repr__(self):
         return f"<{self.id} {self.response} {self.input_token} {self.output_token} {self.timestamp}>"
