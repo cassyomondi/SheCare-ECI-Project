@@ -36,6 +36,13 @@ class User(db.model, SerializerMixin):
         if password < 8 :
             raise ValueError("Password must have 8 characters")
 
+    @validates('email')
+    def validate_email(self, key, email):
+        if not email:
+            raise ValueError("Email is required")
+        if "@" not in email:
+            raise TypeError("Invalid email")
+
     serializer_rules = ('-medicalpractitioners.user', '-admins.user', '-associates.user', '-password', '-phone')
 
 
