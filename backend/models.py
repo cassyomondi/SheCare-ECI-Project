@@ -2,6 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
+from sqlalchemy.dialects.postgresql import JSON
+
 
 
 db = SQLAlchemy()
@@ -18,6 +20,23 @@ class User(db.model, SerializerMixin):
     medicalpractitioners= db.relationship('MedicalPractitioner', back_populates = 'user', cascade='all, delete-orphan')
     admins = db.relationship('Admin', back_populates='user', cascade='all, delete-orphan')
     associates = db.relationship('Associate', back_populates='user', cascade='all, delete')
+
+    @validates('phone')
+    def validate_phone(self, key, phone):
+        if not phone:
+            raise ValueError("Phone number required")
+        if phone < 10 :
+            raise ValueError('Phone number must have ten digits')
+
+    @validates('password')
+    def validate_password(self, key, password):
+        if not password:
+            raise ValueError("Password is required")
+        if password < 8 :
+            raise ValueError("Password must have 8 characters")
+
+    serializer_rules = ('-medicalpractitioners.user', '-admins.user', '-associates.user')
+
 
     def __repr__(self):
         return f"<User phone={self.phone}, password={self.password}, role={self.role}, created_at={self.created_at}>"
@@ -38,6 +57,9 @@ class MedicalPractitioner(db.model, SerializerMixin):
 
     user = db.relationship('User', back_populates='medicalpactitioners', casacade='all, delete-orphan')
 
+    serializer_rules = ('-user.medicalpractitioner')
+
+
     def __repr__(self):
         return f"<Medicalpractitioner user_id={self.user_id}, first_name={self.first_name}, last_name={self.last_name},speciality={self.speciality}, role={self.role}, location={self.location}, description={self.description}, created_at={self.created_at}>"
     
@@ -53,6 +75,8 @@ class Admin(db.model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     user = db.relationship('User', back_populates='admins', casacade='all, delete-orphan')
+
+    serialize_rules=('-user.admin')
 
 
     def __repr__(self):
@@ -72,6 +96,7 @@ class Associate(db.model, SerializerMixin):
 
     user = db.relationship('User', back_populates='associates', casacade='all, delete-orphan')
 
+    serialize_rules = ('-user.associate')
 
     def __repr__(self):
         return f"<Associate  user_id={self.user_id}, first_name = {self.first_name}, last_name={self.last_name}, designation={self.designation}, description={self.decription}, created_at={self.created_at}>"
