@@ -35,7 +35,7 @@ class User(db.model, SerializerMixin):
         if password < 8 :
             raise ValueError("Password must have 8 characters")
 
-    serializer_rules = ('-medicalpractitioners.user', '-admins.user', '-associates.user')
+    serializer_rules = ('-medicalpractitioners.user', '-admins.user', '-associates.user', '-password', '-phone')
 
 
     def __repr__(self):
