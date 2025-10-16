@@ -24,6 +24,7 @@ convention = {
 metadata = MetaData(naming_convention=convention)
 class Message(db.Model, SerializerMixin):
     __tablename__="messages"
+    
     id=db.Column(db.Integer, primary_key=True)
     user_id=db.Column(db.Integer, db.ForeignKey('users.id'))
     response_id=db.Column(db.Integer, db.ForeignKey('response_messages.id'))
@@ -52,6 +53,7 @@ class UserMessage(db.Model, SerializerMixin):
 
 class ResponseMessage(db.Model, SerializerMixin):
     __tablename__="response_messages"
+    serialize_rules=('-messages.response','-user_messages.response',)
     id=db.Column(db.Integer, primary_key=True)
     response=db.Column(db.Text)
     input_token=db.Column(db.String(100))
