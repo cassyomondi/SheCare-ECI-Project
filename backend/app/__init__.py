@@ -4,45 +4,36 @@ from flask_cors import CORS
 from app.utils.db import db
 from app.config import Config
 
-
+# ✅ Rename the variable to avoid clashing with the 'app' package
 def create_app():
     """Application factory pattern for SheCare backend"""
-    app = Flask(__name__)
-    app.config.from_object(Config)
-    CORS(app)
+    flask_app = Flask(__name__)
+    flask_app.config.from_object(Config)
+    CORS(flask_app)
 
     # Initialize database and migrations
-    db.init_app(app)
-    Migrate(app, db)
+    db.init_app(flask_app)
+    Migrate(flask_app, db)
 
-    # Import models
-    from app.models import (
-        user, practitioner, admin, associate, participant,
-        message, response, prescription, tip, chatsession
-    )
+    # Import all models
+    import app.models.models  # ensures all models are registered
 
-    # Import model classes after registration
-    from app.models.user import User
-
-    @app.route("/")
+    @flask_app.route("/")
     def home():
         return {"message": "SheCare backend is running"}
 
-    @app.route("/testdb")
+    @flask_app.route("/testdb")
     def test_db():
-        """Simple DB connectivity test"""
         try:
-            # Insert a new test user
-            new_user = User(phone="254700000000", password="test123", role="participant")
+            from app.models.models import User
+            new_user = User(phone="0712345678", email="test@example.com", password="testpass123", role="participant")
             db.session.add(new_user)
             db.session.commit()
-
-            # Fetch all users
             users = User.query.all()
-            data = [{"id": u.user_id, "phone": u.phone, "role": u.role} for u in users]
-
+            data = [{"id": u.id, "phone": u.phone, "email": u.email, "role": u.role} for u in users]
             return {"message": "Database connection successful", "users": data}
         except Exception as e:
+            db.session.rollback()
             return {"error": str(e)}, 500
 
-    return app
+    return flask_app

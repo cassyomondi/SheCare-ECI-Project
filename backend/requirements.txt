@@ -4,3 +4,5 @@ flask_migrate
 flask_cors
 python-dotenv
 psycopg2-binary
+sqlalchemy-serializer
+Twilio==9.2.3
