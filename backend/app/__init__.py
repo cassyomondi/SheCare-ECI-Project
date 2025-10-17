@@ -4,19 +4,32 @@ from flask_cors import CORS
 from app.utils.db import db
 from app.config import Config
 
-# ✅ Rename the variable to avoid clashing with the 'app' package
 def create_app():
     """Application factory pattern for SheCare backend"""
     flask_app = Flask(__name__)
     flask_app.config.from_object(Config)
     CORS(flask_app)
 
-    # Initialize database and migrations
+    # Initialize database first
     db.init_app(flask_app)
-    Migrate(flask_app, db)
 
-    # Import all models
-    import app.models.models  # ensures all models are registered
+    # ✅ Import models BEFORE initializing Migrate
+    from app.models.models import (
+        User,
+        MedicalPractitioner,
+        Admin,
+        Associate,
+        Participant,
+        Message,
+        UserMessage,
+        ResponseMessage,
+        Prescription,
+        Tip,
+        ChatSession
+    )
+
+    # Now initialize migration AFTER models are known to SQLAlchemy
+    migrate = Migrate(flask_app, db)
 
     @flask_app.route("/")
     def home():
@@ -25,8 +38,12 @@ def create_app():
     @flask_app.route("/testdb")
     def test_db():
         try:
-            from app.models.models import User
-            new_user = User(phone="0712345678", email="test@example.com", password="testpass123", role="participant")
+            new_user = User(
+                phone="0712345678",
+                email="test@example.com",
+                password="testpass123",
+                role="participant"
+            )
             db.session.add(new_user)
             db.session.commit()
             users = User.query.all()

@@ -1,9 +1,8 @@
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from sqlalchemy_serializer import SerializerMixin
+from app.utils.db import db  # ✅ use the shared instance
 
-db = SQLAlchemy()
 
 ##############################################################
 # USERS TABLE — Base identity for all user roles
