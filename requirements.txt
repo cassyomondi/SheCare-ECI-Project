@@ -16,3 +16,4 @@ requests==2.32.3
 django-mpesa==2.0.7 
 mpesa-api==0.1.1 
 alembic==1.14.1
+flask-migrate == 4.1.0
