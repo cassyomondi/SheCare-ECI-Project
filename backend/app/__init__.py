@@ -13,7 +13,7 @@ def create_app():
     # Initialize database
     db.init_app(flask_app)
 
-    # ✅ Import models BEFORE initializing Migrate
+    # Import models BEFORE initializing Migrate
     from app.models.models import (
         User,
         MedicalPractitioner,
@@ -31,16 +31,16 @@ def create_app():
     # Initialize migration AFTER models are known to SQLAlchemy
     Migrate(flask_app, db)
 
-    # ✅ Register Twilio Blueprint
+    # Register Twilio Blueprint
     from app.twilio_routes import twilio_bp
     flask_app.register_blueprint(twilio_bp)
 
-    # ✅ Define home route only once
+    # Define home route only once
     @flask_app.route("/")
     def home():
         return {"message": "SheCare backend is running"}
 
-    # ✅ Optional: database test route
+    # Optional: database test route
     @flask_app.route("/testdb")
     def test_db():
         try:

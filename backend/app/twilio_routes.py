@@ -13,14 +13,14 @@ def whatsapp_bot():
     incoming_msg = request.form.get("Body", "").strip()
     from_number = request.form.get("From", "").replace("whatsapp:", "").strip()
 
-    # ✅ Ensure user exists
+    # Ensure user exists
     user = User.query.filter_by(phone=from_number).first()
     if not user:
         user = User(phone=from_number, role="participant")
         db.session.add(user)
         db.session.commit()
 
-    # ✅ Log user message
+    # Log user message
     user_message = UserMessage(
         user_id=user.id,
         message=incoming_msg,
@@ -29,7 +29,7 @@ def whatsapp_bot():
     db.session.add(user_message)
     db.session.flush()  # get its ID before commit
 
-    # ✅ Generate bot reply
+    # Generate bot reply
     response = MessagingResponse()
     message = response.message()
 
@@ -50,7 +50,7 @@ def whatsapp_bot():
             "Type *Hi* or *Hello* to begin your private health journey 🌸"
         )
 
-    # ✅ Log bot response
+    # Log bot response
     response_msg = ResponseMessage(
         response=reply,
         input_token=None,  # optional if you later integrate AI
@@ -60,10 +60,10 @@ def whatsapp_bot():
     db.session.add(response_msg)
     db.session.flush()
 
-    # ✅ Link both records
+    # Link both records
     user_message.response_id = response_msg.id
     db.session.commit()
 
-    # ✅ Send reply to WhatsApp
+    # Send reply to WhatsApp
     message.body(reply)
     return str(response)
