@@ -11,10 +11,13 @@ class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    phone = db.Column(db.String(10), unique=True, nullable=False)  # 10-digit local numbers
+    # Use up to 20 chars to store Twilio's E.164 format ("whatsapp:+254712345678")
+    phone = db.Column(db.String(20), unique=True, nullable=False)
+
+    # Keep email optional for non-WhatsApp users (e.g., web dashboard admins)
     email = db.Column(db.String(120), unique=True, nullable=True)
-    password = db.Column(db.String, nullable=True)  # Optional for WhatsApp users
-    role = db.Column(db.String, nullable=False)  # "admin", "practitioner", "associate", "participant"
+    password = db.Column(db.String, nullable=True)
+    role = db.Column(db.String, nullable=False, default="participant")  # sensible default
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -27,21 +30,7 @@ class User(db.Model, SerializerMixin):
     prescriptions = db.relationship('Prescription', back_populates='user', cascade='all, delete-orphan')
     chat_sessions = db.relationship('ChatSession', back_populates='user', cascade='all, delete-orphan')
 
-    # Validations
-    @validates('phone')
-    def validate_phone(self, key, phone):
-        if not phone:
-            raise ValueError("Phone number is required")
-        if len(phone) != 10:
-            raise ValueError("Phone number must be 10 digits (e.g., 0712345678)")
-        return phone
-
-    @validates('password')
-    def validate_password(self, key, password):
-        if password and len(password) < 8:
-            raise ValueError("Password must have at least 8 characters")
-        return password
-
+    # Optional — validate only when the field comes from manual registration
     @validates('email')
     def validate_email(self, key, email):
         if email and "@" not in email:
@@ -50,6 +39,7 @@ class User(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f"<User id={self.id}, phone={self.phone}, role={self.role}>"
+
 
 ##############################################################
 # MEDICAL PRACTITIONERS — Doctors or health professionals
