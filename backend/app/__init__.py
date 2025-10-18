@@ -52,5 +52,14 @@ def create_app():
         except Exception as e:
             db.session.rollback()
             return {"error": str(e)}, 500
+        
+     # ✅ Register Twilio Blueprint
+    from app.twilio_routes import twilio_bp
+    flask_app.register_blueprint(twilio_bp)
+
+    @flask_app.route("/")
+    def home():
+        return {"message": "SheCare backend is running"}
+
 
     return flask_app
