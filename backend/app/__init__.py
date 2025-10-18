@@ -10,7 +10,7 @@ def create_app():
     flask_app.config.from_object(Config)
     CORS(flask_app)
 
-    # Initialize database first
+    # Initialize database
     db.init_app(flask_app)
 
     # ✅ Import models BEFORE initializing Migrate
@@ -28,13 +28,19 @@ def create_app():
         ChatSession
     )
 
-    # Now initialize migration AFTER models are known to SQLAlchemy
-    migrate = Migrate(flask_app, db)
+    # Initialize migration AFTER models are known to SQLAlchemy
+    Migrate(flask_app, db)
 
+    # ✅ Register Twilio Blueprint
+    from app.twilio_routes import twilio_bp
+    flask_app.register_blueprint(twilio_bp)
+
+    # ✅ Define home route only once
     @flask_app.route("/")
     def home():
         return {"message": "SheCare backend is running"}
 
+    # ✅ Optional: database test route
     @flask_app.route("/testdb")
     def test_db():
         try:
@@ -52,14 +58,5 @@ def create_app():
         except Exception as e:
             db.session.rollback()
             return {"error": str(e)}, 500
-        
-     # ✅ Register Twilio Blueprint
-    from app.twilio_routes import twilio_bp
-    flask_app.register_blueprint(twilio_bp)
-
-    @flask_app.route("/")
-    def home():
-        return {"message": "SheCare backend is running"}
-
 
     return flask_app
