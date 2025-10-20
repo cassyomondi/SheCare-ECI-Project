@@ -1,0 +1,99 @@
+# -------------------------
+# Python / Flask backend
+# -------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+*.pot
+
+# Virtual environment
+venv/
+.venv/
+ENV/
+env/
+env.bak/
+python_env/
+.Python
+
+# Flask / Migrations
+instance/
+.mypy_cache/
+.pytest_cache/
+celerybeat-schedule
+*.db
+*.sqlite3
+*.sqlite
+
+# Flask-Migrate
+migrations/versions/
+
+# Environment variables
+.env
+*.env
+
+# -------------------------
+# Node / React frontend
+# -------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.pnpm-debug.log*
+coverage/
+.vscode/
+.idea/
+*.tsbuildinfo
+
+# React build files
+build/
+dist/
+.next/
+out/
+
+# -------------------------
+# System / Editor files
+# -------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+*.tmp
+*.orig
+
+# -------------------------
+# IDE & Project files
+# -------------------------
+.vscode/
+.idea/
+*.code-workspace
+
+# -------------------------
+# Compiled assets & cache
+# -------------------------
+__pycache__/
+*.pyc
+.cache/
+*.bak
+*.tmp
+*.log
+*.lock
+*.pid
+
+# -------------------------
+# Database & uploads
+# -------------------------
+*.db
+*.sqlite
+*.sqlite3
+uploads/
+media/
+backend/uploads/
