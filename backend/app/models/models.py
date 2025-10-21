@@ -1,8 +1,10 @@
 from datetime import datetime
 from sqlalchemy.orm import validates
 from sqlalchemy_serializer import SerializerMixin
-from app.utils.db import db  # ✅ use the shared instance
+from app.utils.db import db  # ✅ use the shared 
+from flask_bcrypt import Bcrypt
 
+bcrypt = Bcrypt()
 
 ##############################################################
 # USERS TABLE — Base identity for all user roles
@@ -16,7 +18,7 @@ class User(db.Model, SerializerMixin):
 
     # Keep email optional for non-WhatsApp users (e.g., web dashboard admins)
     email = db.Column(db.String(120), unique=True, nullable=True)
-    password = db.Column(db.String, nullable=True)
+    _password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String, nullable=False, default="participant")  # sensible default
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -29,6 +31,7 @@ class User(db.Model, SerializerMixin):
     user_messages = db.relationship('UserMessage', back_populates='user', cascade='all, delete-orphan')
     prescriptions = db.relationship('Prescription', back_populates='user', cascade='all, delete-orphan')
     chat_sessions = db.relationship('ChatSession', back_populates='user', cascade='all, delete-orphan')
+    inviteTokens = db.relationship('InvitationToken', back_populates = 'inviter', cascade='all, delete-orphan')
 
     # Optional — validate only when the field comes from manual registration
     @validates('email')
@@ -37,6 +40,18 @@ class User(db.Model, SerializerMixin):
             raise ValueError("Invalid email address")
         return email
 
+    @property
+    def  password_hash (self):
+        return self._password_hash
+    
+    @password_hash.setter
+    def password_hash(self, password):
+        password_hash = bcrypt.generate_password_hash(password.encode('utf-8'))
+        self._password_hash = password_hash.decode('utf-8')
+
+    def authenticate(self, password):
+        return bcrypt.check_password_hash(
+            self._password_hash, password.encode('utf-8'))
     def __repr__(self):
         return f"<User id={self.id}, phone={self.phone}, role={self.role}>"
 
@@ -59,6 +74,9 @@ class MedicalPractitioner(db.Model, SerializerMixin):
 
     user = db.relationship('User', back_populates='medical_practitioners')
 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    uploaded = db.Column(db.LargeBinary)
+    response = db.Column(db.Text)
     def __repr__(self):
         return f"<MedicalPractitioner {self.first_name} {self.last_name}>"
 
@@ -73,6 +91,7 @@ class Admin(db.Model, SerializerMixin):
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
     designation = db.Column(db.String)
+    is_super_admin = db.Column(db.Boolean, default=False) 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', back_populates='admins')
@@ -123,6 +142,9 @@ class Participant(db.Model, SerializerMixin):
 ##############################################################
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    uploaded = db.Column(db.LargeBinary)
+    response = db.Column(db.Text)
 
     message_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -162,6 +184,9 @@ class ResponseMessage(db.Model, SerializerMixin):
     messages = db.relationship('Message', back_populates='response')
     user_messages = db.relationship('UserMessage', back_populates='response')
 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    uploaded = db.Column(db.LargeBinary)
+    response = db.Column(db.Text)
     def __repr__(self):
         return f"<ResponseMessage id={self.id}>"
 
@@ -220,3 +245,23 @@ class ChatSession(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f"<ChatSession id={self.id} active={self.is_active}>"
+
+
+##invitation token, tracks invitatio toks sent to future admins from superadmin
+
+class InvitationToken(db.Model, SerializerMixin):
+    __tablename__ = 'invitationTokens'
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String, nullable=False)
+    token = db.Column(db.String, nullable=False, unique=True)
+    invited_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    expires_at = db.Column(db.DateTime, nullable=False)
+    is_used = db.Column(db.Boolean, default=False, nullable=False)
+    used_at = db.Column(db.DateTime, nullable=True)
+
+    inviter = db.relationship('User', back_populates='inviteTokens', cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return f'<Invitation {self.email} - {"Used" if self.is_used else "Pending"}>'

@@ -3,7 +3,6 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from app.utils.db import db
 from app.config import Config
-
 def create_app():
     """Application factory pattern for SheCare backend"""
     flask_app = Flask(__name__)
@@ -30,6 +29,9 @@ def create_app():
 
     # Initialize migration AFTER models are known to SQLAlchemy
     Migrate(flask_app, db)
+
+    # bcrypt = Bcrypt(flask_app)
+
 
     # Register Twilio Blueprint
     from app.twilio_routes import twilio_bp
