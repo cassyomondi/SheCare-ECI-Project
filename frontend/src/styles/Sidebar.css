@@ -1,0 +1,40 @@
+.dashboard-sidebar {
+  width: 240px;
+  background-color: #4a4bff; /* Or your brand color */
+  color: #ffffff;
+  padding: 20px 10px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.dashboard-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-sidebar li {
+  padding: 12px 15px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.dashboard-sidebar li:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sub-menu {
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
+.sub-menu li {
+  padding: 8px 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+
+.sub-menu li:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
