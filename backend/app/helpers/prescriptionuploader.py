@@ -1,60 +1,82 @@
 import io
-import os
 import requests
-from requests.auth import HTTPBasicAuth
 from PIL import Image
 import pytesseract
-from datetime import datetime
+import os
 from dotenv import load_dotenv
+from datetime import datetime
+from flask import current_app
+from openai import OpenAI
 from ..models import Prescription, db
 
-# Load environment variables
 load_dotenv()
 
 def prescription_uploader(user_id, media_url, media_type):
-    """
-    Downloads a prescription image from Twilio, extracts text with Tesseract,
-    saves it to the database, and returns a summary message.
-    """
     try:
-        print(f"📸 Prescription upload detected: {media_url} ({media_type})")
-
-        # ✅ Load Twilio credentials from environment
+        # Get Twilio credentials
         account_sid = os.getenv("TWILIO_ACCOUNT_SID")
         auth_token = os.getenv("TWILIO_AUTH_TOKEN")
 
-        if not account_sid or not auth_token:
-            raise ValueError("⚠️ Missing Twilio credentials in .env")
-
-        # ✅ Download the media file securely
-        res = requests.get(media_url, auth=HTTPBasicAuth(account_sid, auth_token))
+        # Download image securely
+        res = requests.get(media_url, auth=(account_sid, auth_token))
         res.raise_for_status()
+
         image_data = res.content
 
-        # ✅ Perform OCR using Tesseract
+        # Run OCR (Extract text)
         image = Image.open(io.BytesIO(image_data))
         extracted_text = pytesseract.image_to_string(image)
 
-        # ✅ Save both the image and OCR text to the DB
+        if not extracted_text.strip():
+            return False, "⚠️ I couldn't read any text from the prescription image. Please try again with a clearer photo."
+
+        # 🔥 AI Interpretation using OpenAI GPT
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        prompt = f"""
+        You are a healthcare assistant helping users understand their medical prescriptions.
+        The following is text extracted from an image of a prescription:
+
+        \"\"\"{extracted_text}\"\"\"
+
+        Please:
+        1. Summarize the list of medicines (name, dosage, frequency).
+        2. Explain briefly what each medicine is typically used for.
+        3. Give a short reminder about safe use (consult doctor/pharmacist before taking).
+
+        Use simple, friendly language.
+        """
+
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a medical assistant who interprets prescriptions clearly and safely."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500
+        )
+
+        ai_interpretation = completion.choices[0].message.content.strip()
+
+        # Save prescription + OCR text + AI interpretation
         new_prescription = Prescription(
             user_id=user_id,
             uploaded=image_data,
-            response=extracted_text.strip(),
-            timestamp=datetime.utcnow(),
+            response=ai_interpretation,  # Save interpreted result
+            timestamp=datetime.utcnow()
         )
+
         db.session.add(new_prescription)
         db.session.commit()
 
-        # ✅ Success message
+        # ✅ Return success message to WhatsApp
         ai_reply = (
-            "✅ *Prescription uploaded successfully!*\n"
-            "Here’s what I could read from your image:\n\n"
-            f"_{extracted_text.strip()[:400]}..._"
+            "✅ Prescription uploaded successfully!\n"
+            "Here’s what I could read and interpret:\n\n"
+            f"{ai_interpretation[:1200]}..."
         )
 
-        print("💾 Prescription saved successfully.")
         return True, ai_reply
 
     except Exception as e:
-        print(f"❌ Prescription upload failed: {e}")
-        return False, "⚠️ Sorry, something went wrong while reading your prescription."
+        print("Prescription upload failed:", e)
+        return False, "⚠️ Sorry, something went wrong while reading your prescription. Please try again later."
