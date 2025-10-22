@@ -25,7 +25,7 @@ function UserRoleTrend({ title, apiUrl }) {
         users.forEach(u => {
           if (!u.created_at) return;
           const date = u.created_at.split("T")[0]; // YYYY-MM-DD
-          if (!grouped[date]) grouped[date] = { date, participant: 0, practioner: 0, admin: 0 };
+          if (!grouped[date]) grouped[date] = { date, participant: 0, practitioner: 0, admin: 0 };
           const roleKey = u.role.toLowerCase();
           if (grouped[date][roleKey] !== undefined) grouped[date][roleKey] += 1;
         });
@@ -51,7 +51,7 @@ function UserRoleTrend({ title, apiUrl }) {
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="participant" stroke="#1f77b4" />
-          <Line type="monotone" dataKey="practioner" stroke="#ff7f0e" />
+          <Line type="monotone" dataKey="practitioner" stroke="#ff7f0e" />
           <Line type="monotone" dataKey="admin" stroke="#2ca02c" />
         </LineChart>
       </ResponsiveContainer>
