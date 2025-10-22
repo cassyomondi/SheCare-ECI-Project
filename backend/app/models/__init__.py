@@ -1,3 +1,7 @@
+# backend/app/models/__init__.py
+
+from app.utils.db import db 
+
 from app.models.models import (
     User,
     MedicalPractitioner,
@@ -13,6 +17,7 @@ from app.models.models import (
 )
 
 __all__ = [
+    "db",
     "User",
     "MedicalPractitioner",
     "Admin",
