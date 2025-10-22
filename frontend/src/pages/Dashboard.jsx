@@ -17,9 +17,9 @@ function Dashboard() {
         </div>
         
         <BarGraph 
-        title="UserType Comparison"
-        apiUrl="http://localhost:5000/api/user-totals"
-        barColor="yellow"
+        title="User Role Comparison"
+        apiUrl="http://127.0.0.1:5555/api/users"
+        barColor="#6C63FF"
         />
         
      

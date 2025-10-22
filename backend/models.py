@@ -67,3 +67,4 @@ class ResponseMessage(db.Model, SerializerMixin):
     def __repr__(self):
         return f"<{self.id} {self.response} {self.input_token} {self.output_token} {self.timestamp}>"
     
+    #sudo kill -9 $(sudo lsof -t -i:5555)
