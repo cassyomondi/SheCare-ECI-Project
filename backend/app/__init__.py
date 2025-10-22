@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
+from .whatsapp.bot import whatsapp_bp
 import openai
 
 from app.utils.db import db

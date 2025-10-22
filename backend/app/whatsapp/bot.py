@@ -1,3 +1,11 @@
+import os
+from dotenv import load_dotenv
+
+# ✅ Ensure .env is loaded before any helper imports (so OpenAI, etc. have keys)
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+dotenv_path = os.path.join(base_dir, ".env")
+load_dotenv(dotenv_path)
+
 from flask import Blueprint, request
 from twilio.twiml.messaging_response import MessagingResponse
 from datetime import datetime
@@ -6,6 +14,7 @@ from ..helpers.symptomchecker import symptomchecker
 from ..helpers.clinicfinder import find_nearby_clinics
 from ..helpers.prescriptionuploader import prescription_uploader
 from ..models import db, User, UserMessage, ResponseMessage, ChatSession
+
 
 whatsapp_bp = Blueprint("whatsapp_bp", __name__)
 

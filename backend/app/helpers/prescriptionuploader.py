@@ -1,3 +1,4 @@
+# backend/app/helpers/prescriptionuploader.py
 import io
 import requests
 from PIL import Image
@@ -31,7 +32,7 @@ def prescription_uploader(user_id, media_url, media_type):
             return False, "⚠️ I couldn't read any text from the prescription image. Please try again with a clearer photo."
 
         # 🔥 AI Interpretation using OpenAI GPT
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = OpenAI()
         prompt = f"""
         You are a healthcare assistant helping users understand their medical prescriptions.
         The following is text extracted from an image of a prescription:
