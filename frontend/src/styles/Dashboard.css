@@ -1,3 +1,4 @@
+/* Dashboard container */
 .dashboard-container {
   display: flex;
   height: 100vh;
@@ -12,70 +13,59 @@
   overflow-y: auto;
 }
 
-.stat-card {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  flex: 1;
-  text-align: center;
-  color: #000; 
-}
-
-.stat-card p {
-  margin: 5px 0; 
-}
-
-.stat-number {
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.stats-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 30px;
-}
-
-.stat-card {
-  flex: 1 1 150px;
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-.stat-label {
-  color: black;   
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
-.stat-number {
-  color: black;   
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.charts-container {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.charts-container > div {
-  flex: 1 1 500px; 
-  min-width: 300px;
-}
-
+/* Section Titles */
 .section-title {
   font-size: 1.4rem;
   font-weight: 600;
   margin: 20px 0 10px 0;
-  color: #333;
+  color: #6C63FF; /* accent color for sections */
 }
-/* Cards container */
+
+/* Stats Cards */
+.stats-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.stat-card {
+  flex: 1 1 150px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  color: #000; /* black text for all stats */
+}
+
+.stat-title, .stat-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.stat-number, .card-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Charts container */
+.charts-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.charts-container > div {
+  flex: 1 1 500px;
+  min-width: 300px;
+}
+
+/* Generic cards container (for tips and prescriptions) */
 .stats-cards, .tips-cards, .prescriptions-cards {
   display: flex;
   gap: 20px;
@@ -83,97 +73,72 @@
   margin-top: 20px;
 }
 
-/* Individual card */
-.card {
-  background-color: #fff; 
-  padding: 20px;
+/* Individual card styling */
+.card, .tip-card, .prescription-card {
+  flex: 1 1 200px;
+  min-width: 200px;
+  background-color: #fff;
+  padding: 15px;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-/* Card labels and numbers */
-.card-label {
+/* Labels inside cards */
+.card-label, .tip-title, .prescription-label {
   font-weight: 500;
   font-size: 16px;
-  color: #000; 
+  color: #000;
   margin-bottom: 8px;
 }
 
-.card-number {
-  font-weight: 700;
-  font-size: 24px;
-  color: #000; 
-}
-/* Unique color for participants uploaded */
+/* Unique color for participant uploads */
 .card-participants-uploaded .card-number {
-  color: #6C63FF; /* unique purple color */
-  font-weight: 700;
-  font-size: 24px;
+  color: #6C63FF; /* purple accent */
 }
 
-/* Optional: label in same accent or darker shade */
 .card-participants-uploaded .card-label {
-  color: #3f3d56; /* dark gray for label */
-  font-weight: 500;
-  font-size: 16px;
-}
-.stat-number {
-  font-size: 24px;
-  font-weight: bold;
-  color: #000; /* black text */
+  color: #3f3d56; /* dark gray */
 }
 
-.stat-title {
+/* Tip card specific */
+.tip-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tip-category {
+  background-color: #6C63FF;
+  color: #fff;
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 5px;
+}
+
+.tip-description {
+  margin: 10px 0;
   font-size: 14px;
-  color: #000; /* black text */
+  color: #333;
 }
 
+.tip-card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tip-date {
+  font-size: 12px;
+  color: #555;
+}
+
+/* Prescription cards */
 .prescription-participant,
 .prescription-date,
 .prescription-analysis {
   color: #2c3e50; /* dark unique color for readability */
+  font-size: 14px;
+  margin-bottom: 5px;
 }
-
-.charts-container {
-  display: flex;
-  gap: 20px;
-  margin-top: 30px;
-  flex-wrap: wrap;
-}
-
-.stats-cards {
-  display: flex;
-  gap: 20px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
-.stat-card {
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 8px;
-  min-width: 150px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.tips-cards {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-top: 15px;
-}
-
-.tip-card {
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 8px;
-  min-width: 200px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.section-title {
-  margin-top: 40px;
-  color: #6C63FF;
-}
-
