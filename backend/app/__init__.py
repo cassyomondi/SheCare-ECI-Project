@@ -32,8 +32,11 @@ def create_app():
     Migrate(flask_app, db)
 
     # ✅ Register Twilio Blueprint
-    from app.twilio_routes import twilio_bp
+    from app.routes.twilio_routes import twilio_bp
+    from app.routes.api_routes import api_bp
+
     flask_app.register_blueprint(twilio_bp)
+    flask_app.register_blueprint(api_bp, url_prefix="/api")
 
     # ✅ Define home route only once
     @flask_app.route("/")
