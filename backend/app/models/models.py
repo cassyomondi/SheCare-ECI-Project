@@ -193,6 +193,7 @@ class Tip(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
+    category = db.Column(db.String(100))
     status = db.Column(db.Boolean, default=False)
     practitioner = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)

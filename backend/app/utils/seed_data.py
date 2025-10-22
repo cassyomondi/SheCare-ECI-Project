@@ -147,9 +147,10 @@ def seed_data():
 
     # --- Tips ---
     tips = [
-        Tip(title="Drink Water", description="Drink 8 glasses daily", status=True, practitioner="Practitioner1", timestamp=datetime.utcnow()),
-        Tip(title="Exercise Regularly", description="At least 30 mins per day", status=True, practitioner="Practitioner2", timestamp=datetime.utcnow())
-    ]
+    Tip(title="Drink Water", description="Drink 8 glasses daily", category="Health", status=True, practitioner="Practitioner1", timestamp=datetime.utcnow()),
+    Tip(title="Exercise Regularly", description="At least 30 mins per day", category="Fitness", status=True, practitioner="Practitioner2", timestamp=datetime.utcnow())
+]
+
     db.session.add_all(tips)
 
     # --- ChatSessions ---
