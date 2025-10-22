@@ -4,7 +4,6 @@ import Sidebar from "../components/layout/Sidebar.jsx";
 import "../styles/Dashboard.css";
 import Searchbar from "../components/forms/Searchbar.jsx";
 import BarGraph from "../components/charts/BarGraph.jsx";
-import LineGraph from "../components/charts/LineGraph.jsx";
 
 
 function Dashboard() {
@@ -16,17 +15,13 @@ function Dashboard() {
           <Header title="Dashboard" showAvatar={true} showNotification={true} />
         <Searchbar />
         </div>
-        <LineGraph
-        apiUrl=""/>
+        
         <BarGraph 
-        title="Participants Growth"
-        apiUrl=""
-        barColor="#F4F4F4"
+        title="UserType Comparison"
+        apiUrl="http://localhost:5000/api/user-totals"
+        barColor="yellow"
         />
-        <BarGraph 
-        title="Practioners Growth"
-        apiUrl=""
-        barColor="black"/>
+        
      
         
       </div>
