@@ -1,47 +1,74 @@
 from flask import Flask
-from flask_migrate import Migrate
 from flask_cors import CORS
+from flask_migrate import Migrate
+import os
+from dotenv import load_dotenv
+import openai
+
 from app.utils.db import db
-from app.config import Config
+from app.models.models import (
+    User,
+    MedicalPractitioner,
+    Admin,
+    Associate,
+    Participant,
+    Message,
+    UserMessage,
+    ResponseMessage,
+    Prescription,
+    Tip,
+    ChatSession
+)
+
+# Load environment variables
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+dotenv_path = os.path.join(base_dir, ".env")
+load_dotenv(dotenv_path)
+
+# Verify .env loaded
+print("🔐 Loaded TWILIO_ACCOUNT_SID:", os.getenv("TWILIO_ACCOUNT_SID"))
+
+migrate = Migrate()
 
 def create_app():
-    """Application factory pattern for SheCare backend"""
-    flask_app = Flask(__name__)
-    flask_app.config.from_object(Config)
-    CORS(flask_app)
+    """Unified SheCare backend (AI + Twilio + Core)"""
+    app = Flask(__name__)
 
-    # Initialize database
-    db.init_app(flask_app)
-
-    # ✅ Import models BEFORE initializing Migrate
-    from app.models.models import (
-        User,
-        MedicalPractitioner,
-        Admin,
-        Associate,
-        Participant,
-        Message,
-        UserMessage,
-        ResponseMessage,
-        Prescription,
-        Tip,
-        ChatSession
+    # Configuration
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+        'DATABASE_URL',
+        'postgresql://postgres:password@localhost/shecare_db'
     )
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'supersecretkey')
 
-    # Initialize migration AFTER models are known to SQLAlchemy
-    Migrate(flask_app, db)
+    # Initialize OpenAI
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    # ✅ Register Twilio Blueprint
-    from app.twilio_routes import twilio_bp
-    flask_app.register_blueprint(twilio_bp)
+    # Initialize extensions
+    db.init_app(app)
+    migrate.init_app(app, db)
+    CORS(app)
 
-    # ✅ Define home route only once
-    @flask_app.route("/")
+    # ✅ Register Blueprints
+    try:
+        from app.twilio_routes import twilio_bp
+        app.register_blueprint(twilio_bp)
+    except Exception as e:
+        print("⚠️ Could not load Twilio routes:", e)
+
+    try:
+        from app.whatsapp.bot import whatsapp_bp
+        app.register_blueprint(whatsapp_bp, url_prefix='/whatsapp')
+    except Exception as e:
+        print("⚠️ Could not load WhatsApp AI bot:", e)
+
+    # ✅ Routes
+    @app.route("/")
     def home():
-        return {"message": "SheCare backend is running"}
+        return {"message": "SheCare backend (AI + Twilio) is running ✅"}
 
-    # ✅ Optional: database test route
-    @flask_app.route("/testdb")
+    @app.route("/testdb")
     def test_db():
         try:
             new_user = User(
@@ -59,4 +86,4 @@ def create_app():
             db.session.rollback()
             return {"error": str(e)}, 500
 
-    return flask_app
+    return app
