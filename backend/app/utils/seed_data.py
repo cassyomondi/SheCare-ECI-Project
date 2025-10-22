@@ -1,108 +1,178 @@
-from app.utils.db import db
-from app.models.models import (
-    User, MedicalPractitioner, Admin, Associate, Participant,
+# app/utils/seed_data.py
+
+from app import db
+from app.models import (
+    User, Participant, MedicalPractitioner, Admin, Associate,
     Message, UserMessage, ResponseMessage, Prescription, Tip, ChatSession
 )
 from datetime import datetime
-import random
-
 
 def seed_data():
-    """Populate the database with mock SheCare data."""
     print("🌱 Seeding database with mock data...")
 
-    # ✅ 1. Clear existing data
-    db.session.query(Message).delete()
-    db.session.query(UserMessage).delete()
-    db.session.query(ResponseMessage).delete()
-    db.session.query(Prescription).delete()
-    db.session.query(Tip).delete()
-    db.session.query(ChatSession).delete()
-    db.session.query(MedicalPractitioner).delete()
-    db.session.query(Admin).delete()
-    db.session.query(Associate).delete()
-    db.session.query(Participant).delete()
-    db.session.query(User).delete()
-
+    # --- Clear all existing data ---
+    ChatSession.query.delete()
+    Tip.query.delete()
+    Prescription.query.delete()
+    UserMessage.query.delete()
+    Message.query.delete()
+    Participant.query.delete()
+    Associate.query.delete()
+    Admin.query.delete()
+    MedicalPractitioner.query.delete()
+    User.query.delete()
     db.session.commit()
 
-    # ✅ 2. Create users
+    # --- Create Users (5 participants, 4 practitioners, 1 admin) ---
     users = [
-        User(phone="+254712345678", email="alice@example.com", password="test123", role="participant"),
-        User(phone="+254701112233", email="dr.jane@example.com", password="doctor123", role="practitioner"),
-        User(phone="+254733998877", email="admin@example.com", password="admin123", role="admin"),
+        User(phone="whatsapp:+254700000001", email="admin@example.com", role="admin", created_at=datetime.utcnow()),
+        User(phone="whatsapp:+254700000002", email="pract_john@example.com", role="practitioner", created_at=datetime.utcnow()),
+        User(phone="whatsapp:+254700000003", email="pract_mary@example.com", role="practitioner", created_at=datetime.utcnow()),
+        User(phone="whatsapp:+254700000004", email="pract_sam@example.com", role="practitioner", created_at=datetime.utcnow()),
+        User(phone="whatsapp:+254700000005", email="pract_linda@example.com", role="practitioner", created_at=datetime.utcnow()),
+        User(phone="whatsapp:+254700000006", email="participant_amy@example.com", role="participant", created_at=datetime.utcnow()),
+        User(phone="whatsapp:+254700000007", email="participant_bob@example.com", role="participant", created_at=datetime.utcnow()),
+        User(phone="whatsapp:+254700000008", email="participant_clara@example.com", role="participant", created_at=datetime.utcnow()),
+        User(phone="whatsapp:+254700000009", email="participant_dan@example.com", role="participant", created_at=datetime.utcnow()),
+        User(phone="whatsapp:+254700000010", email="participant_ella@example.com", role="participant", created_at=datetime.utcnow()),
     ]
     db.session.add_all(users)
     db.session.commit()
 
-    # ✅ 3. Create practitioners, admin, associate, participant
-    practitioner = MedicalPractitioner(
-        user_id=users[1].id,
-        first_name="Jane",
-        last_name="Doe",
-        speciality="Gynecology",
-        title="Dr.",
-        location="Nairobi Hospital",
-        description="Certified OB-GYN with 10 years of experience."
-    )
+    # Separate users by role
+    admin_user = next(u for u in users if u.role=="admin")
+    practitioner_users = [u for u in users if u.role=="practitioner"]
+    participant_users = [u for u in users if u.role=="participant"]
 
+    # --- Participants ---
+    participants = []
+    for i, user in enumerate(participant_users, start=1):
+        participants.append(
+            Participant(
+                first_name=f"Participant{i}",
+                last_name="Demo",
+                location=f"City{i}",
+                age=20+i,
+                user_id=user.id,
+                created_at=datetime.utcnow()
+            )
+        )
+    db.session.add_all(participants)
+
+    # --- Medical Practitioners ---
+    med_practitioners = []
+    for i, user in enumerate(practitioner_users, start=1):
+        med_practitioners.append(
+            MedicalPractitioner(
+                first_name=f"Practitioner{i}",
+                last_name="Smith",
+                speciality="General",
+                title="Dr.",
+                location=f"City{i}",
+                description="Experienced practitioner",
+                user_id=user.id,
+                created_at=datetime.utcnow()
+            )
+        )
+    db.session.add_all(med_practitioners)
+
+    # --- Admin ---
     admin = Admin(
-        user_id=users[2].id,
-        first_name="Cassy",
-        last_name="Omondi",
-        designation="System Admin"
+        first_name="Super",
+        last_name="Admin",
+        designation="Platform Manager",
+        user_id=admin_user.id,
+        created_at=datetime.utcnow()
     )
+    db.session.add(admin)
 
-    associate = Associate(
-        user_id=users[2].id,
-        first_name="Felix",
-        last_name="Otieno",
-        designation="Health Associate",
-        description="Community outreach coordinator for SheCare."
-    )
+    # --- Associates ---
+    associates = [
+        Associate(
+            first_name="Alice",
+            last_name="Partner",
+            designation="Health Associate",
+            description="Partner org",
+            user_id=admin_user.id,
+            created_at=datetime.utcnow()
+        )
+    ]
+    db.session.add_all(associates)
 
-    participant = Participant(
-        user_id=users[0].id,
-        first_name="Alice",
-        last_name="Akinyi",
-        location="Kisumu",
-        age=24
-    )
+    # --- ResponseMessages ---
+    responses = [
+        ResponseMessage(
+            response="Stay hydrated",
+            input_token="input1",
+            output_token="output1",
+            timestamp=datetime.utcnow()
+        ),
+        ResponseMessage(
+            response="Take vitamins",
+            input_token="input2",
+            output_token="output2",
+            timestamp=datetime.utcnow()
+        )
+    ]
+    db.session.add_all(responses)
+    db.session.commit()  # Commit to get IDs
 
-    db.session.add_all([practitioner, admin, associate, participant])
-    db.session.commit()
+    # --- Messages & UserMessages ---
+    messages = []
+    user_messages = []
+    for i, participant_user in enumerate(participant_users):
+        messages.append(
+            Message(user_id=participant_user.id, response_id=responses[i % len(responses)].id, timestamp=datetime.utcnow())
+        )
+        user_messages.append(
+            UserMessage(user_id=participant_user.id, response_id=responses[i % len(responses)].id, message=f"Hello from participant {i+1}", timestamp=datetime.utcnow())
+        )
+    db.session.add_all(messages)
+    db.session.add_all(user_messages)
 
-    # ✅ 4. Add a few health tips
+    # --- Prescriptions ---
+    prescriptions = []
+    for i, participant_user in enumerate(participant_users):
+        prescriptions.append(
+            Prescription(
+                user_id=participant_user.id,
+                response="Take meds",
+                input_token=f"token_in_{i+1}",
+                output_token=f"token_out_{i+1}",
+                uploaded=b"FakeBinaryData",
+                timestamp=datetime.utcnow()
+            )
+        )
+    db.session.add_all(prescriptions)
+
+    # --- Tips ---
     tips = [
-        Tip(title="Drink More Water", description="Stay hydrated to maintain a healthy body."),
-        Tip(title="Regular Exercise", description="Engage in at least 30 minutes of activity daily."),
-        Tip(title="Balanced Diet", description="Eat more fruits and vegetables every day."),
+        Tip(title="Drink Water", description="Drink 8 glasses daily", status=True, practitioner="Practitioner1", timestamp=datetime.utcnow()),
+        Tip(title="Exercise Regularly", description="At least 30 mins per day", status=True, practitioner="Practitioner2", timestamp=datetime.utcnow())
     ]
     db.session.add_all(tips)
-    db.session.commit()
 
-    # ✅ 5. Add sample prescriptions
-    prescriptions = [
-        Prescription(user_id=users[0].id, response="Take 1 tablet of paracetamol twice daily for 5 days."),
-        Prescription(user_id=users[0].id, response="Vitamin supplements recommended for low iron."),
-    ]
-    db.session.add_all(prescriptions)
-    db.session.commit()
+    # --- ChatSessions ---
+    chat_sessions = []
+    for participant_user in participant_users:
+        chat_sessions.append(
+            ChatSession(
+                user_id=participant_user.id,
+                session_state="started",
+                context="{}",
+                started_at=datetime.utcnow(),
+                last_activity=datetime.utcnow(),
+                is_active=True
+            )
+        )
+    db.session.add_all(chat_sessions)
 
-    # ✅ 6. Add messages and responses
-    response1 = ResponseMessage(response="Hello, how can I help you today?")
-    user_message1 = UserMessage(user_id=users[0].id, message="I have a headache.", response=response1)
-    db.session.add_all([response1, user_message1])
     db.session.commit()
+    print("✅ Database fully seeded with 10+ users and all models!")
 
-    # ✅ 7. Add chat sessions
-    chat_session = ChatSession(
-        user_id=users[0].id,
-        session_state="active",
-        context="Symptom check session",
-        is_active=True
-    )
-    db.session.add(chat_session)
-    db.session.commit()
-
-    print("✅ Database seeded successfully!")
+# Run directly
+if __name__ == "__main__":
+    from app import create_app
+    app = create_app()
+    with app.app_context():
+        seed_data()
