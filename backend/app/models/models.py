@@ -3,8 +3,11 @@ from sqlalchemy.orm import validates
 from sqlalchemy_serializer import SerializerMixin
 from app.utils.db import db  # ✅ use the shared 
 from flask_bcrypt import Bcrypt
+from flask_sqlalchemy import SQLAlchemy
+
 
 bcrypt = Bcrypt()
+db = SQLAlchemy()
 
 ##############################################################
 # USERS TABLE — Base identity for all user roles

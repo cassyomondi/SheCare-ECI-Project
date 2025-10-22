@@ -3,14 +3,33 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from app.utils.db import db
 from app.config import Config
+from dotenv import load_dotenv
+from models import bcrypt
+from flask_mail import Mail
+
+import os
+
+
+load_dotenv()
+mail = Mail()  
+
+
 def create_app():
     """Application factory pattern for SheCare backend"""
-    flask_app = Flask(__name__)
-    flask_app.config.from_object(Config)
-    CORS(flask_app)
+    app = Flask(__name__)
+    app.config.from_object(Config)
+    CORS(app)
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.getenv("SECRET_KEY", "shecare-secret-key")
+
 
     # Initialize database
-    db.init_app(flask_app)
+    db.init_app(app)
+    bcrypt.init_app(app)
+    mail.init_app(app) 
+
+
 
     # Import models BEFORE initializing Migrate
     from app.models.models import (
@@ -28,22 +47,29 @@ def create_app():
     )
 
     # Initialize migration AFTER models are known to SQLAlchemy
-    Migrate(flask_app, db)
+    Migrate(app, db)
 
     # bcrypt = Bcrypt(flask_app)
+
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 
 
     # Register Twilio Blueprint
     from app.twilio_routes import twilio_bp
-    flask_app.register_blueprint(twilio_bp)
+    app.register_blueprint(twilio_bp)
 
     # Define home route only once
-    @flask_app.route("/")
+    @app.route("/")
     def home():
         return {"message": "SheCare backend is running"}
 
     # Optional: database test route
-    @flask_app.route("/testdb")
+    @app.route("/testdb")
     def test_db():
         try:
             new_user = User(
@@ -61,4 +87,4 @@ def create_app():
             db.session.rollback()
             return {"error": str(e)}, 500
 
-    return flask_app
+    return app

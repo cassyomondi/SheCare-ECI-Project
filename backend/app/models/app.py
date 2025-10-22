@@ -1,9 +1,11 @@
 from flask import Flask
-from models import bcrypt
+
+def create_app():
+    app = Flask(__name__)
+    return app
+
+app = create_app()
 
 
-# create Flask app instance
-app = Flask(__name__)
-bcrypt.init_app(app)
-# instantiate Bcrypt with app instance
-# bcrypt = Bcrypt(app)
+if __name__ == "__main__":
+    app.run(debug=True)
