@@ -2,9 +2,13 @@ from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from apscheduler.schedulers.background import BackgroundScheduler
 import os
 from dotenv import load_dotenv
 import openai
+from twilio.rest import Client
+from datetime import datetime
+import random
 
 from app.utils.db import db
 from app.models.models import (
@@ -36,7 +40,7 @@ migrate = Migrate()
 # 🚀 App Factory
 # -------------------------------
 def create_app():
-    """Unified SheCare backend (AI + Twilio + Core + API + Admin Auth)"""
+    """Unified SheCare backend (AI + Twilio + Core + API + Admin Auth + Health Tips)"""
     app = Flask(__name__)
 
     # Configuration
@@ -121,4 +125,70 @@ def create_app():
             db.session.rollback()
             return {"error": str(e)}, 500
 
+    # 🕒 Start daily scheduler for health tips
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(send_daily_health_tips, 'interval', hours=24)
+    scheduler.start()
+    print("🕒 Daily Health Tip Scheduler started!")
+
     return app
+
+
+# -------------------------------
+# 🌿 Health Tip Generation Logic
+# -------------------------------
+def generate_health_tip():
+    tips = [
+        "Drink plenty of water throughout the day to stay hydrated.",
+        "Aim for at least 30 minutes of activity daily to boost mood and heart health.",
+        "Prioritize sleep: aim for 7–9 hours each night.",
+        "Include colorful fruits and vegetables in your meals.",
+        "Practice mindful breathing or short breaks throughout the day.",
+        "Limit processed foods and added sugars for sustained energy."
+    ]
+
+    try:
+        if openai.api_key:
+            resp = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful health assistant."},
+                    {"role": "user", "content": "Provide a concise daily health tip in one sentence."}
+                ],
+                max_tokens=60,
+                n=1,
+                temperature=0.7,
+            )
+            tip = resp.choices[0].message.get("content", "").strip()
+            if tip:
+                return tip
+    except Exception:
+        pass
+
+    return random.choice(tips)
+
+
+def send_daily_health_tips():
+    print("💌 Sending daily health tips...")
+    account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+    auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+    client = Client(account_sid, auth_token)
+
+    users = User.query.all()
+    if not users:
+        print("⚠️ No users found.")
+        return
+
+    for user in users:
+        tip_text = generate_health_tip()
+        try:
+            client.messages.create(
+                from_="whatsapp:+14155238886",
+                to=f"whatsapp:{user.phone}",
+                body=f"🌿 *Daily Health Tip*\n{tip_text}"
+            )
+            print(f"✅ Sent tip to {user.phone}")
+        except Exception as e:
+            print(f"⚠️ Failed to send tip to {user.phone}: {e}")
+
+    print("🎯 All health tips sent successfully!")

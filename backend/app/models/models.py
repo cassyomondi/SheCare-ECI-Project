@@ -27,14 +27,31 @@ class User(db.Model, SerializerMixin):
     prescriptions = db.relationship('Prescription', back_populates='user', cascade='all, delete-orphan')
     chat_sessions = db.relationship('ChatSession', back_populates='user', cascade='all, delete-orphan')
 
+    # New relationship for health tips (Francis’s commit)
+    health_tips = db.relationship('HealthTip', back_populates='user', cascade='all, delete-orphan')
+
+    # Validators
+    @validates('phone')
+    def validate_phone(self, key, phone):
+        if not phone or len(phone) < 10:
+            raise ValueError("Phone number must be at least 10 digits")
+        return phone
+
     @validates('email')
     def validate_email(self, key, email):
         if email and "@" not in email:
             raise ValueError("Invalid email address")
         return email
 
+    @validates('password')
+    def validate_password(self, key, password):
+        if not password or len(password) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return password
+
     def __repr__(self):
         return f"<User id={self.id}, phone={self.phone}, role={self.role}>"
+
 
 ##############################################################
 # ADMIN — Platform administrators (with super admin flag)
@@ -47,13 +64,14 @@ class Admin(db.Model, SerializerMixin):
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
     designation = db.Column(db.String)
-    is_super_admin = db.Column(db.Boolean, default=False)  # ✅
+    is_super_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', back_populates='admins')
 
     def __repr__(self):
         return f"<Admin {self.first_name} {self.last_name} super_admin={self.is_super_admin}>"
+
 
 ##############################################################
 # ADMIN INVITES — For super admins to invite others
@@ -80,6 +98,7 @@ class AdminInvite(db.Model):
     def __repr__(self):
         return f"<AdminInvite {self.email} token={self.token[:6]}... used={self.used}>"
 
+
 ##############################################################
 # MEDICAL PRACTITIONERS
 ##############################################################
@@ -101,6 +120,7 @@ class MedicalPractitioner(db.Model, SerializerMixin):
     def __repr__(self):
         return f"<MedicalPractitioner {self.first_name} {self.last_name}>"
 
+
 ##############################################################
 # ASSOCIATE — Partners
 ##############################################################
@@ -119,6 +139,7 @@ class Associate(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f"<Associate {self.first_name} {self.last_name}>"
+
 
 ##############################################################
 # PARTICIPANT — End users
@@ -139,6 +160,7 @@ class Participant(db.Model, SerializerMixin):
     def __repr__(self):
         return f"<Participant {self.first_name} {self.last_name}>"
 
+
 ##############################################################
 # MESSAGES
 ##############################################################
@@ -153,6 +175,7 @@ class Message(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='messages')
     response = db.relationship('ResponseMessage', back_populates='messages')
 
+
 class UserMessage(db.Model, SerializerMixin):
     __tablename__ = 'user_message'
 
@@ -165,6 +188,7 @@ class UserMessage(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='user_messages')
     response = db.relationship('ResponseMessage', back_populates='user_messages')
 
+
 class ResponseMessage(db.Model, SerializerMixin):
     __tablename__ = 'response_message'
 
@@ -176,6 +200,7 @@ class ResponseMessage(db.Model, SerializerMixin):
 
     messages = db.relationship('Message', back_populates='response')
     user_messages = db.relationship('UserMessage', back_populates='response')
+
 
 ##############################################################
 # PRESCRIPTIONS
@@ -193,8 +218,30 @@ class Prescription(db.Model, SerializerMixin):
 
     user = db.relationship('User', back_populates='prescriptions')
 
+    def __repr__(self):
+        return f"<Prescription id={self.id} user_id={self.user_id}>"
+
+
 ##############################################################
-# TIPS
+# HEALTH TIPS — From Francis’s scheduler commit
+##############################################################
+class HealthTip(db.Model):
+    __tablename__ = 'health_tips'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    tip_text = db.Column(db.Text, nullable=False)
+    date_sent = db.Column(db.DateTime, default=datetime.utcnow)
+    sent = db.Column(db.Boolean, default=False)
+
+    user = db.relationship('User', back_populates='health_tips')
+
+    def __repr__(self):
+        return f"<HealthTip user_id={self.user_id} sent={self.sent}>"
+
+
+##############################################################
+# TIPS — For practitioner-driven tips
 ##############################################################
 class Tip(db.Model, SerializerMixin):
     __tablename__ = 'tips'
@@ -207,6 +254,7 @@ class Tip(db.Model, SerializerMixin):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     sent_timestamp = db.Column(db.DateTime)
     verified_timestamp = db.Column(db.DateTime)
+
 
 ##############################################################
 # CHAT SESSIONS
