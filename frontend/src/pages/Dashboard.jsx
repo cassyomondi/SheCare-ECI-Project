@@ -1,7 +1,7 @@
 // src/pages/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import Header from "../components/layout/Header.jsx";
-import Sidebar from "../components/layout/Sidebar.jsx";
+// import Sidebar from "../components/layout/Sidebar.jsx";
 import Searchbar from "../components/forms/Searchbar.jsx";
 import BarGraph from "../components/charts/BarGraph.jsx";
 import UserRoleTrend from "../components/charts/UserRoleTrend.jsx";
@@ -58,10 +58,10 @@ function Dashboard() {
         setPrescriptionStats({ total, mostCommon });
       });
   }, []);
-
+  console.log("Dashboard is rendering");
   return (
     <div className="dashboard-container">
-      <Sidebar />
+      {/* Remove this: <Sidebar /> */}
       <div className="dashboard-main">
         <div className="dashboard-header">
           <Header title="Dashboard" showAvatar={true} showNotification={true} />
