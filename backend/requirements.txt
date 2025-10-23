@@ -1,17 +1,31 @@
+# --- Core Flask & Extensions ---
 Flask==3.0.3
 Flask-SQLAlchemy==3.1.1
-SQLAlchemy==2.0.31
-Twilio==9.2.3
+Flask-Migrate==4.0.5
+Flask-Cors==4.0.1
 Werkzeug==3.0.3
 itsdangerous==2.2.0
 click==8.1.7
-Flask-Cors==4.0.1
+
+# --- Database & Serialization ---
+SQLAlchemy==2.0.31
+sqlalchemy-serializer==1.4.1
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+
+# --- Deployment ---
 gunicorn==23.0.0
-psycopg2-binary==2.9.9 
-openai==1.51.0
-pillow==10.4.0
-pytesseract==0.3.13
-python-dotenv==1.0.1
-requests==2.32.3
-django-mpesa==2.0.7 
-mpesa-api==0.1.1 
+
+# --- External Integrations ---
+Twilio==9.2.3          # WhatsApp integration
+openai==1.51.0         # AI assistant (Symptom Checker)
+requests==2.32.3       # HTTP requests
+
+# --- Utilities ---
+python-dotenv==1.0.1   # Load environment variables
+APScheduler==3.10.4    # Task scheduling
+pillow==10.4.0         # Image processing
+pytesseract==0.3.13    # OCR for prescriptions
+
+# --- Optional: Mpesa Integration (verify if actively used) ---
+# django-mpesa==2.0.7
+# mpesa-api==0.1.1

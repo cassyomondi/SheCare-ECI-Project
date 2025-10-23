@@ -40,6 +40,7 @@ class User(db.Model, SerializerMixin):
     prescriptions = db.relationship('Prescription', back_populates='user', cascade='all, delete-orphan')
     chat_sessions = db.relationship('ChatSession', back_populates='user', cascade='all, delete-orphan')
     participant = db.relationship('Participant', back_populates='user', uselist=False)
+    health_tips = db.relationship('HealthTip', back_populates='user', cascade='all, delete-orphan')
 
     # Validators
     @validates('phone')
@@ -206,20 +207,19 @@ class Prescription(db.Model, SerializerMixin):
 # =====================================================
 # TIP MODEL
 # =====================================================
-class Tip(db.Model, SerializerMixin):
-    __tablename__ = 'tips'
+class HealthTip(db.Model):
+    __tablename__ = 'health_tips'
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, nullable=False)
-    description = db.Column(db.Text)
-    status = db.Column(db.Boolean, default=False)
-    practitioner = db.Column(db.String(255))
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    sent_timestamp = db.Column(db.DateTime)
-    verified_timestamp = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    tip_text = db.Column(db.Text, nullable=False)
+    date_sent = db.Column(db.DateTime, default=datetime.utcnow)
+    sent = db.Column(db.Boolean, default=False)
+
+    user = db.relationship('User', back_populates='health_tips')
 
     def __repr__(self):
-        return f"<Tip {self.title[:30]}...>"
+        return f"<HealthTip user_id={self.user_id} sent={self.sent}>"
 
 
 # =====================================================
