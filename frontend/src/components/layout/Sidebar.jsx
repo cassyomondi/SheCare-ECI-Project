@@ -39,6 +39,11 @@ function Sidebar() {
               to="/tips" 
               className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
             >
+              <img 
+              src="https://plus.unsplash.com/premium_photo-1682275215669-92545e354db2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=687"
+              alt="Tips"
+              height="10px"
+              width="10px"/>
               Tips
             </NavLink>
           </li>
@@ -47,6 +52,11 @@ function Sidebar() {
               to="/prescriptions" 
               className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
             >
+              <img 
+              src="https://plus.unsplash.com/premium_photo-1668605108582-e7fa7dc2e195?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870"
+              alt="Prescriptions"
+              height="10px"
+              width="10px"/>
               Prescriptions
             </NavLink>
           </li>
@@ -55,6 +65,11 @@ function Sidebar() {
               to="/settings" 
               className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
             >
+              <img 
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDgp53HKq4fyclYtZdD-0wHVV2YC2rZ0tmGg&s"
+              alt="Settings"
+              height="10px"
+              width="10px"/>
               Settings
             </NavLink>
           </li>
