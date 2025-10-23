@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import UserRoleDoughnutChart from "../components/charts/DonutChart";
+import UserTrendsInsight from "../components/charts/UserGrowthTimeline";
 import "../styles/Users.css";
+import UserGrowthTimeline from "../components/charts/UserGrowthTimeline";
 
 
 
@@ -37,7 +39,7 @@ function Users() {
 
 
   return (
-    <div className="users-page">
+    <div className="users-container">
       <h1>Users Management</h1>
       <p>Monitor User Statistics</p>
       <div className="summary-card">
@@ -55,11 +57,13 @@ function Users() {
           <h2>{associates}</h2>
 
       </div>
-
-
-        
-      </div>
+     </div>
+     <br />
       <UserRoleDoughnutChart />
+      <br />
+      <br />
+      <UserGrowthTimeline  apiUrl="http://127.0.0.1:5555/api/users"/>
+      
       
       
     </div>

@@ -59,6 +59,7 @@ function Dashboard() {
       });
   }, []);
   console.log("Dashboard is rendering");
+  
   return (
     <div className="dashboard-container">
       {/* Remove this: <Sidebar /> */}
