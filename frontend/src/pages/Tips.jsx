@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+//import Sidebar from '../components/layout/Sidebar';
 import '../styles/Tips.css';
+
 
 function Tips() {
   const [tips, setTips] = useState([]);
@@ -113,6 +115,22 @@ function Tips() {
     })).sort((a, b) => b.count - a.count)
     .slice(0, 5); // Top 5 only
   }
+  function getTimelineData() {
+    const timelineData = {};
+    
+    tips.forEach(tip => {
+      const date = new Date(tip.timestamp).toISOString().split('T')[0];
+      timelineData[date] = (timelineData[date] || 0) + 1;
+    });
+    
+    return Object.entries(timelineData)
+    .map(([date, count]) => ({
+      date,
+      count
+    }))
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .slice(-30); // Last 30 days
+    }
 
 
   if (loading) {
@@ -120,9 +138,14 @@ function Tips() {
   }
   const categoryData = getCategoryData();
   const practitionerData = getPractitionerData();
+  const timelineData = getTimelineData(); 
   
+
+
   return (
+    
   <div className="tips-container">
+    
     <div className="tips-header">
       <h1 className="tips-title">Tips Analytics</h1>
       <p className="tips-subtitle">Overview of tips performance and metrics</p>
@@ -280,9 +303,42 @@ function Tips() {
             )}
           </div>
         </div>
+        {/* Timeline Chart */}
+        <div className="chart-card timeline-card">
+          <h3 className="chart-title">Tips Timeline (Last 30 Days)</h3>
+          <div className="chart-container">
+            {timelineData.length > 0 ? (
+              <div className="timeline-chart">
+                {timelineData.map((item, index) => (
+                  <div key={item.date} className="timeline-item">
+                    <div className="timeline-bar">
+                      <div 
+                        className="timeline-fill"
+                        style={{ 
+                          height: `${(item.count / Math.max(...timelineData.map(d => d.count))) * 100}%` 
+                        }}
+                      ></div>
+                    </div>
+                    <div className="timeline-label">
+                      {new Date(item.date).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
+                    </div>
+                    <div className="timeline-value">{item.count}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-data">No timeline data available</div>
+            )}
+          </div>
+        </div>
+        
       </div>
     </div>
-  </div>);
+  </div>
+  );
 
 }
 
