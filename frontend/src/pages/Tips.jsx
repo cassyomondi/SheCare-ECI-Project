@@ -130,7 +130,15 @@ function Tips() {
     }))
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .slice(-30); // Last 30 days
-    }
+  }
+  function getStatusData() {
+    const statusCount = {
+      active: tips.filter(tip => tip.status === true).length,
+      inactive: tips.filter(tip => tip.status === false).length
+    };
+    return statusCount;
+  }
+
 
 
   if (loading) {
@@ -139,6 +147,7 @@ function Tips() {
   const categoryData = getCategoryData();
   const practitionerData = getPractitionerData();
   const timelineData = getTimelineData(); 
+  const statusData = getStatusData();
   
 
 
@@ -331,6 +340,38 @@ function Tips() {
               </div>
             ) : (
               <div className="no-data">No timeline data available</div>
+            )}
+          </div>
+        </div>
+        {/* Status Distribution Chart */}
+        <div className="chart-card status-card">
+          <h3 className="chart-title">Tips Status</h3>
+          <div className="chart-container">
+            {tips.length > 0 ? (
+              <div className="status-chart">
+                <div className="status-item">
+                  <div className="status-dot active-dot"></div>
+                  <div className="status-info">
+                    <span className="status-label">Active</span>
+                    <span className="status-value">{statusData.active}</span>
+                  </div>
+                  <div className="status-percent">
+                    {Math.round((statusData.active / tips.length) * 100)}%
+                  </div>
+                </div>
+                <div className="status-item">
+                  <div className="status-dot inactive-dot"></div>
+                  <div className="status-info">
+                    <span className="status-label">Inactive</span>
+                    <span className="status-value">{statusData.inactive}</span>
+                  </div>
+                  <div className="status-percent">
+                    {Math.round((statusData.inactive / tips.length) * 100)}%
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="no-data">No status data available</div>
             )}
           </div>
         </div>

@@ -162,5 +162,58 @@
         text-align: left;
     }
 }
+/*status chart*/
+/* Status Distribution Chart */
+.status-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 0;
+}
 
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.active-dot {
+  background: linear-gradient(135deg, #4CAF50, #8BC34A);
+}
+
+.inactive-dot {
+  background: linear-gradient(135deg, #f44336, #ff9800);
+}
+
+.status-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-label {
+  font-weight: 500;
+  color: #333;
+}
+
+.status-value {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.status-percent {
+  font-weight: 700;
+  color: #666;
+  font-size: 14px;
+}
 
