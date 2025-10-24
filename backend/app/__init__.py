@@ -3,7 +3,6 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
-from .whatsapp.bot import whatsapp_bp
 import openai
 
 from app.utils.db import db
@@ -52,22 +51,33 @@ def create_app():
     CORS(app)
 
     # ✅ Register Blueprints
+
+    # 1️⃣ Twilio routes
     try:
         from app.twilio_routes import twilio_bp
         app.register_blueprint(twilio_bp)
     except Exception as e:
         print("⚠️ Could not load Twilio routes:", e)
 
+    # 2️⃣ WhatsApp AI bot
     try:
         from app.whatsapp.bot import whatsapp_bp
-        app.register_blueprint(whatsapp_bp, url_prefix='/whatsapp')
+        app.register_blueprint(whatsapp_bp, url_prefix="/whatsapp")
     except Exception as e:
         print("⚠️ Could not load WhatsApp AI bot:", e)
 
-    # ✅ Routes
+    # 3️⃣ REST API routes (for database access)
+    try:
+        from app.routes.api_routes import api_bp
+        app.register_blueprint(api_bp)
+        print("✅ API routes registered successfully.")
+    except Exception as e:
+        print("⚠️ Could not load API routes:", e)
+
+    # ✅ Default routes
     @app.route("/")
     def home():
-        return {"message": "SheCare backend (AI + Twilio) is running ✅"}
+        return {"message": "SheCare backend (AI + Twilio + API) is running ✅"}
 
     @app.route("/testdb")
     def test_db():
