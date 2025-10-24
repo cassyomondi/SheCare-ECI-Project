@@ -1,8 +1,8 @@
 # backend/app/models/__init__.py
 
-from app.utils.db import db 
+from backend.app.utils.db import db 
 
-from app.models.models import (
+from backend.app.models.models import (
     User,
     MedicalPractitioner,
     Admin,

@@ -1,6 +1,7 @@
+# backend/app/routes/api_routes.py
 from flask import Blueprint, jsonify
-from app.utils.db import db
-from app.models.models import (
+from backend.app.utils.db import db
+from backend.app.models.models import (
     User,
     MedicalPractitioner,
     Admin,

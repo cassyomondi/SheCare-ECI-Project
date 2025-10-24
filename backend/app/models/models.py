@@ -1,8 +1,8 @@
-from datetime import datetime
+import secrets
+from datetime import datetime, timedelta
 from sqlalchemy.orm import validates
 from sqlalchemy_serializer import SerializerMixin
-from app.utils.db import db  # ✅ use the shared instance
-
+from backend.app.utils.db import db
 
 ##############################################################
 # USERS TABLE — Base identity for all user roles
@@ -11,13 +11,10 @@ class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    # Use up to 20 chars to store Twilio's E.164 format ("whatsapp:+254712345678")
     phone = db.Column(db.String(20), unique=True, nullable=False)
-
-    # Keep email optional for non-WhatsApp users (e.g., web dashboard admins)
     email = db.Column(db.String(120), unique=True, nullable=True)
     password = db.Column(db.String, nullable=True)
-    role = db.Column(db.String, nullable=False, default="participant")  # sensible default
+    role = db.Column(db.String, nullable=False, default="participant")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -30,7 +27,6 @@ class User(db.Model, SerializerMixin):
     prescriptions = db.relationship('Prescription', back_populates='user', cascade='all, delete-orphan')
     chat_sessions = db.relationship('ChatSession', back_populates='user', cascade='all, delete-orphan')
 
-    # Optional — validate only when the field comes from manual registration
     @validates('email')
     def validate_email(self, key, email):
         if email and "@" not in email:
@@ -40,9 +36,52 @@ class User(db.Model, SerializerMixin):
     def __repr__(self):
         return f"<User id={self.id}, phone={self.phone}, role={self.role}>"
 
+##############################################################
+# ADMIN — Platform administrators (with super admin flag)
+##############################################################
+class Admin(db.Model, SerializerMixin):
+    __tablename__ = 'admins'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    first_name = db.Column(db.String)
+    last_name = db.Column(db.String)
+    designation = db.Column(db.String)
+    is_super_admin = db.Column(db.Boolean, default=False)  # ✅
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', back_populates='admins')
+
+    def __repr__(self):
+        return f"<Admin {self.first_name} {self.last_name} super_admin={self.is_super_admin}>"
 
 ##############################################################
-# MEDICAL PRACTITIONERS — Doctors or health professionals
+# ADMIN INVITES — For super admins to invite others
+##############################################################
+class AdminInvite(db.Model):
+    __tablename__ = 'admin_invites'
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    token = db.Column(db.String(128), nullable=False, unique=True, index=True)
+    created_by = db.Column(db.Integer, db.ForeignKey('admins.id'), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used = db.Column(db.Boolean, default=False)
+
+    def generate_token(self, length=48):
+        self.token = secrets.token_urlsafe(length)
+        return self.token
+
+    @staticmethod
+    def make_expires(days=7):
+        return datetime.utcnow() + timedelta(days=days)
+
+    def __repr__(self):
+        return f"<AdminInvite {self.email} token={self.token[:6]}... used={self.used}>"
+
+##############################################################
+# MEDICAL PRACTITIONERS
 ##############################################################
 class MedicalPractitioner(db.Model, SerializerMixin):
     __tablename__ = 'medical_practitioners'
@@ -63,25 +102,7 @@ class MedicalPractitioner(db.Model, SerializerMixin):
         return f"<MedicalPractitioner {self.first_name} {self.last_name}>"
 
 ##############################################################
-# ADMIN — Platform administrators
-##############################################################
-class Admin(db.Model, SerializerMixin):
-    __tablename__ = 'admins'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    first_name = db.Column(db.String)
-    last_name = db.Column(db.String)
-    designation = db.Column(db.String)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    user = db.relationship('User', back_populates='admins')
-
-    def __repr__(self):
-        return f"<Admin {self.first_name} {self.last_name}>"
-
-##############################################################
-# ASSOCIATE — Health associates or partners
+# ASSOCIATE — Partners
 ##############################################################
 class Associate(db.Model, SerializerMixin):
     __tablename__ = 'associates'
@@ -100,7 +121,7 @@ class Associate(db.Model, SerializerMixin):
         return f"<Associate {self.first_name} {self.last_name}>"
 
 ##############################################################
-# PARTICIPANT — End users (women/girls using SheCare)
+# PARTICIPANT — End users
 ##############################################################
 class Participant(db.Model, SerializerMixin):
     __tablename__ = 'participants'
@@ -119,7 +140,7 @@ class Participant(db.Model, SerializerMixin):
         return f"<Participant {self.first_name} {self.last_name}>"
 
 ##############################################################
-# MESSAGE SYSTEM — Communication between users and system
+# MESSAGES
 ##############################################################
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
@@ -131,9 +152,6 @@ class Message(db.Model, SerializerMixin):
 
     user = db.relationship('User', back_populates='messages')
     response = db.relationship('ResponseMessage', back_populates='messages')
-
-    def __repr__(self):
-        return f"<Message id={self.message_id} user_id={self.user_id}>"
 
 class UserMessage(db.Model, SerializerMixin):
     __tablename__ = 'user_message'
@@ -147,9 +165,6 @@ class UserMessage(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='user_messages')
     response = db.relationship('ResponseMessage', back_populates='user_messages')
 
-    def __repr__(self):
-        return f"<UserMessage id={self.id} user_id={self.user_id}>"
-
 class ResponseMessage(db.Model, SerializerMixin):
     __tablename__ = 'response_message'
 
@@ -162,11 +177,8 @@ class ResponseMessage(db.Model, SerializerMixin):
     messages = db.relationship('Message', back_populates='response')
     user_messages = db.relationship('UserMessage', back_populates='response')
 
-    def __repr__(self):
-        return f"<ResponseMessage id={self.id}>"
-
 ##############################################################
-# PRESCRIPTIONS — Uploaded prescriptions and analysis
+# PRESCRIPTIONS
 ##############################################################
 class Prescription(db.Model, SerializerMixin):
     __tablename__ = 'prescriptions'
@@ -181,11 +193,8 @@ class Prescription(db.Model, SerializerMixin):
 
     user = db.relationship('User', back_populates='prescriptions')
 
-    def __repr__(self):
-        return f"<Prescription id={self.id}>"
-
 ##############################################################
-# TIPS — Health tips sent by system or practitioners
+# TIPS
 ##############################################################
 class Tip(db.Model, SerializerMixin):
     __tablename__ = 'tips'
@@ -199,11 +208,8 @@ class Tip(db.Model, SerializerMixin):
     sent_timestamp = db.Column(db.DateTime)
     verified_timestamp = db.Column(db.DateTime)
 
-    def __repr__(self):
-        return f"<Tip title='{self.title[:20]}...'>"
-
 ##############################################################
-# CHAT SESSIONS — Track user chat sessions
+# CHAT SESSIONS
 ##############################################################
 class ChatSession(db.Model, SerializerMixin):
     __tablename__ = 'chat_sessions'
@@ -217,6 +223,3 @@ class ChatSession(db.Model, SerializerMixin):
     is_active = db.Column(db.Boolean, default=True)
 
     user = db.relationship('User', back_populates='chat_sessions')
-
-    def __repr__(self):
-        return f"<ChatSession id={self.id} active={self.is_active}>"

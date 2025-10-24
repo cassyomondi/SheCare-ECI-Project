@@ -5,8 +5,8 @@ import os
 from dotenv import load_dotenv
 import openai
 
-from app.utils.db import db
-from app.models.models import (
+from backend.app.utils.db import db
+from backend.app.models.models import (
     User,
     MedicalPractitioner,
     Admin,
@@ -31,7 +31,7 @@ print("🔐 Loaded TWILIO_ACCOUNT_SID:", os.getenv("TWILIO_ACCOUNT_SID"))
 migrate = Migrate()
 
 def create_app():
-    """Unified SheCare backend (AI + Twilio + Core)"""
+    """Unified SheCare backend (AI + Twilio + Core + API)"""
     app = Flask(__name__)
 
     # Configuration
@@ -54,21 +54,21 @@ def create_app():
 
     # 1️⃣ Twilio routes
     try:
-        from app.twilio_routes import twilio_bp
+        from backend.app.routes.twilio_routes import twilio_bp
         app.register_blueprint(twilio_bp)
     except Exception as e:
         print("⚠️ Could not load Twilio routes:", e)
 
     # 2️⃣ WhatsApp AI bot
     try:
-        from app.whatsapp.bot import whatsapp_bp
+        from backend.app.whatsapp.bot import whatsapp_bp
         app.register_blueprint(whatsapp_bp, url_prefix="/whatsapp")
     except Exception as e:
         print("⚠️ Could not load WhatsApp AI bot:", e)
 
-    # 3️⃣ REST API routes (for database access)
+    # 3️⃣ REST API routes
     try:
-        from app.routes.api_routes import api_bp
+        from backend.app.routes.api_routes import api_bp
         app.register_blueprint(api_bp)
         print("✅ API routes registered successfully.")
     except Exception as e:
