@@ -86,9 +86,40 @@ function Tips() {
   function clearDateFilter() {
     setSelectedDate('');
   }
+
+  function getCategoryData() {
+    const categoryCount = {};
+    tips.forEach((tip) => {
+      const category = tip.category || 'Uncategorized';
+      categoryCount[category] = (categoryCount[category] || 0) + 1;
+    });
+    return Object.entries(categoryCount).map(([name, count]) => ({
+      name,
+      count,
+    })).sort((a, b) => b.count - a.count)
+  }
+
+  function getPractitionerData() {
+    const practitionerCount = {};
+    
+    tips.forEach((tip) => {
+      const practitioner = tip.practitioner || 'Unknown';
+      practitionerCount[practitioner] = (practitionerCount[practitioner] || 0) + 1;
+    });
+    return Object.entries(practitionerCount)
+    .map(([name, count]) => ({
+      name,
+      count,
+    })).sort((a, b) => b.count - a.count)
+    .slice(0, 5); // Top 5 only
+  }
+
+
   if (loading) {
     return <div className="tips-loading">Loading tips analytics...</div>;
   }
+  const categoryData = getCategoryData();
+  const practitionerData = getPractitionerData();
   
   return (
   <div className="tips-container">
@@ -97,7 +128,6 @@ function Tips() {
       <p className="tips-subtitle">Overview of tips performance and metrics</p>
     </div>
 
-    {/* Metrics Card */}
     <div className="metrics-grid">
       <div className="metric-card">
         <div className="metric-icon total-tips-icon">📊</div>
@@ -132,7 +162,6 @@ function Tips() {
       </div>
     </div>
 
-    {/* Tips Data Table with Date Filter */}
     <div className="table-section">
       <div className="table-header">
         <h2 className="table-title">All Tips</h2>
@@ -190,8 +219,71 @@ function Tips() {
         )}
       </div>
     </div>
-  </div>
-);
+
+    <div className="charts-section">
+      <h2 className="section-title">Tips Analysis</h2>
+      <div className="charts-grid">
+        <div className="chart-card">
+          <h3 className="chart-title">Tips by Category</h3>
+          <div className="chart-container">
+            {categoryData.length > 0 ? (
+              <div className="bar-chart">
+                {categoryData.map((item) => (
+                  <div key={item.name} className="bar-item">
+                    <div className="bar-label">{item.name}</div>
+                    <div className="bar-track">
+                      <div
+                        className="bar-fill"
+                        style={{
+                          width: `${
+                            (item.count /
+                              Math.max(...categoryData.map((d) => d.count))) * 100
+                          }%`,
+                        }}
+                      ></div>
+                    </div>
+                    <div className="bar-value">{item.count}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-data">No category data available</div>
+            )}
+          </div>
+        </div>
+
+        <div className="chart-card">
+          <h3 className="chart-title">Top Practitioners</h3>
+          <div className="chart-container">
+            {practitionerData.length > 0 ? (
+              <div className="bar-chart">
+                {practitionerData.map((item) => (
+                  <div key={item.name} className="bar-item">
+                    <div className="bar-label">{item.name}</div>
+                    <div className="bar-track">
+                      <div
+                        className="bar-fill practitioner-bar"
+                        style={{
+                          width: `${
+                            (item.count /
+                              Math.max(...practitionerData.map((d) => d.count))) * 100
+                          }%`,
+                        }}
+                      ></div>
+                    </div>
+                    <div className="bar-value">{item.count}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-data">No practitioner data available</div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>);
+
 }
 
 export default Tips;

@@ -59,6 +59,7 @@ def get_tips():
             "id": t.id,
             "title": t.title,
             "description": t.description,
+            "category": t.category,
             "status": t.status,
             "practitioner": t.practitioner,
             "timestamp": t.timestamp.isoformat() if t.timestamp else None

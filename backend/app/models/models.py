@@ -189,7 +189,7 @@ class Prescription(db.Model, SerializerMixin):
 ##############################################################
 class Tip(db.Model, SerializerMixin):
     __tablename__ = 'tips'
-
+    serialize_rules = ()
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
@@ -199,6 +199,8 @@ class Tip(db.Model, SerializerMixin):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     sent_timestamp = db.Column(db.DateTime)
     verified_timestamp = db.Column(db.DateTime)
+
+    
 
     def __repr__(self):
         return f"<Tip title='{self.title[:20]}...'>"
