@@ -276,4 +276,75 @@
 .user-card strong {
   color: #333;
 }
+ /*Users table */
+.users-table-section {
+  margin: 30px 0;
+}
+
+.users-table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.users-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+.role-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.role-badge.participant {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.role-badge.practitioner {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.role-badge.admin {
+  background: #fce4ec;
+  color: #c2185b;
+}
+.view-users-section {
+  margin: 20px 0;
+}
+
+.view-users-btn {
+  background: #6C63FF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.view-users-btn:hover {
+  background: #5a52d5;
+}
+
 

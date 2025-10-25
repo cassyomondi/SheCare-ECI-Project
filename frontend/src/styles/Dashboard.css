@@ -183,3 +183,25 @@
 .result-card strong {
   color: #333;
 }
+.dashboard-container {
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.dashboard-main {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Ensure all containers don't overflow */
+.stats-cards, .charts-container, .tips-cards {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Make sure tables don't cause overflow */
+.table-container {
+  overflow-x: auto; /* Horizontal scroll only for tables if needed */
+  width: 100%;
+}
