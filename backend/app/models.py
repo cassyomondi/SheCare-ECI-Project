@@ -260,3 +260,21 @@ class Participant(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f"<Participant {self.first_name} {self.last_name}>"
+    
+
+# chat memory
+
+class ChatMemory(db.Model, SerializerMixin):
+    __tablename__ = 'chat_memory'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    sender = db.Column(db.String(10))  # 'user' or 'bot'
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='chat_memory')
+
+    def __repr__(self):
+        return f"<ChatMemory user_id={self.user_id} sender={self.sender}>"
+

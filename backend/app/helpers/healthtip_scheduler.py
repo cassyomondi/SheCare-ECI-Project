@@ -17,6 +17,12 @@ def send_daily_health_tips():
 
     client = Client(account_sid, auth_token)
     users = User.query.all()
+    
+    
+    for user in users:
+        tip_text = generate_health_tip(user)
+        # send via Twilio or other API
+        print(f"✅ Sent tip to {user.phone}: {tip_text}")
 
     if not users:
         print("⚠️ No users found.")
