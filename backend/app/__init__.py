@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager
 import os
 from dotenv import load_dotenv
 import openai
+from flask_mail import Mail
 
 from app.utils.db import db
 from app.models.models import (
@@ -32,6 +33,9 @@ print("🔐 Loaded TWILIO_ACCOUNT_SID:", os.getenv("TWILIO_ACCOUNT_SID"))
 
 migrate = Migrate()
 
+# Initialize Flask-Mail
+mail = Mail()
+
 # -------------------------------
 # 🚀 App Factory
 # -------------------------------
@@ -47,10 +51,23 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "supersecretkey")
 
+    # Email configuration from environment
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+    app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'False') == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+    app.config['APP_BASE_URL'] = os.getenv('APP_BASE_URL', 'http://localhost:5000')
+
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     CORS(app)
+    mail.init_app(app)
+
+
 
     # 🔐 JWT Setup
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "supersecretjwtkey")
