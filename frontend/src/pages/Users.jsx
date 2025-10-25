@@ -24,23 +24,38 @@ function Users() {
 
   // Search functionality
   const filteredUsers = searchQuery ? users.filter(user =>
-      (user.name && user.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (user.first_name && user.first_name.toLowerCase().includes(searchQuery.toLowerCase()))||
+      (user.last_name && user.last_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (user.email && user.email.toLowerCase().includes(searchQuery.toLowerCase())) || 
       (user.role && user.role.toLowerCase().includes(searchQuery.toLowerCase()))
     ): users;
 
 
   useEffect(()=>{
-    axios.get("http://127.0.0.1:5555/api/users")
-    .then(res=>{
-      const usersData = res.data;
-      setUsers(usersData); 
-      console.log("User data structure:", usersData[0])
+    Promise.all([
+      axios.get("http://127.0.0.1:5555/api/participants"),
+      axios.get("http://127.0.0.1:5555/api/practitioners"), 
+      axios.get("http://127.0.0.1:5555/api/admins")
+    ])
+    .then(([participantsRes, practitionersRes, adminsRes]) => {
+    // Combine all users and add role information
+      const allUsers = [
+        ...participantsRes.data.map(user => ({ ...user, role: 'participant' })),
+        ...practitionersRes.data.map(user => ({ ...user, role: 'practitioner' })),
+        ...adminsRes.data.map(user => ({ ...user, role: 'admin' }))
+      ];
+    
+      setUsers(allUsers);
+      console.log("All users data:", allUsers);
+    
       setStats({
-        totalParticipants:usersData.filter(u => u.role === "participant").length, // CHANGE: users to usersData
-        totalPractitioners:usersData.filter(u=> u.role==="practitioner").length // CHANGE: users to usersData
+        totalParticipants: participantsRes.data.length,
+        totalPractitioners: practitionersRes.data.length,
+        totalAdmins: adminsRes.data.length
       });
     })
+    .catch(error => console.log("Error fetching users:", error));
+    
    
     axios.get("http://127.0.0.1:5555/api/associates")
     .then(res=>{
@@ -88,9 +103,11 @@ function Users() {
           <div className="users-list">
           {filteredUsers.map(user => (
             <div key={user.id} className="user-card">
-              <h4>{user.name || 'Unknown Name'}</h4>
+              <h4>{user.first_name} {user.last_name}</h4>
               <p><strong>Email:</strong> {user.email}</p>
               <p><strong>Role:</strong> {user.role}</p>
+              {user.age && <p><strong>Age:</strong> {user.age}</p>}
+              {user.location && <p><strong>Location:</strong> {user.location}</p>}
             </div>
           ))}
           </div>
