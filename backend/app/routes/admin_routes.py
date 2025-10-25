@@ -7,8 +7,8 @@ from flask_jwt_extended import (
 from datetime import timedelta
 import os
 
-from backend.app.models.models import User, Admin
-from backend.app.utils.db import db
+from app.models.models import User, Admin
+from app.utils.db import db
 
 admin_bp = Blueprint("admin_bp", __name__, url_prefix="/admin")
 

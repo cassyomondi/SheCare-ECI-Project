@@ -2,7 +2,7 @@ import secrets
 from datetime import datetime, timedelta
 from sqlalchemy.orm import validates
 from sqlalchemy_serializer import SerializerMixin
-from backend.app.utils.db import db
+from app.utils.db import db
 
 ##############################################################
 # USERS TABLE — Base identity for all user roles
