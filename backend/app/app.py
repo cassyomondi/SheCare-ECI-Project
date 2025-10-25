@@ -1,7 +1,9 @@
 from flask import Flask
 from .whatsapp.bot import whatsapp_bp
 from apscheduler.schedulers.background import BackgroundScheduler
-from helpers.healthtip_scheduler import start_healthtip_scheduler
+from .helpers.healthtip_scheduler import start_healthtip_scheduler
+
+
 
 def create_app():
     app = Flask(__name__)

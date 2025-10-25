@@ -13,7 +13,7 @@ from datetime import datetime
 from ..helpers.symptomchecker import symptomchecker
 from ..helpers.clinicfinder import find_nearby_clinics
 from ..helpers.prescriptionuploader import prescription_uploader
-from ..models import db, User, UserMessage, ResponseMessage, ChatSession
+from ..models import db, User, UserMessage, ResponseMessage, ChatSession, ChatMemory
 
 
 whatsapp_bp = Blueprint("whatsapp_bp", __name__)
@@ -21,8 +21,6 @@ whatsapp_bp = Blueprint("whatsapp_bp", __name__)
 @whatsapp_bp.route("/", methods=["POST"])
 def whatsapp_webhook():
     print("✅ WhatsApp webhook triggered")
-    print("📩 Incoming data:", request.form)
-
     data = request.form
     user_phone = data.get("From", "").replace("whatsapp:", "").strip()
     user_message = data.get("Body", "").strip()
@@ -34,13 +32,15 @@ def whatsapp_webhook():
 
     # --- 1️⃣ Find or create user ---
     user = User.query.filter_by(phone=user_phone).first()
+    new_user = False
     if not user:
         user = User(phone=user_phone, role="participant", password="whatsapp_user")
         db.session.add(user)
         db.session.commit()
+        new_user = True
         print(f"🆕 New user created: {user_phone}")
 
-    # --- 2️⃣ Manage ChatSession ---
+    # --- 2️⃣ Manage chat session ---
     session = ChatSession.query.filter_by(user_id=user.id, is_active=True).first()
     if not session:
         session = ChatSession(
@@ -51,6 +51,23 @@ def whatsapp_webhook():
         db.session.add(session)
         db.session.commit()
         print(f"🆕 New chat session started for {user_phone}")
+
+    # --- 3️⃣ Auto Greet New Users or Empty Messages ---
+    if new_user:
+        ai_greeting = symptomchecker(user_phone, "Greet the user warmly and introduce SheCare.")
+        ai_reply = (
+            f"{ai_greeting}\n\n"
+            "I can help you with:\n"
+            "1️⃣ Check symptoms\n"
+            "2️⃣ Find nearby clinics\n"
+            "3️⃣ Upload prescription\n"
+            "4️⃣ Get daily health tips\n\n"
+            "👉 Reply with a number to continue."
+        )
+        message.body(ai_reply)
+        print("🤖 Sent welcome + main menu message")
+        return str(response), 200, {"Content-Type": "application/xml"}
+
 
     # --- 3️⃣ Handle Prescription Upload (if media is attached) ---
     if num_media > 0:
@@ -150,7 +167,7 @@ def whatsapp_webhook():
                 "4️⃣ Get daily tips"
             )
         else:
-            ai_reply = symptomchecker(normalized)
+            ai_reply = symptomchecker(user_phone, normalized)
             session.session_state = "main_menu"
             db.session.commit()
 
@@ -184,3 +201,12 @@ def whatsapp_webhook():
     print("🤖 Sending reply:", ai_reply)
 
     return str(response), 200, {"Content-Type": "application/xml"}
+
+def log_chat(phone, message, sender):
+    user = User.query.filter_by(phone=phone).first()
+    if not user:
+        return
+
+    log = ChatMemory(user_id=user.id, message=message, sender=sender)
+    db.session.add(log)
+    db.session.commit()

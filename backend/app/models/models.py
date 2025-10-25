@@ -26,9 +26,8 @@ class User(db.Model, SerializerMixin):
     user_messages = db.relationship('UserMessage', back_populates='user', cascade='all, delete-orphan')
     prescriptions = db.relationship('Prescription', back_populates='user', cascade='all, delete-orphan')
     chat_sessions = db.relationship('ChatSession', back_populates='user', cascade='all, delete-orphan')
-
-    # New relationship for health tips (Francis’s commit)
     health_tips = db.relationship('HealthTip', back_populates='user', cascade='all, delete-orphan')
+    chat_memory = db.relationship('ChatMemory', back_populates='user', cascade='all, delete-orphan')
 
     # Validators
     @validates('phone')
@@ -223,7 +222,7 @@ class Prescription(db.Model, SerializerMixin):
 
 
 ##############################################################
-# HEALTH TIPS — From Francis’s scheduler commit
+# HEALTH TIPS — For scheduler
 ##############################################################
 class HealthTip(db.Model):
     __tablename__ = 'health_tips'
@@ -241,7 +240,7 @@ class HealthTip(db.Model):
 
 
 ##############################################################
-# TIPS — For practitioner-driven tips
+# TIPS — Practitioner-driven
 ##############################################################
 class Tip(db.Model, SerializerMixin):
     __tablename__ = 'tips'
@@ -271,3 +270,24 @@ class ChatSession(db.Model, SerializerMixin):
     is_active = db.Column(db.Boolean, default=True)
 
     user = db.relationship('User', back_populates='chat_sessions')
+
+    def __repr__(self):
+        return f"<ChatSession {self.id} active={self.is_active}>"
+
+
+##############################################################
+# CHAT MEMORY (new in Francis’s branch)
+##############################################################
+class ChatMemory(db.Model, SerializerMixin):
+    __tablename__ = 'chat_memory'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    sender = db.Column(db.String(10))  # 'user' or 'bot'
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', back_populates='chat_memory')
+
+    def __repr__(self):
+        return f"<ChatMemory user_id={self.user_id} sender={self.sender}>"
