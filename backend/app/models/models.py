@@ -137,6 +137,7 @@ class Participant(db.Model, SerializerMixin):
 
     user = db.relationship('User', back_populates='participants')
 
+
     def __repr__(self):
         return f"<Participant {self.first_name} {self.last_name}>"
 
