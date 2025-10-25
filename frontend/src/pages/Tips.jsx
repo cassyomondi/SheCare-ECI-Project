@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 //import Sidebar from '../components/layout/Sidebar';
 import '../styles/Tips.css';
+import Searchbar from '../components/forms/Searchbar';
 
 
 function Tips() {
@@ -15,6 +16,7 @@ function Tips() {
     monthlyTipsSent: 0,
     verificationRate: 0
   });
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(function() {
     fetchTips();
@@ -23,7 +25,7 @@ function Tips() {
   useEffect(function() {
     calculateMetrics();
     filterTipsByDate();
-  }, [tips, selectedDate]);
+  }, [tips, selectedDate, searchQuery]);
   async function fetchTips() {
     try {
       const response = await axios.get('http://127.0.0.1:5555/api/tips');
@@ -60,27 +62,30 @@ function Tips() {
       monthlyTipsSent,
       verificationRate
     });
-  }
+  };
 
   function filterTipsByDate() {
-    if (!selectedDate) {
-      setFilteredTips(tips);
-      return;
-    }
+    let filtered = tips;
     
-    const filtered = tips.filter(tip => {
-      const tipDate = new Date(tip.timestamp).toISOString().split('T')[0];
-      return tipDate === selectedDate;
-    });
+    if (selectedDate) {
+      filtered = filtered.filter(tip => {
+        const tipDate = new Date(tip.timestamp).toISOString().split('T')[0];
+        return tipDate === selectedDate;
+      });
+    }
+  
+  // Apply search filter - ONLY title and category
+    if (searchQuery) {
+      filtered = filtered.filter(tip =>
+        (tip.title && tip.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (tip.category && tip.category.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
     setFilteredTips(filtered);
   }
-  function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
+
+  
+
   function handleDateChange(event) {
     setSelectedDate(event.target.value);
   }
@@ -137,6 +142,16 @@ function Tips() {
       inactive: tips.filter(tip => tip.status === false).length
     };
     return statusCount;
+  }
+  function handleSearch(query) {
+    setSearchQuery(query);
+  }
+  function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   }
 
 
@@ -197,22 +212,42 @@ function Tips() {
     <div className="table-section">
       <div className="table-header">
         <h2 className="table-title">All Tips</h2>
-        <div className="date-filter">
-          <label htmlFor="date-picker">Filter by Date:</label>
-          <input
+        <div className="filters-container">
+          <div className="search-filter">
+            <Searchbar  onSearch={handleSearch} placeholder={"Search by title or category..."}/>
+          </div>
+          <div className="date-filter">
+            <label htmlFor="date-picker">Filter by Date:</label>
+            <input
             type="date"
             id="date-picker"
             value={selectedDate}
             onChange={handleDateChange}
             className="date-input"
-          />
-          {selectedDate && (
-            <button onClick={clearDateFilter} className="clear-filter-btn">
-              Clear Filter
+            />
+            {selectedDate && (
+              <button onClick={clearDateFilter} className="clear-filter-btn">
+                Clear Date
+              </button>
+            )}
+          </div>
+        </div>
+        
+      </div>
+      {(searchQuery || selectedDate) && (
+        <div className="search-results-info">
+          <p>
+            Showing {filteredTips.length} tips
+            {searchQuery && ` matching "${searchQuery}"`}
+            {selectedDate && ` from ${selectedDate}`}
+          </p>
+          {(searchQuery || selectedDate) && (
+            <button onClick={() => {setSearchQuery('');setSelectedDate('');}} className="clear-all-btn">
+              Clear All Filters
             </button>
           )}
         </div>
-      </div>
+      )}
 
       <div className="table-container">
         <table className="tips-table">
