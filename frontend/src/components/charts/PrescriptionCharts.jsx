@@ -87,7 +87,7 @@ function PrescriptionCharts({ prescriptions }) {
         <div className="response-chart">
           <div className="response-stats">
             <div className="stat-item">
-              <span className="stat-label">Average Length</span>
+              <span className="stat-label">Average Length: </span>
               <span className="stat-value">
                 {prescriptions.length > 0 
                   ? Math.round(prescriptions.reduce((sum, p) => sum + (p.response?.length || 0), 0) / prescriptions.length)
@@ -96,7 +96,7 @@ function PrescriptionCharts({ prescriptions }) {
               </span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">Longest Response</span>
+              <span className="stat-label">Longest Response: </span>
               <span className="stat-value">
                 {Math.max(...prescriptions.map(p => p.response?.length || 0))} chars
               </span>

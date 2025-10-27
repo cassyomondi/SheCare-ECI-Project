@@ -3,16 +3,16 @@ import React, { useState } from 'react';
 import Searchbar from '../forms/Searchbar';
 
 
-function PrescriptionFilters({ onSearch }) {
-  const [dateFilter, setDateFilter] = useState('');
+function PrescriptionFilters({ onSearch, onDateChange, dateFilter }) {
 
   const handleDateChange = (event) => {
-    setDateFilter(event.target.value);
+    const date=event.target.value;
+    onDateChange(event);
   };
 
   const clearFilters = () => {
-    setDateFilter('');
     onSearch('');
+    onDateChange({target: {value:""}})
   };
 
   return (
