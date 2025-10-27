@@ -22,14 +22,6 @@ from app.models.models import (
     ChatSession
 )
 
-# -------------------------------
-# 🔧 Environment Setup
-# -------------------------------
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-dotenv_path = os.path.join(base_dir, ".env")
-load_dotenv(dotenv_path)
-
-print("🔐 Loaded TWILIO_ACCOUNT_SID:", os.getenv("TWILIO_ACCOUNT_SID"))
 
 migrate = Migrate()
 
@@ -41,7 +33,19 @@ mail = Mail()
 # -------------------------------
 def create_app():
     """Unified SheCare backend (AI + Twilio + Core + API + Admin Auth)"""
+
+    # -------------------------------
+    # 🔧 Environment Setup
+    # -------------------------------
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+    dotenv_path = os.path.join(base_dir, ".env")
+    load_dotenv(dotenv_path)
+
+    print("🔐 Loaded TWILIO_ACCOUNT_SID:", os.getenv("TWILIO_ACCOUNT_SID"))
+
     app = Flask(__name__)
+    mail.init_app(app)
+
 
     # Configuration
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
@@ -59,13 +63,14 @@ def create_app():
     app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
-    app.config['APP_BASE_URL'] = os.getenv('APP_BASE_URL', 'http://localhost:5000')
+    # Force Flask-Mail to use the right settings
+    
+    # app.config['APP_BASE_URL'] = os.getenv('APP_BASE_URL', 'http://localhost:5000')
 
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     CORS(app)
-    mail.init_app(app)
 
 
 
