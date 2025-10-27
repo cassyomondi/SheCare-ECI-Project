@@ -1,5 +1,8 @@
 # backend/app/routes/api_routes.py
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token
+from datetime import timedelta
 from app.utils.db import db
 from app.models.models import (
     User,
