@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import Searchbar from '../forms/Searchbar';
-import './PrescriptionFilters.css';
+
 
 function PrescriptionFilters({ onSearch }) {
   const [dateFilter, setDateFilter] = useState('');

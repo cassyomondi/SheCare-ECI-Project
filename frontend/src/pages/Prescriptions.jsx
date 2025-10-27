@@ -1,7 +1,8 @@
 import React from "react";
 import axios from "axios";
-
-
+import PrescriptionCharts from "../components/charts/PrescriptionCharts";
+import PrescriptionFilters from "../components/forms/PrescriptionFilters";
+//import '..styles/Prescriptions.css'
 
 
 function Prescriptions() {
