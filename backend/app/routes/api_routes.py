@@ -37,6 +37,96 @@ def get_users():
     ]
     return jsonify(data), 200
 
+# -----------------------------
+# USER SIGNUP
+# -----------------------------
+@api_bp.route("/signup", methods=["POST"])
+def signup():
+    data = request.get_json()
+
+    phone = data.get("phone")
+    email = data.get("email")
+    password = data.get("password")
+    first_name = data.get("first_name")
+    last_name = data.get("last_name")
+    role = data.get("role", "participant")
+
+    # Validation
+    if not phone or not password:
+        return jsonify({"error": "Phone and password are required"}), 400
+
+    # Check if user already exists
+    if User.query.filter((User.phone == phone) | (User.email == email)).first():
+        return jsonify({"error": "User already exists"}), 400
+
+    # Create new user
+    user = User(
+        phone=phone,
+        email=email.lower() if email else None,
+        password=generate_password_hash(password),
+        role=role
+    )
+    db.session.add(user)
+    db.session.commit()
+
+    # If participant, create linked record
+    if role == "participant":
+        participant = Participant(
+            user_id=user.id,
+            first_name=first_name,
+            last_name=last_name
+        )
+        db.session.add(participant)
+        db.session.commit()
+
+    return jsonify({
+        "message": "User registered successfully",
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "phone": user.phone,
+            "role": user.role
+        }
+    }), 201
+
+
+# -----------------------------
+# USER LOGIN
+# -----------------------------
+@api_bp.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    email_or_phone = data.get("email") or data.get("phone")
+    password = data.get("password")
+
+    if not email_or_phone or not password:
+        return jsonify({"error": "Email/Phone and password are required"}), 400
+
+    # Find user by email or phone
+    user = User.query.filter(
+        (User.email == email_or_phone) | (User.phone == email_or_phone)
+    ).first()
+
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({"error": "Invalid credentials"}), 401
+
+    # Generate JWT token (valid for 12 hours)
+    access_token = create_access_token(
+        identity={"user_id": user.id, "email": user.email, "role": user.role},
+        expires_delta=timedelta(hours=12)
+    )
+
+    return jsonify({
+        "message": "Login successful",
+        "access_token": access_token,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "phone": user.phone,
+            "role": user.role
+        }
+    }), 200
+
 
 # 💊 PRESCRIPTIONS
 @api_bp.route("/prescriptions", methods=["GET"])
