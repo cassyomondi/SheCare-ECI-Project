@@ -24,6 +24,13 @@ function Dashboard() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState([]);
+
+  const [adminProfile, setAdminProfile] = useState({
+    name: "Admin User", // Default fallback
+    email: "admin@healthcare.com",
+    role: "Administrator",
+    lastLogin: new Date().toLocaleDateString(),
+  });
   
   function handleSearch(query){
     setSearchQuery(query);
@@ -41,8 +48,30 @@ function Dashboard() {
           totalPractitioners: usersData.filter(u => u.role === "practitioner").length,
           activeSessions: usersData.filter(u => u.chat_sessions && u.chat_sessions.length > 0).length,
         });
-      });
+        const adminUser = usersData.find(user => user.role === "admin");
 
+        if (adminUser){
+          setAdminProfile({
+            name: "Admin User",
+            email: adminUser.email || "admin@healthcare.com",
+            role: "Administrator",
+            lastLogin: new Date().toLocaleDateString(),
+          });  
+        }else{
+          setAdminProfile({
+            name: "Admin User",
+            email: "admin@healthcare.com", 
+            role: "Administrator",
+            lastLogin: new Date().toLocaleDateString(),
+          });
+        }
+      })
+      .catch(error => {
+        console.log("Error fetching admin profile:", error);
+      // Keep the default values if API fails
+      });
+      
+      
     // Fetch tips
     axios.get("http://127.0.0.1:5555/api/tips")
       .then(res => setTips(res.data));
@@ -64,6 +93,8 @@ function Dashboard() {
 
         setPrescriptionStats({ total, mostCommon });
       });
+    
+    
   }, []);
 
   // Search functionality
@@ -139,6 +170,19 @@ function Dashboard() {
         <div className="dashboard-header">
           <Header title="Dashboard" showAvatar={true} showNotification={true} />
           <Searchbar onSearch={handleSearch} placeholder={"Search users, tips, stats..."}/>
+          {/* --- Add Admin Profile HERE --- */}
+            <div className="admin-profile-section">
+              <div className="admin-profile-card">
+                <div className="admin-avatar">👨</div>
+                <div className="admin-info">
+                  <h2>{adminProfile.name}</h2>
+                  <p className="admin-role">{adminProfile.role}</p>
+                  <p className="admin-email">{adminProfile.email}</p>
+                  <p className="admin-login">Last login: {adminProfile.lastLogin}</p>
+                </div>
+                
+              </div>
+            </div>
         </div>
 
         {/* Search Results */}
@@ -188,9 +232,11 @@ function Dashboard() {
           </div>
         )}
 
+
         {/* Normal Dashboard Content (only shown when not searching) */}
         {!searchQuery && (
           <>
+            
             {/* --- Stats Cards --- */}
             <div className="stats-cards">
               <div className="stat-card">

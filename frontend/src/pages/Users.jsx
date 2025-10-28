@@ -83,6 +83,21 @@ function Users() {
           </div>
         )}
       </div>
+      {searchQuery && filteredUsers.length > 0 && (
+        <div className="users-search-results">
+          <h3>Matching Users</h3>
+          <div className="users-list">
+            {filteredUsers.map(user => (
+              <div key={user.id} className="user-card">
+                <h4>{user.first_name} {user.last_name}</h4>
+                <p><strong>Email:</strong> {user.email}</p>
+                <p><strong>Role:</strong> {user.role}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
       
       <div className="summary-card">
         <div className="card">
@@ -143,20 +158,6 @@ function Users() {
         )}
       </div>
 
-      {searchQuery && filteredUsers.length > 0 && (
-        <div className="users-search-results">
-          <h3>Matching Users</h3>
-          <div className="users-list">
-            {filteredUsers.map(user => (
-              <div key={user.id} className="user-card">
-                <h4>{user.first_name} {user.last_name}</h4>
-                <p><strong>Email:</strong> {user.email}</p>
-                <p><strong>Role:</strong> {user.role}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
       
       <br />
       <UserRoleDoughnutChart />

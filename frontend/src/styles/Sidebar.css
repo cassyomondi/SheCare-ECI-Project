@@ -8,6 +8,7 @@
   position: fixed;
   left: 0;
   top: 0;
+  font-family: Arial, sans-serif;
 }
 
 .dashboard-sidebar ul {
@@ -20,10 +21,20 @@
   padding: 12px 15px;
   cursor: pointer;
   border-radius: 6px;
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.3s ease;
 }
 
 .dashboard-sidebar li:hover {
   background-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(5px); 
+}
+.dashboard-sidebar li.dashboard-item {
+  font-weight: 900; 
+  font-size: 18px; 
+  background-color: rgba(255, 255, 255, 0.15); /* Slight background */
+  border-left: 4px solid #ffffff; /* Accent border */
 }
 
 .sub-menu {
@@ -36,6 +47,8 @@
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 6px;
   margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .sub-menu li:hover {
