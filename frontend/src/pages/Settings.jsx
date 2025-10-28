@@ -32,9 +32,44 @@ function Settings() {
   };
 
   return (
-    <div>
-      <h1>Settings</h1>
-      <p>Configure your application settings.</p>
+    <div classname="settigs-container">
+      <div className="settings-header">
+        <h1>Admin Settings</h1>
+        <p>Manage SheCare System Configuration</p>
+      </div>
+      {/*Tab Navigation*/}
+      <div className="settings-tab">
+        <button 
+        className={`tab-button ${activeTab ==='system' ? 'active' : ''}`}
+        onClick={()=>setActiveTab('system')}
+        >
+          ⚙️ System
+        </button>
+        <button
+        className={`tab-button ${activeTab === 'users'? 'active' : ''}`}
+        onClick={()=> setActiveTab('users')}
+        >
+         👥 Users
+        </button>
+      </div>
+      {/*System Configuration Tab*/}
+      {activeTab === 'system' &&(
+        <div className="settings-section">
+          <h2>System Configuration</h2>
+          <div className="setting-item">
+            <label>API Base URL: </label>
+            <input 
+            type="text"
+            value={systemSettings.apiUrl}
+            onChange={(e)=> handleSystemChange('apiUrl', e.target.value)}
+            className="setting-input"
+            placeholder="http://127.0.0.1:5555"
+            />
+          </div>
+
+        </div>
+      )}
+
     </div>
   );
 }
