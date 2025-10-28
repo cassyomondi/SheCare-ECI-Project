@@ -1,6 +1,7 @@
 
 .prescriptions-container {
   padding: 20px;
+  background: linear-gradient(to bottom, #ffffff, #b6b6e9);
 }
 
 .prescriptions-header {

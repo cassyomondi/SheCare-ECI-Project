@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import '../styles/Settings.css'
 
 
 function Settings() {
@@ -6,7 +7,7 @@ function Settings() {
   const [systemSettings, setSystemSettings] = useState({
     apiUrl: "http://127.0.0.1:5555",
     autoBackup: true,
-    maintainanceMode: false,
+    maintenanceMode: false,
     aiResponseDelay: "2"
   });
   const [userSettings, setUserSettings] = useState({
@@ -36,13 +37,13 @@ function Settings() {
   };
 
   return (
-    <div classname="settigs-container">
+    <div className="settings-container">
       <div className="settings-header">
         <h1>Admin Settings</h1>
         <p>Manage SheCare System Configuration</p>
       </div>
       {/*Tab Navigation*/}
-      <div className="settings-tab">
+      <div className="settings-tabs">
         <button 
         className={`tab-button ${activeTab ==='system' ? 'active' : ''}`}
         onClick={()=>setActiveTab('system')}
@@ -87,27 +88,27 @@ function Settings() {
           <div className="setting-item">
             <label>
               <input 
-              type= "checkout"
+              type= "checkbox"
               checked={systemSettings.autoBackup}
-              onChange={(e)=> handleSystemChange('autoBackup', e.target.value)}
+              onChange={(e)=> handleSystemChange('autoBackup', e.target.checked)}
               />
-              :  Automatic Daily Backups: 
+              Automatic Daily Backups: 
 
             </label>
           </div>
-          <div className="settingn-item">
+          <div className="setting-item">
             <label>
               <input 
-              type="checkout"
-              checked={systemSettings.maintainanceMode}
+              type="checkbox"
+              checked={systemSettings.maintenanceMode}
               onChange={(e) => handleSystemChange('maintenanceMode', e.target.checked)}
               />
-              :  Maintainance Mode (Pauses WhatsApp bot)
+              Maintenance Mode (Pauses WhatsApp bot)
             </label>
           </div>
           <div className="setting-item">
-            <h4>Systems Actions</h4>
-            <button className="action-btn" onClick={exportData}>Export -All Data</button>
+            <h4>System Actions</h4>
+            <button className="action-btn" onClick={exportData}>Export All Data</button>
             <button className="action-btn" onClick={clearCache}>Clear Cache</button>
             <button className="action-btn danger">Restart WhatsApp Bot</button>
             

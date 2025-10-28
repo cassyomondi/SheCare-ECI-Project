@@ -1,7 +1,7 @@
 .dashboard-sidebar {
   width: 240px;
-  background-color: #934abd; 
-  color: #ffffff;
+  background: linear-gradient(to bottom, #ff69b4, #934abd, #6c63ff);
+  color: #000000;
   padding: 20px 10px;
   height: 100vh;
   overflow-y: auto;

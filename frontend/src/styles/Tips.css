@@ -1,7 +1,7 @@
 
 .tips-container {
     padding: 24px;
-    background-color: #f8f9fa;
+    background:linear-gradient(to bottom, #ffffff, #b6b6e9);
     min-height: 100vh;
 }
 
