@@ -21,6 +21,10 @@ function Settings() {
   const handleUserChange = (field, value) =>{
     setUserSettings(prev =>({...prev, [field]: value}));
   };
+
+  const exportData = ()=>{
+    alert('Exporting all data...');
+  };
   const saveSettings = ()=>{
     alert ("Admin settings saved successfully!")
   }
@@ -101,9 +105,73 @@ function Settings() {
               :  Maintainance Mode (Pauses WhatsApp bot)
             </label>
           </div>
+          <div className="setting-item">
+            <h4>Systems Actions</h4>
+            <button className="action-btn" onClick={exportData}>Export -All Data</button>
+            <button className="action-btn" onClick={clearCache}>Clear Cache</button>
+            <button className="action-btn danger">Restart WhatsApp Bot</button>
+            
+          </div>
         </div>
       )}
-      {}
+      {activeTab === 'users' && (
+        <div className="settings-section">
+          <h2>User Management</h2>
+          
+          <div className="setting-item">
+            <label>
+              <input 
+                type="checkbox" 
+                checked={userSettings.allowNewUsers}
+                onChange={(e) => handleUserChange('allowNewUsers', e.target.checked)}
+              />
+              Allow New WhatsApp Users
+            </label>
+          </div>
+
+          <div className="setting-item">
+            <label>Default User Role: </label>
+            <select 
+              value={userSettings.defaultUserRole}
+              onChange={(e) => handleUserChange('defaultUserRole', e.target.value)}
+              className="setting-select"
+            >
+              <option value="participant">Participant</option>
+              <option value="practitioner">Practitioner</option>
+            </select>
+          </div>
+           <div className="setting-item">
+            <label>Session Timeout (minutes): </label>
+            <select 
+              value={userSettings.sessionTimeout}
+              onChange={(e) => handleUserChange('sessionTimeout', e.target.value)}
+              className="setting-select"
+            >
+              <option value="30">30 minutes</option>
+              <option value="60">60 minutes</option>
+              <option value="120">2 hours</option>
+            </select>
+          </div>
+
+          <div className="setting-item">
+            <label>Max Prescriptions Per User: </label>
+            <select 
+              value={userSettings.maxPrescriptionsPerUser}
+              onChange={(e) => handleUserChange('maxPrescriptionsPerUser', e.target.value)}
+              className="setting-select"
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50 (unlimited)</option>
+            </select>
+          </div>
+        </div>
+      )}
+      {/* Save Button */}
+      <div className="settings-actions">
+        <button onClick={saveSettings} className="save-btn">Save Settings</button>
+      </div>
 
     </div>
   );
