@@ -45,7 +45,7 @@ function App() {
         {/* === WHATSAPP ICON (visible only when logged in) === */}
         {user && (
           <a
-            href="https://wa.me/254700000000"
+            href="https://wa.me/100777779"
             className="whatsapp-icon"
             target="_blank"
             rel="noopener noreferrer"
