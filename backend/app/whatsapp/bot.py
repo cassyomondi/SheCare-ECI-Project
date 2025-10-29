@@ -9,14 +9,27 @@ load_dotenv(dotenv_path)
 from flask import Blueprint, request
 from twilio.twiml.messaging_response import MessagingResponse
 from datetime import datetime
+import random
 
 from ..helpers.symptomchecker import symptomchecker
 from ..helpers.clinicfinder import find_nearby_clinics
 from ..helpers.prescriptionuploader import prescription_uploader
+from ..helpers.healthtip_agent import generate_health_tip
+
 from ..models import db, User, UserMessage, ResponseMessage, ChatSession, ChatMemory
 
 
 whatsapp_bp = Blueprint("whatsapp_bp", __name__)
+
+# 💡 Random fallback health tips
+FALLBACK_TIPS = [
+    "Stay hydrated, rest well, and take care of your body every day!",
+    "Eat balanced meals and include fruits and vegetables.",
+    "Get at least 7 hours of sleep daily to boost immunity.",
+    "Take short walks and stretch to reduce stress.",
+    "Stay positive — your mental health matters too!",
+]
+
 
 @whatsapp_bp.route("/", methods=["POST"])
 def whatsapp_webhook():
@@ -52,7 +65,7 @@ def whatsapp_webhook():
         db.session.commit()
         print(f"🆕 New chat session started for {user_phone}")
 
-    # --- 3️⃣ Auto Greet New Users or Empty Messages ---
+    # --- 3️⃣ Auto Greet New Users ---
     if new_user:
         ai_greeting = symptomchecker(user_phone, "Greet the user warmly and introduce SheCare.")
         ai_reply = (
@@ -64,12 +77,14 @@ def whatsapp_webhook():
             "4️⃣ Get daily health tips\n\n"
             "👉 Reply with a number to continue."
         )
+
+        log_chat(user_phone, ai_reply, "bot")
+
         message.body(ai_reply)
         print("🤖 Sent welcome + main menu message")
         return str(response), 200, {"Content-Type": "application/xml"}
 
-
-    # --- 3️⃣ Handle Prescription Upload (if media is attached) ---
+    # --- 4️⃣ Handle Prescription Upload ---
     if num_media > 0:
         media_url = data.get("MediaUrl0")
         media_type = data.get("MediaContentType0")
@@ -81,39 +96,40 @@ def whatsapp_webhook():
         db.session.add(response_msg)
         db.session.commit()
 
+        log_chat(user_phone, ai_reply, "bot")
+
         message.body(ai_reply)
         print("💾 Prescription upload handled" if success else "⚠️ Upload failed")
         return str(response), 200, {"Content-Type": "application/xml"}
 
-    # --- 4️⃣ Save user message (for text only) ---
+    # --- 5️⃣ Save user message ---
     user_msg = UserMessage(user_id=user.id, message=normalized, timestamp=datetime.utcnow())
     db.session.add(user_msg)
     db.session.commit()
+    log_chat(user_phone, normalized, "user")
 
     ai_reply = ""
     greetings = ["hi", "hello", "hey", "mambo", "habari", "niaje"]
 
-    # 💬 Greeting handler
-    if normalized in greetings:
-        session.session_state = "main_menu"
-        db.session.commit()
-        ai_reply = (
-            "👋 Karibu SheCare!\n\n"
-            "I can help you with:\n"
-            "1️⃣ Check your symptoms\n"
-            "2️⃣ Find nearby clinics\n"
-            "3️⃣ Upload prescription\n"
-            "4️⃣ Get daily health tips\n"
-            "0️⃣ Help / Menu\n\n"
-            "👉 Please reply with a number (e.g., 1)."
-        )
-        print("✅ Greeting detected — showing main menu")
+    # --- 6️⃣ Handle Main Menu ---
+    if session.session_state == "main_menu":
+        print(f"🔎 Main menu input: '{normalized}'")
 
-    # --- 5️⃣ Main menu logic ---
-    elif session.session_state == "main_menu":
-        print(f"🔎 Checking main menu input: '{normalized}'")
+        if normalized in greetings:
+            ai_reply = (
+                "Hey there, \n\n"
+                "Welcome to SheCare — your safe space for women’s health support.\n"
+                "Whether you’re feeling unwell, need to find a nearby clinic, want to upload a prescription, or just want a little health inspiration — I’ve got you. \n"
+                "Here’s how you can begin:\n"
+                "1️⃣ Check your symptoms\n"
+                "2️⃣ Find nearby clinics\n"
+                "3️⃣ Upload prescription\n"
+                "4️⃣ Get daily health tips\n"
+                "0️⃣ Help / Menu\n\n"
+                "✨ Reply with the number of what you’d like to do!"
+            )
 
-        if normalized == "1":
+        elif normalized == "1":
             session.session_state = "symptom_input"
             db.session.commit()
             ai_reply = "🩺 Please describe your symptom (e.g., 'I have a headache and fever')."
@@ -124,13 +140,14 @@ def whatsapp_webhook():
             ai_reply = "📍 Please share your location or town name to find clinics near you."
 
         elif normalized == "3":
-            ai_reply = (
-                "📸 Please upload a clear photo of your prescription.\n\n"
-                "Make sure text is visible and not blurry."
-            )
+            ai_reply = "📸 Please upload a clear photo of your prescription."
 
         elif normalized == "4":
-            ai_reply = "💡 Tip: Stay hydrated, rest well, and take care of your body every day!"
+            try:
+                ai_reply = f"💡 Tip: {generate_health_tip(user)}"
+            except Exception as e:
+                print(f"⚠️ Health tip generation failed: {e}")
+                ai_reply = f"💡 Tip: {random.choice(FALLBACK_TIPS)}"
 
         elif normalized in ["0", "help", "menu"]:
             ai_reply = (
@@ -138,55 +155,41 @@ def whatsapp_webhook():
                 "1️⃣ Check symptoms\n"
                 "2️⃣ Find clinics\n"
                 "3️⃣ Upload prescription\n"
-                "4️⃣ Daily tips\n\n"
-                "Type the number to continue."
-            )
-
-        else:
-            ai_reply = (
-                "⚠️ I didn’t understand that.\n"
-                "Please reply with one of these options:\n"
-                "1️⃣ Check symptoms\n"
-                "2️⃣ Find clinics\n"
-                "3️⃣ Upload prescription\n"
-                "4️⃣ Get daily tips\n"
+                "4️⃣ Daily tips\n"
                 "0️⃣ Help / Menu"
             )
 
-    # --- 6️⃣ Symptom checker flow ---
+        else:
+            ai_reply = "⚠️ I didn’t understand that.\nPlease reply with a number (1–4)."
+
+    # --- 7️⃣ Handle Symptom Checker ---
     elif session.session_state == "symptom_input":
         if normalized in ["menu", "0", "back"]:
             session.session_state = "main_menu"
             db.session.commit()
-            ai_reply = (
-                "🔙 Returning to the main menu.\n"
-                "Please reply with a number:\n"
-                "1️⃣ Check symptoms\n"
-                "2️⃣ Find clinics\n"
-                "3️⃣ Upload prescription\n"
-                "4️⃣ Get daily tips"
-            )
+            ai_reply = "🔙 Back to menu — reply with a number."
         else:
             ai_reply = symptomchecker(user_phone, normalized)
             session.session_state = "main_menu"
             db.session.commit()
 
-    # --- 7️⃣ Clinic finder flow ---
+    # --- 8️⃣ Handle Clinic Finder ---
     elif session.session_state == "clinic_finder":
-        if normalized in ["menu", "0", "back", "rudi"]:
+        if normalized in ["menu", "0", "back"]:
             session.session_state = "main_menu"
             db.session.commit()
-            ai_reply = "🔙 You have returned to main menu. Please reply with a number (e.g.: 1 au 2)."
+            ai_reply = "🔙 Back to menu — reply with a number."
         else:
             clinics = find_nearby_clinics(user_message)
-            if clinics:
-                ai_reply = "🩺 Clinics near you:\n\n" + "\n\n".join(clinics)
-            else:
-                ai_reply = "⚕️ Sorry, I couldn’t find any clinics near that location."
+            ai_reply = (
+                "🩺 Clinics near you:\n\n" + "\n\n".join(clinics)
+                if clinics else
+                "⚕️ Sorry, I couldn’t find any clinics near that location."
+            )
             session.session_state = "main_menu"
             db.session.commit()
 
-    # --- 8️⃣ Save AI response ---
+    # --- 9️⃣ Save AI response ---
     if not ai_reply:
         ai_reply = "⚠️ Sorry, I didn’t get that. Please try again."
 
@@ -197,11 +200,15 @@ def whatsapp_webhook():
     user_msg.response_id = response_msg.id
     db.session.commit()
 
+    log_chat(user_phone, ai_reply, "bot")
+
     message.body(ai_reply)
     print("🤖 Sending reply:", ai_reply)
 
     return str(response), 200, {"Content-Type": "application/xml"}
 
+
+# --- 🔹 Helper: Log Chat Memory ---
 def log_chat(phone, message, sender):
     user = User.query.filter_by(phone=phone).first()
     if not user:

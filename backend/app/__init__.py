@@ -1,14 +1,15 @@
+import os
+import random
+from datetime import datetime
+from dotenv import load_dotenv
+
 from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from apscheduler.schedulers.background import BackgroundScheduler
-import os
-from dotenv import load_dotenv
-import openai
 from twilio.rest import Client
-from datetime import datetime
-import random
+import openai
 
 from app.utils.db import db
 from app.models.models import (
@@ -22,8 +23,11 @@ from app.models.models import (
     ResponseMessage,
     Prescription,
     Tip,
-    ChatSession
+    ChatSession,
+    HealthTip
 )
+
+from app.helpers.healthtip_agent import generate_health_tip
 
 # -------------------------------
 # 🔧 Environment Setup
@@ -35,6 +39,7 @@ load_dotenv(dotenv_path)
 print("🔐 Loaded TWILIO_ACCOUNT_SID:", os.getenv("TWILIO_ACCOUNT_SID"))
 
 migrate = Migrate()
+
 
 # -------------------------------
 # 🚀 App Factory
@@ -66,22 +71,18 @@ def create_app():
     # -------------------------------
     # ✅ Register Blueprints
     # -------------------------------
-
-    # 1️⃣ Twilio routes
     try:
         from app.routes.twilio_routes import twilio_bp
         app.register_blueprint(twilio_bp)
     except Exception as e:
         print("⚠️ Could not load Twilio routes:", e)
 
-    # 2️⃣ WhatsApp AI bot
     try:
         from app.whatsapp.bot import whatsapp_bp
         app.register_blueprint(whatsapp_bp, url_prefix="/whatsapp")
     except Exception as e:
         print("⚠️ Could not load WhatsApp AI bot:", e)
 
-    # 3️⃣ REST API routes
     try:
         from app.routes.api_routes import api_bp
         app.register_blueprint(api_bp)
@@ -89,7 +90,6 @@ def create_app():
     except Exception as e:
         print("⚠️ Could not load API routes:", e)
 
-    # 4️⃣ Admin authentication routes
     try:
         from app.routes.admin_routes import admin_bp
         app.register_blueprint(admin_bp)
@@ -97,9 +97,6 @@ def create_app():
     except Exception as e:
         print("⚠️ Could not load Admin routes:", e)
 
-    # -------------------------------
-    # 🏠 Default Test Routes
-    # -------------------------------
     @app.route("/")
     def home():
         return {"message": "SheCare backend (AI + Twilio + API) is running ✅"}
@@ -126,48 +123,18 @@ def create_app():
             return {"error": str(e)}, 500
 
     # 🕒 Start daily scheduler for health tips
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(send_daily_health_tips, 'interval', hours=24)
-    scheduler.start()
-    print("🕒 Daily Health Tip Scheduler started!")
+    with app.app_context():
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(send_daily_health_tips, "interval", hours=24)
+        scheduler.start()
+        print("🕒 Daily Health Tip Scheduler started!")
 
     return app
 
 
 # -------------------------------
-# 🌿 Health Tip Generation Logic
+# 🌿 Daily Health Tip Sender
 # -------------------------------
-def generate_health_tip():
-    tips = [
-        "Drink plenty of water throughout the day to stay hydrated.",
-        "Aim for at least 30 minutes of activity daily to boost mood and heart health.",
-        "Prioritize sleep: aim for 7–9 hours each night.",
-        "Include colorful fruits and vegetables in your meals.",
-        "Practice mindful breathing or short breaks throughout the day.",
-        "Limit processed foods and added sugars for sustained energy."
-    ]
-
-    try:
-        if openai.api_key:
-            resp = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a helpful health assistant."},
-                    {"role": "user", "content": "Provide a concise daily health tip in one sentence."}
-                ],
-                max_tokens=60,
-                n=1,
-                temperature=0.7,
-            )
-            tip = resp.choices[0].message.get("content", "").strip()
-            if tip:
-                return tip
-    except Exception:
-        pass
-
-    return random.choice(tips)
-
-
 def send_daily_health_tips():
     print("💌 Sending daily health tips...")
     account_sid = os.getenv("TWILIO_ACCOUNT_SID")
@@ -180,13 +147,36 @@ def send_daily_health_tips():
         return
 
     for user in users:
-        tip_text = generate_health_tip()
+        try:
+            # ✅ Personalized health tip
+            tip_text = generate_health_tip(user)
+        except Exception as e:
+            print(f"⚠️ Error generating personalized tip: {e}")
+            tip_text = random.choice([
+                "Drink plenty of water throughout the day.",
+                "Aim for at least 30 minutes of activity daily.",
+                "Get enough sleep — your body needs it to heal.",
+                "Eat more fruits and vegetables for balanced nutrition.",
+                "Take time to relax and breathe deeply each day."
+            ])
+
         try:
             client.messages.create(
                 from_="whatsapp:+14155238886",
                 to=f"whatsapp:{user.phone}",
                 body=f"🌿 *Daily Health Tip*\n{tip_text}"
             )
+
+            # ✅ Log sent tip
+            new_tip = HealthTip(
+                user_id=user.id,
+                tip_text=tip_text,
+                sent=True,
+                date_sent=datetime.utcnow()
+            )
+            db.session.add(new_tip)
+            db.session.commit()
+
             print(f"✅ Sent tip to {user.phone}")
         except Exception as e:
             print(f"⚠️ Failed to send tip to {user.phone}: {e}")
