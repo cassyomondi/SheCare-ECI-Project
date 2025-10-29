@@ -21,7 +21,7 @@ with app.app_context():
     print("📧 Sending test email...")
     
     result = send_admin_invitation(
-        email="cassyomondi@gmail.com",  # Replace with your email
+        email="andrew.waruiru@student.moringaschool.com",  # Replace with your email
         invite_link=test_link,
         expires_at=test_expires
     )

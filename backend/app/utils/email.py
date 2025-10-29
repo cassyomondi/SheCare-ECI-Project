@@ -4,17 +4,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def send_admin_invitation(email, invite_link, expires_at):
-    """
-    Send admin invitation email using direct SMTP (bypasses Flask-Mail)
-    
-    Args:
-        email: Recipient email address
-        invite_link: Full URL with invitation token
-        expires_at: DateTime when invitation expires
-    
-    Returns:
-        True if email sent successfully, False otherwise
-    """
+
     try:
         # Get config from Flask app
         smtp_server = current_app.config['MAIL_SERVER']
