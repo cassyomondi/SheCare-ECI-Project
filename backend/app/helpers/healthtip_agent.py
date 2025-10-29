@@ -1,53 +1,47 @@
-# helpers/healthtip_agent.py
 import os
-from openai import OpenAI
-from datetime import datetime, timedelta
-from ..models import db, User, ChatMemory, HealthTip
+import openai
+import random
+from dotenv import load_dotenv
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+load_dotenv()
 
-def generate_health_tip(user):
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+def generate_health_tip():
     """
-    Generate a personalized health tip using recent chat memory.
+    Generates one concise, friendly daily health tip using AI.
+    Tips vary by category for freshness.
     """
-    # Fetch last 5 user messages (past 7 days)
-    messages = (
-        ChatMemory.query
-        .filter_by(user_id=user.id, sender="user")
-        .order_by(ChatMemory.timestamp.desc())
-        .limit(5)
-        .all()
-    )
+    categories = [
+        "nutrition",
+        "mental health",
+        "exercise",
+        "hygiene",
+        "reproductive health",
+        "hydration",
+        "sleep habits",
+        "disease prevention"
+    ]
 
-    recent_text = "\n".join([m.message for m in reversed(messages)]) if messages else ""
+    category = random.choice(categories)
 
-    if not recent_text:
-        context = "The user has not interacted recently. Provide a general women's health tip."
-    else:
-        context = f"Recent conversation history:\n{recent_text}"
+    prompt = f"Write one short, friendly daily health tip about {category}, suitable for a general audience in Kenya. Keep it under 50 words."
 
-    prompt = f"""
-    You are SheCare, a compassionate women’s health assistant.
-    Based on the following context, generate one short, personalized health tip:
-    ---
-    {context}
-    ---
-    Make it friendly, practical, and under 80 words.
-    """
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a caring digital health assistant providing practical advice."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7
+        )
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a health assistant who provides daily health advice."},
-            {"role": "user", "content": prompt},
-        ]
-    )
+        tip = response.choices[0].message.content.strip()
+        print(f"💡 Generated health tip ({category}): {tip}")
+        return tip
 
-    tip_text = response.choices[0].message.content.strip()
-
-    # Save generated tip
-    new_tip = HealthTip(user_id=user.id, tip_text=tip_text, sent=False)
-    db.session.add(new_tip)
-    db.session.commit()
-
-    return tip_text
+    except Exception as e:
+        print("❌ Failed to generate health tip:", e)
+        # fallback tip
+        return "Remember to drink enough clean water today — staying hydrated helps your body and mind function at their best!"
