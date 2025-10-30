@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../../styles/Searchbar.css";
 
 function Searchbar({ onSearch, placeholder = "search", className = "", searchQuery }) {
   const [query, setQuery] = useState(searchQuery || "");
@@ -49,7 +50,7 @@ function Searchbar({ onSearch, placeholder = "search", className = "", searchQue
           
           {/* Search icon button */}
           <button type="submit" className="search-submit">
-            🔍juts 
+            🔍
           </button>
         </div>
       </form>
