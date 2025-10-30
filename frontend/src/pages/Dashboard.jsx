@@ -169,7 +169,7 @@ function Dashboard() {
       <div className="dashboard-main">
         <div className="dashboard-header">
           <Header title="Dashboard" showAvatar={true} showNotification={true} />
-          <Searchbar onSearch={handleSearch} placeholder={"Search users, tips, stats..."}/>
+          <Searchbar onSearch={handleSearch} searchQuery={searchQuery} placeholder={"Search users, tips, stats..."}/>
           {/* --- Add Admin Profile HERE --- */}
             <div className="admin-profile-section">
               <div className="admin-profile-card">

@@ -76,7 +76,7 @@ function Users() {
       <div className="users-header">
         <h1>Users Management</h1>
         <p>Monitor User Statistics</p>
-        <Searchbar onSearch={handleSearch} placeholder={"Search users by name, role..."}/>
+        <Searchbar onSearch={handleSearch} searchQuery={searchQuery} placeholder={"Search users by name, role..."}/>
         {searchQuery &&(
           <div className="search-results-info">
             <p>Found {filteredUsers.length} users matching "{searchQuery}"</p>

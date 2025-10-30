@@ -261,7 +261,7 @@ function Tips() {
         <h2 className="table-title">All Tips</h2>
         <div className="filters-container">
           <div className="search-filter">
-            <Searchbar  onSearch={handleSearch} placeholder={"Search by title or category..."}/>
+            <Searchbar  onSearch={handleSearch} searchQuery={searchQuery} placeholder={"Search by title or category..."}/>
           </div>
           <div className="date-filter">
             <label htmlFor="date-picker">Filter by Date:</label>
