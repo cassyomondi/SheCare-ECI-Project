@@ -1,0 +1,363 @@
+/* Dashboard container */
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  /*overflow: hidden;*/
+  background:linear-gradient(to bottom, #ffffff, #b6b6e9);
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Section Titles */
+.section-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 20px 0 10px 0;
+  color: #6C63FF; /* accent color for sections */
+}
+
+/* Stats Cards */
+.stats-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.stat-card {
+  flex: 1 1 150px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  color: #000; /* black text for all stats */
+}
+
+.stat-title, .stat-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.stat-number, .card-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Charts container */
+.charts-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.charts-container > div {
+  flex: 1 1 500px;
+  min-width: 300px;
+}
+
+/* Generic cards container (for tips and prescriptions) */
+.stats-cards, .tips-cards, .prescriptions-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+/* Individual card styling */
+.card, .tip-card, .prescription-card {
+  flex: 1 1 200px;
+  min-width: 200px;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Labels inside cards */
+.card-label, .tip-title, .prescription-label {
+  font-weight: 500;
+  font-size: 16px;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+/* Unique color for participant uploads */
+.card-participants-uploaded .card-number {
+  color: #6C63FF; /* purple accent */
+}
+
+.card-participants-uploaded .card-label {
+  color: #3f3d56; /* dark gray */
+}
+
+/* Tip card specific */
+.tip-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tip-category {
+  background-color: #6C63FF;
+  color: #fff;
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 5px;
+}
+
+.tip-description {
+  margin: 10px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.tip-card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tip-date {
+  font-size: 12px;
+  color: #555;
+}
+
+/* Prescription cards */
+.prescription-participant,
+.prescription-date,
+.prescription-analysis {
+  color: #2c3e50; /* dark unique color for readability */
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+/* Search Results Styles */
+.search-results {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #6C63FF;
+}
+
+.search-results h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.search-results p {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.result-card {
+  background: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-left: 3px solid #6C63FF;
+}
+
+.result-card h4 {
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.result-card p {
+  margin: 4px 0;
+  color: #666;
+}
+
+.result-card strong {
+  color: #333;
+}
+.dashboard-container {
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.dashboard-main {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Ensure all containers don't overflow */
+.stats-cards, .charts-container, .tips-cards {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Make sure tables don't cause overflow */
+.table-container {
+  overflow-x: auto; /* Horizontal scroll only for tables if needed */
+  width: 100%;
+}
+/* Admin Profile Section */
+.admin-profile-section {
+  margin-bottom: 30px;
+}
+
+.admin-profile-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  padding: 25px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-profile-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+}
+
+.admin-avatar {
+  font-size: 60px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255,255,255,0.3);
+  z-index: 2;
+}
+
+.admin-info {
+  flex: 1;
+  z-index: 2;
+}
+
+.admin-info h2 {
+  margin: 0 0 5px 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+.admin-role {
+  margin: 0 0 8px 0;
+  font-weight: bold;
+  opacity: 0.9;
+  font-size: 16px;
+  background: rgba(255,255,255,0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.admin-email {
+  margin: 8px 0;
+  opacity: 0.9;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-email::before {
+  content: '📧';
+  font-size: 12px;
+}
+
+.admin-login {
+  margin: 8px 0 0 0;
+  opacity: 0.8;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-login::before {
+  content: '🕒';
+  font-size: 10px;
+}
+.dashboard-header {
+  margin-bottom: 30px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+/* Make admin profile compact */
+.admin-profile-section {
+  flex: 1;
+  min-width: 280px;
+  margin-bottom: 0;
+}
+
+.admin-profile-card {
+  padding: 15px 20px;
+  gap: 15px;
+}
+
+.admin-avatar {
+  font-size: 40px;
+  width: 60px;
+  height: 60px;
+}
+
+.admin-info h2 {
+  font-size: 18px;
+}
+
+/* Mobile fix */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+  }
+}
+.header-content .searchbar {
+  flex-grow: 1;  
+}
+
+.admin-profile-section {
+  flex-shrink: 0;  /* Prevent admin from stretching */
+  width: auto;     /* Don't force width */
+}
+.admin-profile-card {
+  padding: 10px 15px; /* Reduce padding */
+  gap: 10px; /* Reduce gap between avatar and info */
+}
+
+.admin-avatar {
+  width: 50px;  /* Make avatar smaller */
+  height: 50px;
+  font-size: 30px;
+}
+
+.admin-info h2 {
+  font-size: 16px; /* Smaller text */
+}
+
+.admin-profile-section {
+  max-width: 300px; /* Limit maximum width */
+}
