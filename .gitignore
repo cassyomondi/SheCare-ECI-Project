@@ -2,3 +2,19 @@
 */.env
 backend/.env
 backend/venv-test/
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Environments
+venv/
+.env
+.env.local
+
+# IDEs
+.vscode/
+.idea/
