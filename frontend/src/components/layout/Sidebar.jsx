@@ -73,6 +73,20 @@ function Sidebar() {
               Settings
             </NavLink>
           </li>
+          <li>
+            <NavLink 
+              to="/admin-invite" 
+              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+            >
+              <img 
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDgp53HKq4fyclYtZdD-0wHVV2YC2rZ0tmGg&s"
+              alt="Admin-Invite"
+              height="10px"
+              width="10px"/>
+              Admin Invite
+            </NavLink>
+
+          </li>
         </ul>
       </nav>
     </aside>

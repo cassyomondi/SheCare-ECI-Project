@@ -223,3 +223,5 @@ class ChatSession(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f"<ChatSession id={self.id} active={self.is_active}>"
+ # ADDING MODEL ADMININVITATION
+ # models.py - Add this

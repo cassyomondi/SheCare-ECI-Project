@@ -11,8 +11,10 @@ from app.models.models import (
     ResponseMessage,
     Prescription,
     Tip,
-    ChatSession
+    ChatSession,
+    
 )
+
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -206,3 +208,5 @@ def get_chat_sessions():
         for s in sessions
     ]
     return jsonify(data), 200
+
+# ADDING INVITATION ENDPOINT
