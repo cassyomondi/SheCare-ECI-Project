@@ -1,9 +1,11 @@
 import React, {useState} from "react";
 import '../styles/Settings.css'
+import {useTheme} from "../components/layout/ThemeContext.jsx";
 
 
 function Settings() {
   const [activeTab, setActiveTab]=useState("system")
+  const { isDarkMode, toggleTheme } = useTheme();
   const [systemSettings, setSystemSettings] = useState({
     apiUrl: "http://127.0.0.1:5555",
     autoBackup: true,
@@ -55,6 +57,12 @@ function Settings() {
         onClick={()=> setActiveTab('users')}
         >
          👥 Users
+        </button>
+        <button className={`tab-button ${activeTab === 'appearance'? 'active' : ''}`}
+          onClick={()=> setActiveTab('appearance')}
+        >
+          🎨 Appearance
+
         </button>
       </div>
       {/*System Configuration Tab*/}
@@ -169,6 +177,22 @@ function Settings() {
           </div>
         </div>
       )}
+      {activeTab === 'appearance' && (
+        <div className="settings-section">
+          <h2>Appearance</h2>
+          <div className="setting-item">
+            <label>
+              <input 
+              type="checkbox" 
+              checked={isDarkMode} 
+              onChange={toggleTheme}
+              />
+              Dark Mode
+            </label>
+          </div>
+        </div>
+      )}
+
       {/* Save Button */}
       <div className="settings-actions">
         <button onClick={saveSettings} className="save-btn">Save Settings</button>
