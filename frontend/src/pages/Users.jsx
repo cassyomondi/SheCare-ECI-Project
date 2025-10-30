@@ -101,11 +101,11 @@ function Users() {
       
       <div className="summary-card">
         <div className="card">
-          <p className="card-title"> Total participants</p>
+          <p className="card-title"> Total Participants</p>
           <h2>{stats.totalParticipants}</h2>
         </div>
         <div className="card">
-          <p className="card-title">Total Users</p>
+          <p className="card-title">Total Practitioners</p>
           <h2>{stats.totalPractitioners}</h2>
         </div>
         <div className="card">

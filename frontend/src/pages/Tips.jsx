@@ -14,7 +14,10 @@ function Tips() {
     totalTips: 0,
     activeTips: 0,
     monthlyTipsSent: 0,
-    verificationRate: 0
+    verificationRate: 0,
+    pendingVerification: 0,
+    averageVerificationTime: 0, 
+    rejectionRate: 0 
   });
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -55,12 +58,17 @@ function Tips() {
         // Calculate verification rate (tips with verified_timestamp)
     const verifiedTips = tips.filter(tip => tip.status === true).length;
     const verificationRate = totalTips > 0 ? Math.round((verifiedTips / totalTips) * 100) : 0;
+    const pendingVerification = tips.filter(tip => !tip.status && !tip.rejected).length;
+    const rejectedTips = tips.filter(tip => tip.rejected).length;
+    const rejectionRate = totalTips > 0 ? Math.round((rejectedTips / totalTips) * 100) : 0;
     
     setMetrics({
       totalTips,
       activeTips,
       monthlyTipsSent,
-      verificationRate
+      verificationRate,
+      pendingVerification,
+      rejectionRate
     });
   };
 
@@ -106,20 +114,7 @@ function Tips() {
     })).sort((a, b) => b.count - a.count)
   }
 
-  function getPractitionerData() {
-    const practitionerCount = {};
-    
-    tips.forEach((tip) => {
-      const practitioner = tip.practitioner || 'Unknown';
-      practitionerCount[practitioner] = (practitionerCount[practitioner] || 0) + 1;
-    });
-    return Object.entries(practitionerCount)
-    .map(([name, count]) => ({
-      name,
-      count,
-    })).sort((a, b) => b.count - a.count)
-    .slice(0, 5); // Top 5 only
-  }
+  
   function getTimelineData() {
     const timelineData = {};
     
@@ -154,6 +149,42 @@ function Tips() {
     });
   }
 
+  function getPractitionerData() {
+    const practitionerStats = {};
+  
+    tips.forEach((tip) => {
+      const practitioner = tip.practitioner || 'Unknown';
+      if (!practitionerStats[practitioner]) {
+        practitionerStats[practitioner] = {
+          verifications: 0,
+          rejections: 0,
+          avgVerificationTime: 0
+        };
+      }
+      practitionerStats[practitioner].verifications++;
+      if (tip.rejected) {
+        practitionerStats[practitioner].rejections++;
+      }
+    });
+    return Object.entries(practitionerStats).map(([name, stats]) => ({
+      name,
+      count: stats.verifications,
+      rejections: stats.rejections,
+      approvalRate: Math.round(((stats.verifications - stats.rejections) / stats.verifications) * 100) || 0
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+  }
+
+  function getWorkflowData() {
+    return {
+      pending: tips.filter(tip => !tip.status && !tip.rejected).length,
+      approved: tips.filter(tip => tip.status === true).length,
+      rejected: tips.filter(tip => tip.rejected).length,
+      needsRevision: tips.filter(tip => tip.needs_revision).length // if you track this
+    };
+  }
+
 
 
   if (loading) {
@@ -163,6 +194,7 @@ function Tips() {
   const practitionerData = getPractitionerData();
   const timelineData = getTimelineData(); 
   const statusData = getStatusData();
+  const workflowData = getWorkflowData();
   
 
 
@@ -207,8 +239,23 @@ function Tips() {
           <div className="metric-value">{metrics.verificationRate}%</div>
         </div>
       </div>
-    </div>
+      <div className="metric-card">
+        <div className="metric-icon pending-icon">⏳</div>
+        <div className="metric-content">
+          <h3 className="metric-title">Pending Verification</h3>
+          <div className="metric-value">{metrics.pendingVerification}</div>
+        </div>
+      </div>
+      
+      <div className="metric-card">
+        <div className="metric-icon rejection-icon">🚫</div>
+        <div className="metric-content">
+          <h3 className="metric-title">Rejection Rate</h3>
+          <div className="metric-value">{metrics.rejectionRate}%</div>
+        </div>
+      </div>
 
+    </div>
     <div className="table-section">
       <div className="table-header">
         <h2 className="table-title">All Tips</h2>
@@ -320,13 +367,23 @@ function Tips() {
         </div>
 
         <div className="chart-card">
-          <h3 className="chart-title">Top Practitioners</h3>
+          <h3 className="chart-title">Top Tip Verifiers</h3>
+          <p className="chart-subtitle">Medical oversight for AI-generated content</p>
           <div className="chart-container">
             {practitionerData.length > 0 ? (
               <div className="bar-chart">
                 {practitionerData.map((item) => (
                   <div key={item.name} className="bar-item">
-                    <div className="bar-label">{item.name}</div>
+                    <div className="bar-label">
+                      {item.name}
+                      <div className="practitioner-stats">
+                        <span className="approval-rate">{item.approvalRate}% approved</span>
+                        {item.rejections > 0 &&(
+                          <span className="rejection-count">({item.rejections} rejected)</span>
+                        )}
+                      </div>
+                      
+                    </div>
                     <div className="bar-track">
                       <div
                         className="bar-fill practitioner-bar"
@@ -343,10 +400,33 @@ function Tips() {
                 ))}
               </div>
             ) : (
-              <div className="no-data">No practitioner data available</div>
+              <div className="no-data">No verification data available</div>
             )}
           </div>
         </div>
+
+        <div className="chart-card">
+          <h3 className="chart-title">Tip Workflow Status</h3>
+          <div className="chart-container">
+            <div className="workflow-chart">
+              <div className="workflow-item pending">
+                <span className="workflow-label">⏳ Pending Review</span>
+                <span className="workflow-value">{workflowData.pending}</span>
+              </div>
+              <div className="workflow-item approved">
+                <span className="workflow-label">✅ Approved</span>
+                <span className="workflow-value">{workflowData.approved}</span>
+              </div>
+              <div className="workflow-item rejected">
+                <span className="workflow-label">🚫 Rejected</span>
+                <span className="workflow-value">{workflowData.rejected}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
         {/* Timeline Chart */}
         <div className="chart-card timeline-card">
           <h3 className="chart-title">Tips Timeline (Last 30 Days)</h3>

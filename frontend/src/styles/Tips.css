@@ -458,4 +458,28 @@
   background: #ff5252;
 }
 
+.practitioner-stats {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.approval-rate {
+  color: #28a745;
+}
+
+.rejection-count {
+  color: #dc3545;
+}
+
+.workflow-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.workflow-item.pending { border-left: 4px solid #ffc107; }
+.workflow-item.approved { border-left: 4px solid #28a745; }
+.workflow-item.rejected { border-left: 4px solid #dc3545; }
+
 
