@@ -13,7 +13,9 @@ from app.models.models import (
     ResponseMessage,
     Prescription,
     Tip,
-    ChatSession
+    ChatSession,
+    HealthTip,      # ✅ add this
+    ChatMemory      # ✅ add this
 )
 
 __all__ = [
@@ -28,5 +30,7 @@ __all__ = [
     "ResponseMessage",
     "Prescription",
     "Tip",
-    "ChatSession"
+    "ChatSession",
+    "HealthTip",     # ✅ add this
+    "ChatMemory"     # ✅ add this
 ]
