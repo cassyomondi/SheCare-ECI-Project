@@ -9,8 +9,11 @@ click==8.1.7
 
 # --- Database & Serialization ---
 SQLAlchemy==2.0.31
-sqlalchemy-serializer==1.4.4
+sqlalchemy-serializer==1.4.1
 psycopg2-binary==2.9.9  # PostgreSQL adapter
+
+# --- Security ---
+flask-jwt-extended==4.4.4
 
 # --- Deployment ---
 gunicorn==23.0.0

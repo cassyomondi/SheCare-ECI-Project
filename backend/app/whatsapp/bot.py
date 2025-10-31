@@ -118,15 +118,15 @@ def whatsapp_webhook():
         if normalized in greetings:
             ai_reply = (
                 "Hey there, \n\n"
-                "Welcome to SheCare — your safe space for women’s health support.\n"
+                "Welcome to SheCare — your safe space for women’s health support.\n\n"
                 "Whether you’re feeling unwell, need to find a nearby clinic, want to upload a prescription, or just want a little health inspiration — I’ve got you. \n"
-                "Here’s how you can begin:\n"
+                "Here’s how you can begin:\n\n"
                 "1️⃣ Check your symptoms\n"
                 "2️⃣ Find nearby clinics\n"
                 "3️⃣ Upload prescription\n"
                 "4️⃣ Get daily health tips\n"
                 "0️⃣ Help / Menu\n\n"
-                "✨ Reply with the number of what you’d like to do!"
+                "Reply with the number of what you’d like to do!"
             )
 
         elif normalized == "1":
