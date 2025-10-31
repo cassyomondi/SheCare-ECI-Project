@@ -1,0 +1,27 @@
+/* src/App.css */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #f5f5f5;
+  margin-left: 250px;
+}
+/* Dark Theme - Minimal */
+body.dark-theme {
+  background: #1a1a1a;
+  color: white;
+}
+
+body.dark-theme .settings-container {
+  background: #2d2d2d;
+}
+
+/* Light Theme - Your existing theme */
+body.light-theme {
+  background: white;
+  color: black;
+}

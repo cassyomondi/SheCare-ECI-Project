@@ -1,0 +1,485 @@
+
+.tips-container {
+    padding: 24px;
+    background:linear-gradient(to bottom, #ffffff, #b6b6e9);
+    min-height: 100vh;
+}
+
+.tips-header {
+    margin-bottom: 32px;
+}
+
+.tips-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+}
+
+.tips-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.metric-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e5e9;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.metric-icon {
+    font-size: 32px;
+    margin-right: 16px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+.total-tips-icon {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.active-tips-icon {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+}
+
+.monthly-icon {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.verification-icon {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.metric-content {
+    flex: 1;
+}
+
+.metric-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 8px 0;
+}
+
+.metric-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+
+.tips-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    font-size: 18px;
+    color: #666;
+}
+
+
+@media (max-width: 768px) {
+    .tips-container {
+        padding: 16px;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .metric-card {
+        padding: 20px;
+    }
+    
+    .metric-value {
+        font-size: 28px;
+    }
+    
+    .metric-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+}
+.tips-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    font-size: 18px;
+    color: #666;
+}
+
+/* Table Section */
+.table-section {
+    margin-top: 40px;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.table-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+/* Date Filter Styles */
+.date-filter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.date-filter label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.date-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+.clear-filter-btn {
+    padding: 8px 16px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.clear-filter-btn:hover {
+    background-color: #ff5252;
+}
+
+.table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e5e9;
+}
+
+.tips-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tips-table th {
+    background-color: #f8f9fa;
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1px solid #e1e5e9;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tips-table td {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+}
+
+.tips-table tr:last-child td {
+    border-bottom: none;
+}
+
+.tips-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Table Cell Styles */
+.tip-id {
+    font-weight: 600;
+    color: #666;
+    width: 60px;
+}
+
+.tip-title {
+    font-weight: 600;
+    color: #1a1a1a;
+    min-width: 150px;
+}
+
+.tip-description {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tip-practitioner {
+    color: #666;
+    min-width: 120px;
+}
+
+.tip-date {
+    color: #666;
+    font-size: 14px;
+    min-width: 120px;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+}
+
+.status-inactive {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+    background: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tips-container {
+        padding: 16px;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .metric-card {
+        padding: 20px;
+    }
+    
+    .metric-value {
+        font-size: 28px;
+    }
+    
+    .metric-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .date-filter {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .tips-table {
+        min-width: 600px;
+    }
+    
+    .tips-table th,
+    .tips-table td {
+        padding: 12px 8px;
+    }
+}
+.timeline-chart {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  height: 200px;
+  padding: 20px 0;
+  gap: 8px;
+}
+
+.timeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+}
+
+.timeline-bar {
+  width: 20px;
+  height: 150px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  align-items: end;
+}
+
+.timeline-fill {
+  width: 100%;
+  background: linear-gradient(to top, #4CAF50, #8BC34A);
+  border-radius: 10px;
+ transition: height 0.5s ease;
+  min-height: 5px;
+}
+
+.timeline-label {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  font-weight: 500;
+}
+
+.timeline-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .charts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* Searchbar styles*/
+.filters-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.search-filter {
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-results-info {
+  background: #e3f2fd;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border-left: 4px solid #2196f3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-results-info p {
+  margin: 0;
+  color: #1565c0;
+  font-weight: 500;
+}
+
+.clear-all-btn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.clear-all-btn:hover {
+  background: #ff5252;
+}
+
+.practitioner-stats {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.approval-rate {
+  color: #28a745;
+}
+
+.rejection-count {
+  color: #dc3545;
+}
+
+.workflow-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.workflow-item.pending { border-left: 4px solid #ffc107; }
+.workflow-item.approved { border-left: 4px solid #28a745; }
+.workflow-item.rejected { border-left: 4px solid #dc3545; }
+
+

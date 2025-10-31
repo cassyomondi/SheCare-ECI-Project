@@ -1,0 +1,313 @@
+/* === GLOBAL STYLES === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #1f1f1f;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* === NAVBAR === */
+.navbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 3rem;
+  background-color: #111;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #00ffcc;
+}
+
+.logo img {
+  width: 40px;
+  height: 40px;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.nav-buttons button {
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-buttons button:hover {
+  opacity: 0.85;
+}
+
+/* === PAGE CONTENT === */
+.page-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === ABOUT PAGE === */
+.about-page {
+  max-width: 900px;
+  width: 90%;
+  text-align: center;
+  margin: 5rem auto;
+  line-height: 1.8;
+}
+
+.about-logo {
+  width: 180px;
+  margin-bottom: 1.5rem;
+}
+
+.about-page h1 {
+  font-size: 2.7rem;
+  margin-bottom: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.about-page h3 {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #00ffcc;
+  margin-bottom: 1.5rem;
+}
+
+.about-page p {
+  color: #e0e0e0;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+
+/* === OVERLAYS (LOGIN / SIGNUP) === */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.login-container {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  padding: 2.5rem;
+  border-radius: 16px;
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+  animation: popIn 0.3s ease-out;
+}
+
+.login-container h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.login-container input {
+  margin: 0.6rem 0;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  background-color: #2e2e2e;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.login-container input::placeholder {
+  color: #bbb;
+}
+
+.login-container button {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-container button:hover {
+  background-color: #f2f2f2;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 1.3rem;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.close-btn:hover {
+  color: #ddd;
+}
+
+/* === WHATSAPP ICON === */
+.whatsapp-icon {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 55px;
+  height: 55px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  z-index: 50;
+}
+
+.whatsapp-icon:hover {
+  transform: scale(1.1);
+}
+
+.whatsapp-icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #25d366;
+}
+
+/* === ANIMATIONS === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, #b76cf1, #f78da7);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(183, 108, 241, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gradient-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(183, 108, 241, 0.5);
+}
+
+.gradient-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(183, 108, 241, 0.4);
+}
+
+.dashboard-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fdf6fb, #fbe5f6);
+  padding: 20px;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 25px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+.dashboard-logo {
+  width: 80px;
+  margin-bottom: 20px;
+}
+
+.dashboard-card h1 {
+  color: #8a2be2;
+  margin-bottom: 10px;
+}
+
+.dashboard-subtext {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 25px;
+}
+
+.whatsapp-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.whatsapp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 211, 102, 0.5);
+}

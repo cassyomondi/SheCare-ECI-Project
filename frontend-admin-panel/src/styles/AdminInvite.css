@@ -1,0 +1,70 @@
+.admin-invite-page {
+  padding: 30px;
+  max-width: 600px;
+}
+
+.admin-invite-page h1 {
+  color: #6C63FF;
+  margin-bottom: 30px;
+}
+
+.invite-form {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.invite-form input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.invite-form button {
+  background: #6C63FF;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.invite-form button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.message {
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background: #f8f9fa;
+  border-left: 4px solid #6C63FF;
+}
+
+.invite-guide {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.step span {
+  background: #6C63FF;
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  font-size: 14px;
+}
