@@ -1,0 +1,124 @@
+.
+├── ERD.png                                # Entity Relationship Diagram showing database design
+├── Pipfile                                # Root-level Pipenv configuration for managing dependencies
+├── README.md                              # Project documentation
+├── STRUCTURE.txt                          # This file listing the directory structure
+│
+├── backend/                               # Flask backend that powers APIs and the WhatsApp chatbot
+│   ├── Pipfile                            # Pipenv configuration for backend dependencies
+│   ├── __init__.py                        # Makes backend a Python package
+│   ├── app/
+│   │   ├── __init__.py                    # App factory for initializing Flask and extensions
+│   │   ├── app.py                         # Main Flask application instance and route registration
+│   │   ├── config.py                      # Environment variables, Twilio credentials, and database config
+│   │   │
+│   │   ├── helpers/                       # Core logic modules supporting various chatbot features
+│   │   │   ├── __init__.py
+│   │   │   ├── clinicfinder.py            # Finds nearby clinics using geolocation APIs
+│   │   │   ├── healthtip_agent.py         # AI agent for generating health tips
+│   │   │   ├── healthtip_scheduler.py     # Scheduler that automates daily health tips
+│   │   │   ├── prescriptionuploader.py    # Handles prescription uploads and AI-based interpretation
+│   │   │   └── symptomchecker.py          # AI module that checks symptoms and provides advice
+│   │   │
+│   │   ├── models/                        # SQLAlchemy models representing database tables
+│   │   │   ├── __init__.py
+│   │   │   └── models.py                  # Defines User, Prescription, Tip, and related models
+│   │   │
+│   │   ├── routes/                        # Flask Blueprints defining backend API endpoints
+│   │   │   ├── admin_routes.py            # Endpoints for admin operations and analytics
+│   │   │   ├── api_routes.py              # REST API endpoints for users, tips, and prescriptions
+│   │   │   └── twilio_routes.py           # Endpoints handling incoming and outgoing WhatsApp messages
+│   │   │
+│   │   ├── utils/                         # Utility scripts
+│   │   │   └── db.py                      # Database setup and connection logic
+│   │   │
+│   │   └── whatsapp/                      # WhatsApp bot integration via Twilio
+│   │       ├── __init__.py
+│   │       └── bot.py                     # Message handler for Twilio WhatsApp communication
+│   │
+│   ├── migrations/                        # Alembic migrations for database version control
+│   │   ├── README
+│   │   ├── alembic.ini                    # Alembic configuration file
+│   │   ├── env.py                         # Migration environment setup
+│   │   ├── script.py.mako                 # Template for generating new migrations
+│   │   └── versions/                      # Individual migration scripts
+│   │       ├── 53910c160760_adjust_phone_column_for_twilio_format.py
+│   │       └── b74198b506c5_detect_unified_models_schema_with_email_.py
+│   │
+│   ├── requirements.txt                   # Backend Python dependencies (for non-Pipenv environments)
+│   └── run.py                             # Entry point for starting the Flask backend server
+│
+├── frontend-admin-panel/                  # React dashboard for admins to manage data and analytics
+│   ├── README.md
+│   ├── eslint.config.js                   # ESLint configuration for code linting
+│   ├── index.html                         # HTML entry file for the Vite build
+│   ├── package-lock.json                  # Dependency lockfile
+│   ├── package.json                       # Defines frontend dependencies and scripts
+│   ├── public/
+│   │   └── vite.svg                       # Public assets
+│   ├── src/
+│   │   ├── App.css                        # Global CSS styles
+│   │   ├── App.jsx                        # Root React component
+│   │   ├── assets/                        # Image and icon assets
+│   │   │   └── react.svg
+│   │   ├── components/                    # Reusable React UI components
+│   │   │   ├── charts/                    # Charts and analytics components
+│   │   │   │   ├── BarGraph.jsx
+│   │   │   │   ├── DonutChart.jsx
+│   │   │   │   ├── LineGraph.jsx
+│   │   │   │   ├── PrescriptionCharts.jsx
+│   │   │   │   ├── UserGrowthTimeline.jsx
+│   │   │   │   └── UserRoleTrend.jsx
+│   │   │   ├── forms/                     # Input components for searching and filtering
+│   │   │   │   ├── PrescriptionFilters.jsx
+│   │   │   │   └── Searchbar.jsx
+│   │   │   └── layout/                    # Layout components (navigation, theme, etc.)
+│   │   │       ├── Footer.jsx
+│   │   │       ├── Header.jsx
+│   │   │       ├── NavBar.jsx
+│   │   │       ├── Sidebar.jsx
+│   │   │       └── ThemeContext.jsx
+│   │   ├── index.css                      # Root CSS file imported in main.jsx
+│   │   ├── main.jsx                       # Application entry point that renders App.jsx
+│   │   ├── pages/                         # Main admin pages
+│   │   │   ├── AdminInvite.jsx
+│   │   │   ├── AdminRegistration.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Prescriptions.jsx
+│   │   │   ├── Settings.jsx
+│   │   │   ├── Tips.jsx
+│   │   │   └── Users.jsx
+│   │   └── styles/                        # Page-specific CSS files
+│   │       ├── AdminInvite.css
+│   │       ├── AdminRegistration.css
+│   │       ├── Dashboard.css
+│   │       ├── Header.css
+│   │       ├── Prescriptions.css
+│   │       ├── Searchbar.css
+│   │       ├── Settings.css
+│   │       ├── Sidebar.css
+│   │       ├── Tips.css
+│   │       └── Users.css
+│   └── vite.config.js                     # Vite configuration file for the build setup
+│
+└── frontend-auth/                         # React frontend for user registration and login
+    ├── README.md
+    ├── eslint.config.js
+    ├── index.html
+    ├── package-lock.json
+    ├── package.json
+    ├── public/
+    │   └── vite.svg
+    ├── src/
+    │   ├── App.css
+    │   ├── App.jsx
+    │   ├── assets/
+    │   │   └── react.svg
+    │   ├── components/                    # UI components for authentication
+    │   │   ├── About.jsx
+    │   │   ├── Loginform.jsx
+    │   │   └── Signupform.jsx
+    │   ├── main.jsx                       # Renders the React root component
+    │   └── pages/
+    │       └── UserDashboard.jsx          # Simple user dashboard after login
+    └── vite.config.js                     # Vite configuration for the auth app

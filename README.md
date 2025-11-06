@@ -40,20 +40,9 @@ It integrates **Twilio APIs**, a structured **Flask backend**, and a relational 
 
 ## System Architecture
 
-The system is designed for modularity and scalability, organized around clear layers:
+The system is designed for modularity and scalability, organized around clear layers.
 
-```
-backend/
-│
-├── app/
-│   ├── models/            # Database models
-│   ├── routes/            # API route definitions
-│   ├── config.py          # Environment and Twilio config
-│   └── __init__.py        # App factory initialization
-│
-├── migrations/            # Database migrations
-└── run.py                 # Entry point to start the Flask app
-```
+*(Refer to `STRUCTURE.txt` for the full structure visualization.)*
 
 **Goals by Milestone:**
 - ✅ Twilio webhook connected  
@@ -239,7 +228,7 @@ Admin panel will be available at: http://localhost:5174
 
 ---
 
-## 🪪 License
+## License
 
 This project is licensed under the **MIT License**.  
 
