@@ -8,14 +8,14 @@
 
 ---
 
-## 🩺 Overview
+## Overview
 
 **SheCare** is a health-focused communication and data management platform designed to support maternal health, community outreach, and practitioner coordination.  
 It integrates **Twilio APIs**, a structured **Flask backend**, and a relational **SQL database** to automate healthcare messaging, patient tracking, and follow-up reminders.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 - **Automated Messaging System**
   - Sends and receives SMS through Twilio webhooks.
@@ -38,7 +38,7 @@ It integrates **Twilio APIs**, a structured **Flask backend**, and a relational 
 
 ---
 
-## 🧩 System Architecture
+## System Architecture
 
 The system is designed for modularity and scalability, organized around clear layers:
 
@@ -64,7 +64,7 @@ backend/
 
 ---
 
-## 🗃️ Database Schema (ERD)
+## Database Schema (ERD)
 
 The core database is relational and optimized for chat and health-tracking functionality.
 
@@ -89,69 +89,153 @@ The core database is relational and optimized for chat and health-tracking funct
 ## ⚙️ Setup Instructions
 
 ### Prerequisites
-- Python 3.10+
-- Flask
-- PostgreSQL or MySQL
-- Twilio Account (with verified phone number)
+
+- Python 3.8+
+- Node.js 18+ and npm
+- PostgreSQL
+- Git
+- Ngrok – for exposing the Twilio webhook locally
 - `.env` file with credentials
 
-### Installation
+### Step 1 - Clone the repo
 
 ```bash
 # Clone repository
-git clone https://github.com/<your-repo>/shecare-backend.git
-cd shecare-backend
+git clone https://github.com/cassyomondi/SheCare-ECI-Project.git
+cd SheCare-ECI-Project
+```
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
+---
 
-# Install dependencies
+### Step 2 - Set up the backend
+
+```bash
+# Create and Activate Virtual Environment
+cd backend
+python3 -m venv venv
+source venv/bin/activate    # On Windows: venv\Scripts\activate
+```
+
+```bash
+# Install Dependencies
 pip install -r requirements.txt
+```
 
-# Run database migrations
+### Configure Environment Variables
+
+Create a .env file inside the backend directory in this format:
+
+```bash
+FLASK_APP=run.py 
+FLASK_ENV=development 
+DATABASE_URL=postgresql://postgres:password@localhost/shecare_db 
+SECRET_KEY=shecare-secret-key 
+TWILIO_ACCOUNT_SID=your-twilio-account-sid-here 
+TWILIO_AUTH_TOKEN=your-twilio-auth-token-here 
+TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886 # Twilio Sandbox number 
+OPENAI_API_KEY=your-open-ai-api-key-here
+OPENCAGE_API_KEY=your-opencage-api-key-here
+GOOGLE_MAPS_API_KEY=your_google_maps_key_here
+```
+
+Replace the placeholder API keys with your actual API keys.
+
+### Run Migrations
+```bash
 flask db upgrade
+```
 
-# Start the server
+### Start the Backend Server
+```bash
 flask run
 ```
 
----
-
-## 🔐 Environment Variables
-
-Create a `.env` file in the project root with:
-
-```
-DATABASE_URL=postgresql://username:password@localhost/shecare
-TWILIO_ACCOUNT_SID=your_account_sid
-TWILIO_AUTH_TOKEN=your_auth_token
-TWILIO_PHONE_NUMBER=+1234567890
-FLASK_ENV=development
+Server should start at:
+```bash
+http://127.0.0.1:5000
 ```
 
+You can test endpoints like:
+```bash
+GET /api/users
+GET /api/tips
+GET /api/prescriptions
+```
+
+### Twilio WhatsApp Bot Setup
+
+If you’re testing the WhatsApp bot locally:
+
+- Run the backend (if not already)
+- Make sure flask run is running on port 5000
+- Start Ngrok
+
+```bash
+ngrok http 5000
+```
+
+### Update Twilio Webhook
+
+In your Twilio Console → Sandbox for WhatsApp, set:
+
+WHEN A MESSAGE COMES IN: https://abcd1234.ngrok.io/webhook
+
+You can now message your Twilio WhatsApp number and interact with the bot.
+
+--- 
+
+### Step 3 - Set up the user frontend
+
+Navigate to user frontend
+```bash
+cd frontend-auth
+```
+
+Install dependencies
+```bash
+npm install
+```
+
+Run development server
+```bash
+npm run dev
+```
+
+User frontend will be available at: http://localhost:5173
+
 ---
 
-## 🧠 Future Enhancements
+### Step 4 - Set up the admin frontend
 
-- Web-based Admin Dashboard  
-- Real-time analytics for outreach programs  
-- Automated health reminders and scheduling  
-- Integration with electronic health records (EHR)  
-- Multilingual support for rural deployment  
+Navigate to admin frontend
+```bash
+cd ../frontend-admin-panel
+```
+
+Install dependencies
+```bash
+npm install
+```
+
+Run development server
+```bash
+npm run dev
+```
+
+Admin panel will be available at: http://localhost:5174
 
 ---
 
-## 👩‍💻 Contributors
+## Contributors
 
 | Name |
 |------|
-| [Cassy Omondi] |
-| [Francis Njoroge] |
-| [Cheryl Mbani] |
-| [Andrew Waruiru] |
-| [Felix Waweru] |
-| [Immanuel Kinuthia] |
+| Cassy Omondi |
+| Francis Njoroge |
+| Cheryl Mbani |
+| Andrew Waruiru |
+| Felix Waweru |
+| Immanuel Kinuthia |
 
 ---
 
@@ -161,5 +245,4 @@ This project is licensed under the **MIT License**.
 
 ---
 
-© 2025 SheCare Project. All rights reserved.
-
+© 2025 SheCare Project. All rights reserved. 
