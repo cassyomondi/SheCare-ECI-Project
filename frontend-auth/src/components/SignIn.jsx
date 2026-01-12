@@ -1,10 +1,10 @@
-// frontend-auth/src/components/LoginForm.jsx
+// frontend-auth/src/components/SignIn.jsx
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import "../App.css";
 
-function LoginForm({ setUser, onClose }) {
+function SignIn({ setUser, onClose }) {
   const initialValues = { emailOrPhone: "", password: "" };
 
   const validationSchema = Yup.object({
@@ -89,4 +89,4 @@ function LoginForm({ setUser, onClose }) {
 
 }
 
-export default LoginForm;
+export default SignIn;

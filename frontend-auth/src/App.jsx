@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import About from "./components/About";
-import LoginForm from "./components/Loginform";
-import SignupForm from "./components/Signupform";
+import Main from "./components/Main";
+import SignIn from "./components/SignIn";
+import SignUp from "./components/SignUp";
 import UserDashboard from "./pages/UserDashboard";
 
 function App() {
@@ -26,12 +26,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<About />} />
-        <Route path="/login" element={<LoginForm setUser={handleSetUser} />} />
-        <Route path="/signup" element={<SignupForm setUser={handleSetUser} />} />
+        <Route path="/" element={<Main />} />
+        <Route path="/signin" element={<SignIn setUser={handleSetUser} />} />
+        <Route path="/signup" element={<SignUp setUser={handleSetUser} />} />
         <Route
           path="/user-dashboard"
-          element={user ? <UserDashboard user={user} /> : <Navigate to="/login" />}
+          element={user ? <UserDashboard user={user} /> : <Navigate to="/signin" />}
         />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import "../App.css";
 
-function SignupForm({ setUser, onClose }) {
+function SignUp({ setUser, onClose }) {
   const initialValues = {
     first_name: "",
     last_name: "",
@@ -111,4 +111,4 @@ function SignupForm({ setUser, onClose }) {
   );
 }
 
-export default SignupForm;
+export default SignUp;
