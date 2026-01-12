@@ -2,10 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../App.css";
 
-function About() {
+function Main() {
   return (
-    <section className="about-page">
-      <img src="https://shecare-nu.vercel.app/images/logo.png" alt="SheCare Logo" className="about-logo" />
+    <section className="Main-page">
+      <img src="https://shecare-nu.vercel.app/images/logo.png" alt="SheCare Logo" className="Main-logo" />
       <h1>SheCare</h1>
       <h3>Empowering Women’s Health</h3>
       <p>SheCare: Your Private AI Health Companion — on WhatsApp.</p>
@@ -28,4 +28,4 @@ function About() {
   );
 }
 
-export default About;
+export default Main;
