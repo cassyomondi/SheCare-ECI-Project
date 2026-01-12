@@ -75,37 +75,70 @@ body {
 }
 
 /* === MAIN PAGE === */
-.Main-page {
+.main-page {
   max-width: 900px;
   width: 90%;
   text-align: center;
   margin: 5rem auto;
   line-height: 1.8;
+  background-color: #ffffff; /* white background */
+  color: #333333; /* dark text for readability */
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
 }
 
-.Main-logo {
+.main-logo {
   width: 180px;
   margin-bottom: 1.5rem;
 }
 
-.Main-page h1 {
-  font-size: 2.7rem;
+.main-title {
+  font-size: 2.8rem;
   margin-bottom: 0.8rem;
-  letter-spacing: 1px;
+  color: #8a2be2; /* brand purple */
+  font-weight: 700;
 }
 
-.Main-page h3 {
-  font-size: 1.4rem;
+.main-subtitle {
+  font-size: 1.5rem;
   font-weight: 500;
-  color: #00ffcc;
+  color: #f78da7; /* pink accent from SheCare palette */
   margin-bottom: 1.5rem;
 }
 
-.Main-page p {
-  color: #e0e0e0;
+.main-description {
   font-size: 1.05rem;
+  color: #555555; /* subtle gray text */
   margin-bottom: 1rem;
 }
+
+.main-buttons {
+  margin-top: 25px;
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, #b76cf1, #f78da7);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(183, 108, 241, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gradient-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(183, 108, 241, 0.5);
+}
+
+.signup-btn {
+  margin-left: 15px; /* spacing between buttons */
+}
+
 
 /* === OVERLAYS (SIGN IN / SIGNUP) === */
 .overlay {
