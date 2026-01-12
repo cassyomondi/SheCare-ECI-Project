@@ -7,7 +7,7 @@ function Main() {
     <div className="auth-layout">
       {/* LEFT SIDE */}
       <div className="auth-left">
-        <div className="auth-left-content centered-top">
+        <div className="auth-left-content">
           <img
             src="https://shecare-nu.vercel.app/images/logo.png"
             alt="SheCare Logo"
@@ -18,9 +18,9 @@ function Main() {
 
       {/* RIGHT SIDE */}
       <div className="auth-right auth-right-centered">
-        <h2 className="auth-title centered-text">Sign In</h2>
+        <h2 className="auth-title">Sign In to talk to SheCare on WhatsApp</h2>
 
-        <form className="auth-form centered-form">
+        <form className="auth-form">
           <input
             type="tel"
             placeholder="Phone number"
@@ -38,7 +38,7 @@ function Main() {
           </button>
         </form>
 
-        <p className="auth-footer centered-text">
+        <p className="auth-footer">
           No account yet?{" "}
           <Link to="/signup" className="auth-link">
             Sign Up

@@ -1,0 +1,135 @@
+.auth-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* LEFT */
+.auth-left {
+  flex: 1;
+  position: relative;
+  background: url("https://shecare.africa/static/img/Gemini_Generated_Image_3yw8783yw8783yw8.png")
+    center / cover no-repeat;
+}
+
+.auth-left-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;       /* ✅ center horizontally */
+  justify-content: flex-start;
+}
+
+.auth-left::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2); /* ✅ 20% dark tint */
+  z-index: 0;
+}
+
+
+.auth-logo {
+  width: 120px;
+}
+
+/* RIGHT */
+.auth-right {
+  flex: 1;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+}
+
+.auth-right-centered {
+  justify-content: center;
+  align-items: center;
+}
+
+/* TEXT */
+.auth-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.auth-footer {
+  margin-top: 28px;
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+}
+
+.auth-link {
+  color: #00c2a8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+/* FORM */
+.auth-form {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+
+.auth-input,
+.auth-submit {
+  width: 100%;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 18px 16px;
+  font-size: 15px;
+
+  background-color: #f5f5f5;   /* ✅ inputs are grey */
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+}
+
+.auth-input:focus {
+  background-color: #ffffff;  /* optional UX polish */
+  border-color: #00c2a8;
+}
+
+
+.auth-submit {
+  width: 100%;
+  padding: 18px;
+
+  background-color: #00c2a8;  /* ✅ green CTA */
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.auth-submit:hover {
+  background-color: #00c2a8;
+}
+
+
+/* UTILITIES */
+.centered-text {
+  text-align: center;
+}
