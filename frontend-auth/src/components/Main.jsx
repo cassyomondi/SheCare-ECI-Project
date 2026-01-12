@@ -16,8 +16,8 @@ function Main() {
         simple, and supportive way.
       </p>
       <div style={{ marginTop: "20px" }}>
-  <Link to="/login">
-    <button className="gradient-btn">Login</button>
+  <Link to="/signin">
+    <button className="gradient-btn">Sign In</button>
   </Link>
   <Link to="/signup" style={{ marginLeft: "10px" }}>
     <button className="gradient-btn">Sign Up</button>
