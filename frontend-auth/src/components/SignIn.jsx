@@ -11,8 +11,11 @@ function SignIn({ onSwitch }) {
     password: "",
   };
 
+  // Updated validation: phone must start with optional +, followed by digits only
   const validationSchema = Yup.object({
-    phone: Yup.string().required("Phone number is required"),
+    phone: Yup.string()
+      .required("Phone number is required")
+      .matches(/^\+?\d+$/, "Phone number can only contain digits and +"),
     password: Yup.string().required("Password is required"),
   });
 
@@ -45,6 +48,13 @@ function SignIn({ onSwitch }) {
     }
   };
 
+  // Optional: prevent invalid characters while typing
+  const handlePhoneChange = (e, setFieldValue) => {
+    const value = e.target.value;
+    const sanitized = value.replace(/[^0-9+]/g, ""); // remove invalid characters
+    setFieldValue("phone", sanitized);
+  };
+
   return (
     <>
       <h2 className="auth-title">
@@ -58,12 +68,23 @@ function SignIn({ onSwitch }) {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form className="auth-form">
-            <Field type="tel" name="phone" placeholder="Phone number" className="auth-input" />
+            <Field
+              type="tel"
+              name="phone"
+              placeholder="Phone number"
+              className="auth-input"
+              onChange={(e) => handlePhoneChange(e, setFieldValue)}
+            />
             <ErrorMessage name="phone" component="div" className="auth-error" />
 
-            <Field type="password" name="password" placeholder="Password" className="auth-input" />
+            <Field
+              type="password"
+              name="password"
+              placeholder="Password"
+              className="auth-input"
+            />
             <ErrorMessage name="password" component="div" className="auth-error" />
 
             <button type="submit" className="auth-submit" disabled={isSubmitting}>
