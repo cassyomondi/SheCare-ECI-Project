@@ -41,8 +41,9 @@ function SignUp({ onSwitch }) {
       const payload = { ...values };
       delete payload.confirm;
 
-      // normalize email: send null if empty
-      payload.email = payload.email?.trim() ? payload.email.trim().toLowerCase() : null;
+      
+      payload.email = payload.email.trim().toLowerCase();
+      payload.phone = payload.phone.trim();
 
       await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
 

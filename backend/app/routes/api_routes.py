@@ -51,22 +51,23 @@ def signup():
     last_name = data.get("last_name")
     role = data.get("role", "participant")
 
-    # Validation
+    phone = phone.strip() if phone else None
+    email = email.strip().lower() if email else None
+
     if not phone or not email or not password:
         return jsonify({"error": "Phone, email, and password are required"}), 400
 
-
-    # Check if user already exists
     if User.query.filter((User.phone == phone) | (User.email == email)).first():
         return jsonify({"error": "User already exists"}), 400
 
     # Create new user
     user = User(
-        email=email.strip().lower() if email else None,
-        phone=phone.strip() if phone else None,
-        password=generate_password_hash(password),
-        role=role
+    email=email,
+    phone=phone,
+    password=generate_password_hash(password),
+    role=role
     )
+
     db.session.add(user)
     db.session.commit()
 
