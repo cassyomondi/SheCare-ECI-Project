@@ -4,8 +4,8 @@ import * as Yup from "yup";
 import axios from "axios";
 
 function SignUp({ onSwitch }) {
-  const [apiError, setApiError] = useState(""); // <-- state for API error
-  const [apiSuccess, setApiSuccess] = useState(""); // optional success message
+  const [apiError, setApiError] = useState("");
+  const [apiSuccess, setApiSuccess] = useState("");
 
   const initialValues = {
     first_name: "",
@@ -40,7 +40,6 @@ function SignUp({ onSwitch }) {
       setApiSuccess("Signup successful!");
       resetForm();
 
-      // redirect to sign in after short delay
       setTimeout(onSwitch, 1000);
     } catch (err) {
       setApiError(err.response?.data?.error || "Signup failed");
@@ -49,10 +48,8 @@ function SignUp({ onSwitch }) {
     }
   };
 
-  // Optional: prevent invalid characters while typing
   const handlePhoneChange = (e, setFieldValue) => {
-    const value = e.target.value;
-    const sanitized = value.replace(/[^0-9+]/g, ""); // remove letters & special chars
+    const sanitized = e.target.value.replace(/[^0-9+]/g, "");
     setFieldValue("phone", sanitized);
   };
 
@@ -70,13 +67,33 @@ function SignUp({ onSwitch }) {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting, setFieldValue }) => (
+        {({ isSubmitting, setFieldValue, submitCount }) => (
           <Form className="auth-form">
-            <Field name="first_name" placeholder="First Name" className="auth-input" />
-            <ErrorMessage name="first_name" component="div" className="auth-error" />
+            <Field
+              name="first_name"
+              placeholder="First Name"
+              className="auth-input"
+            />
+            {submitCount > 0 && (
+              <ErrorMessage
+                name="first_name"
+                component="div"
+                className="auth-error"
+              />
+            )}
 
-            <Field name="last_name" placeholder="Last Name" className="auth-input" />
-            <ErrorMessage name="last_name" component="div" className="auth-error" />
+            <Field
+              name="last_name"
+              placeholder="Last Name"
+              className="auth-input"
+            />
+            {submitCount > 0 && (
+              <ErrorMessage
+                name="last_name"
+                component="div"
+                className="auth-error"
+              />
+            )}
 
             <Field
               name="phone"
@@ -84,15 +101,47 @@ function SignUp({ onSwitch }) {
               className="auth-input"
               onChange={(e) => handlePhoneChange(e, setFieldValue)}
             />
-            <ErrorMessage name="phone" component="div" className="auth-error" />
+            {submitCount > 0 && (
+              <ErrorMessage
+                name="phone"
+                component="div"
+                className="auth-error"
+              />
+            )}
 
-            <Field type="password" name="password" placeholder="Password" className="auth-input" />
-            <ErrorMessage name="password" component="div" className="auth-error" />
+            <Field
+              type="password"
+              name="password"
+              placeholder="Password"
+              className="auth-input"
+            />
+            {submitCount > 0 && (
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="auth-error"
+              />
+            )}
 
-            <Field type="password" name="confirm" placeholder="Confirm Password" className="auth-input" />
-            <ErrorMessage name="confirm" component="div" className="auth-error" />
+            <Field
+              type="password"
+              name="confirm"
+              placeholder="Confirm Password"
+              className="auth-input"
+            />
+            {submitCount > 0 && (
+              <ErrorMessage
+                name="confirm"
+                component="div"
+                className="auth-error"
+              />
+            )}
 
-            <button type="submit" className="auth-submit" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Creating..." : "Sign Up"}
             </button>
           </Form>
