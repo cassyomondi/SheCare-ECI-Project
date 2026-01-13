@@ -19,7 +19,9 @@ function SignUp({ onSwitch }) {
   const validationSchema = Yup.object({
     first_name: Yup.string().required("Required"),
     last_name: Yup.string().required("Required"),
-    phone: Yup.string().required("Required"),
+    phone: Yup.string()
+      .required("Phone number is required")
+      .matches(/^\+?\d+$/, "Phone number can only contain digits and +"),
     password: Yup.string().min(6).required("Required"),
     confirm: Yup.string()
       .oneOf([Yup.ref("password")], "Passwords must match")
@@ -47,6 +49,13 @@ function SignUp({ onSwitch }) {
     }
   };
 
+  // Optional: prevent invalid characters while typing
+  const handlePhoneChange = (e, setFieldValue) => {
+    const value = e.target.value;
+    const sanitized = value.replace(/[^0-9+]/g, ""); // remove letters & special chars
+    setFieldValue("phone", sanitized);
+  };
+
   return (
     <>
       <h2 className="auth-title">
@@ -61,7 +70,7 @@ function SignUp({ onSwitch }) {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form className="auth-form">
             <Field name="first_name" placeholder="First Name" className="auth-input" />
             <ErrorMessage name="first_name" component="div" className="auth-error" />
@@ -69,7 +78,12 @@ function SignUp({ onSwitch }) {
             <Field name="last_name" placeholder="Last Name" className="auth-input" />
             <ErrorMessage name="last_name" component="div" className="auth-error" />
 
-            <Field name="phone" placeholder="Phone number" className="auth-input" />
+            <Field
+              name="phone"
+              placeholder="Phone number"
+              className="auth-input"
+              onChange={(e) => handlePhoneChange(e, setFieldValue)}
+            />
             <ErrorMessage name="phone" component="div" className="auth-error" />
 
             <Field type="password" name="password" placeholder="Password" className="auth-input" />
