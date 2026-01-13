@@ -12,7 +12,7 @@ class User(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     phone = db.Column(db.String(20), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String, nullable=True)
     role = db.Column(db.String, nullable=False, default="participant")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -33,8 +33,8 @@ function SignIn({ onSwitch }) {
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
 
       const payload = {
-        email: isEmail ? input.toLowerCase() : null,
-        phone: isEmail ? null : input.replace(/\s+/g, ""),
+        email: isEmail ? input.toLowerCase() : "",
+        phone: isEmail ? "" : input.replace(/\s+/g, ""),
         password: values.password,
       };
 

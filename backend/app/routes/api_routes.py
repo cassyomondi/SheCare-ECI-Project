@@ -62,8 +62,8 @@ def signup():
 
     # Create new user
     user = User(
-        phone=phone,
-        email=email.lower() if email else None,
+        email=email.strip().lower() if email else None,
+        phone=phone.strip() if phone else None,
         password=generate_password_hash(password),
         role=role
     )
@@ -97,8 +97,17 @@ def signup():
 @api_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
-    email_or_phone = data.get("email") or data.get("phone")
+    email = data.get("email")
+    phone = data.get("phone")
     password = data.get("password")
+
+    if email:
+        email = email.strip().lower()
+    if phone:
+        phone = phone.strip()
+
+    email_or_phone = email or phone
+
 
     if not email_or_phone or not password:
         return jsonify({"error": "Email/Phone and password are required"}), 400
