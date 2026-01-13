@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 
 function SignIn({ onSwitch }) {
   const [apiError, setApiError] = useState("");
+
+  const topRef = useRef(null);
+
+  useEffect(() => {
+    if (apiError) {
+      topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [apiError]);
+
 
   const initialValues = {
     emailOrPhone: "",
@@ -58,6 +67,7 @@ function SignIn({ onSwitch }) {
 
   return (
     <>
+      <div ref={topRef} />
       <h2 className="auth-title">Sign In to talk to SheCare on WhatsApp</h2>
       {apiError && <div className="auth-error-banner">{apiError}</div>}
 
