@@ -10,6 +10,7 @@ function SignUp({ onSwitch }) {
   const initialValues = {
     first_name: "",
     last_name: "",
+    email: "",          // <-- restored
     phone: "",
     password: "",
     confirm: "",
@@ -19,6 +20,10 @@ function SignUp({ onSwitch }) {
   const validationSchema = Yup.object({
     first_name: Yup.string().required("Required"),
     last_name: Yup.string().required("Required"),
+    email: Yup.string()
+      .trim()
+      .email("Enter a valid email")
+      .notRequired(),   // optional
     phone: Yup.string()
       .required("Phone number is required")
       .matches(/^\+?\d+$/, "Phone number can only contain digits and +"),
@@ -35,11 +40,13 @@ function SignUp({ onSwitch }) {
       const payload = { ...values };
       delete payload.confirm;
 
+      // normalize email: send null if empty
+      payload.email = payload.email?.trim() ? payload.email.trim().toLowerCase() : null;
+
       await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
 
       setApiSuccess("Signup successful!");
       resetForm();
-
       setTimeout(onSwitch, 1000);
     } catch (err) {
       setApiError(err.response?.data?.error || "Signup failed");
@@ -55,45 +62,22 @@ function SignUp({ onSwitch }) {
 
   return (
     <>
-      <h2 className="auth-title">
-        Sign Up to talk to SheCare on WhatsApp
-      </h2>
+      <h2 className="auth-title">Sign Up to talk to SheCare on WhatsApp</h2>
 
       {apiError && <div className="auth-error-banner">{apiError}</div>}
       {apiSuccess && <div className="auth-success-banner">{apiSuccess}</div>}
 
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
+      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
         {({ isSubmitting, setFieldValue, submitCount }) => (
           <Form className="auth-form">
-            <Field
-              name="first_name"
-              placeholder="First Name"
-              className="auth-input"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
-                name="first_name"
-                component="div"
-                className="auth-error"
-              />
-            )}
+            <Field name="first_name" placeholder="First Name" className="auth-input" />
+            {submitCount > 0 && <ErrorMessage name="first_name" component="div" className="auth-error" />}
 
-            <Field
-              name="last_name"
-              placeholder="Last Name"
-              className="auth-input"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
-                name="last_name"
-                component="div"
-                className="auth-error"
-              />
-            )}
+            <Field name="last_name" placeholder="Last Name" className="auth-input" />
+            {submitCount > 0 && <ErrorMessage name="last_name" component="div" className="auth-error" />}
+
+            <Field type="email" name="email" placeholder="Email (optional)" className="auth-input" />
+            {submitCount > 0 && <ErrorMessage name="email" component="div" className="auth-error" />}
 
             <Field
               name="phone"
@@ -101,47 +85,15 @@ function SignUp({ onSwitch }) {
               className="auth-input"
               onChange={(e) => handlePhoneChange(e, setFieldValue)}
             />
-            {submitCount > 0 && (
-              <ErrorMessage
-                name="phone"
-                component="div"
-                className="auth-error"
-              />
-            )}
+            {submitCount > 0 && <ErrorMessage name="phone" component="div" className="auth-error" />}
 
-            <Field
-              type="password"
-              name="password"
-              placeholder="Password"
-              className="auth-input"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
-                name="password"
-                component="div"
-                className="auth-error"
-              />
-            )}
+            <Field type="password" name="password" placeholder="Password" className="auth-input" />
+            {submitCount > 0 && <ErrorMessage name="password" component="div" className="auth-error" />}
 
-            <Field
-              type="password"
-              name="confirm"
-              placeholder="Confirm Password"
-              className="auth-input"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
-                name="confirm"
-                component="div"
-                className="auth-error"
-              />
-            )}
+            <Field type="password" name="confirm" placeholder="Confirm Password" className="auth-input" />
+            {submitCount > 0 && <ErrorMessage name="confirm" component="div" className="auth-error" />}
 
-            <button
-              type="submit"
-              className="auth-submit"
-              disabled={isSubmitting}
-            >
+            <button type="submit" className="auth-submit" disabled={isSubmitting}>
               {isSubmitting ? "Creating..." : "Sign Up"}
             </button>
           </Form>
