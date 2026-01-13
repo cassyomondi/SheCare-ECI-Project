@@ -23,15 +23,16 @@ function SignUp({ onSwitch }) {
     email: Yup.string()
       .trim()
       .email("Enter a valid email")
-      .notRequired(),   // optional
+      .required("Email is required"),
     phone: Yup.string()
       .required("Phone number is required")
       .matches(/^\+?\d+$/, "Phone number can only contain digits and +"),
-    password: Yup.string().min(6).required("Required"),
+    password: Yup.string().min(8, "Password must be at least 8 characters").required("Required"),
     confirm: Yup.string()
       .oneOf([Yup.ref("password")], "Passwords must match")
       .required("Required"),
   });
+
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     setApiError("");
@@ -76,7 +77,7 @@ function SignUp({ onSwitch }) {
             <Field name="last_name" placeholder="Last Name" className="auth-input" />
             {submitCount > 0 && <ErrorMessage name="last_name" component="div" className="auth-error" />}
 
-            <Field type="email" name="email" placeholder="Email (optional)" className="auth-input" />
+            <Field type="email" name="email" placeholder="Email" className="auth-input" />
             {submitCount > 0 && <ErrorMessage name="email" component="div" className="auth-error" />}
 
             <Field
