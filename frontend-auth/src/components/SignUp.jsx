@@ -1,9 +1,8 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import "../App.css";
 
-function SignUp({ setUser, onClose }) {
+function SignUp({ onSwitch }) {
   const initialValues = {
     first_name: "",
     last_name: "",
@@ -15,99 +14,72 @@ function SignUp({ setUser, onClose }) {
   };
 
   const validationSchema = Yup.object({
-    first_name: Yup.string().required("First name is required"),
-    last_name: Yup.string().required("Last name is required"),
-    email: Yup.string().email("Invalid email format").nullable(),
-    phone: Yup.string().required("Phone number is required"),
-    password: Yup.string().min(6, "Minimum 6 characters").required("Password is required"),
+    first_name: Yup.string().required("Required"),
+    last_name: Yup.string().required("Required"),
+    email: Yup.string().email("Invalid email"),
+    phone: Yup.string().required("Required"),
+    password: Yup.string().min(6).required("Required"),
     confirm: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm your password"),
-    role: Yup.string().oneOf(["participant", "admin"], "Invalid role"),
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Required"),
   });
 
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-  try {
-    const payload = { ...values };
-    delete payload.confirm; // remove confirm password
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      const payload = { ...values };
+      delete payload.confirm;
 
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
+      await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
 
-    setUser(res.data.user);
-
-    // If backend returns JWT token, save it
-    if (res.data.access_token) {
-      localStorage.setItem("token", res.data.access_token);
+      alert("Signup successful");
+      onSwitch(); // fade back to sign-in
+    } catch (err) {
+      alert(err.response?.data?.error || "Signup failed");
+    } finally {
+      setSubmitting(false);
     }
-
-    alert("Signup successful!");
-    onClose();
-    resetForm();
-
-    // Optional redirect
-    if (res.data.user.role === "admin") {
-      window.location.href = "/admin-panel";
-    } else {
-      window.location.href = "/user-dashboard";
-    }
-
-  } catch (err) {
-    //alert(err.response?.data?.error || "Signup failed");
-    console.error("Signup error response:", err.response);
-  alert(err.response?.data?.error || "Signup failed");
-  } finally {
-    setSubmitting(false);
-  }
-};
-
+  };
 
   return (
-    <div className="overlay">
-      <div className="login-container">
-        <button type="button" className="close-btn" onClick={onClose}>
-          ✕
+    <>
+      <h2 className="auth-title">
+        Sign Up to start talking to SheCare on WhatsApp
+      </h2>
+
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting }) => (
+          <Form className="auth-form">
+            <Field name="first_name" placeholder="First Name" className="auth-input" />
+            <ErrorMessage name="first_name" component="div" />
+
+            <Field name="last_name" placeholder="Last Name" className="auth-input" />
+            <ErrorMessage name="last_name" component="div" />
+
+            <Field name="email" placeholder="Email (optional)" className="auth-input" />
+
+            <Field name="phone" placeholder="Phone number" className="auth-input" />
+
+            <Field type="password" name="password" placeholder="Password" className="auth-input" />
+            <Field type="password" name="confirm" placeholder="Confirm Password" className="auth-input" />
+
+            <button type="submit" className="auth-submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Sign Up"}
+            </button>
+          </Form>
+        )}
+      </Formik>
+
+      <p className="auth-footer">
+        Already have an account?{" "}
+        <button type="button" className="auth-link link-btn" onClick={onSwitch}>
+          Sign In
         </button>
-        <h2>Signup</h2>
-
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <Field name="first_name" placeholder="First Name" />
-              <ErrorMessage name="first_name" component="div" className="error" />
-
-              <Field name="last_name" placeholder="Last Name" />
-              <ErrorMessage name="last_name" component="div" className="error" />
-
-              <Field name="email" placeholder="Email (optional)" />
-              <ErrorMessage name="email" component="div" className="error" />
-
-              <Field name="phone" placeholder="Phone" />
-              <ErrorMessage name="phone" component="div" className="error" />
-
-              <Field type="password" name="password" placeholder="Password" />
-              <ErrorMessage name="password" component="div" className="error" />
-
-              <Field type="password" name="confirm" placeholder="Confirm Password" />
-              <ErrorMessage name="confirm" component="div" className="error" />
-
-              <Field as="select" name="role">
-                <option value="participant">Participant</option>
-                <option value="admin">Admin</option>
-              </Field>
-              <ErrorMessage name="role" component="div" className="error" />
-
-              <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create Account"}
-              </button>
-            </Form>
-          )}
-        </Formik>
-      </div>
-    </div>
+      </p>
+    </>
   );
 }
 
