@@ -147,3 +147,27 @@
 .centered-text {
   text-align: center;
 }
+
+
+.fade {
+  animation: fadeIn 0.35s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Make auth-link clickable like text */
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
