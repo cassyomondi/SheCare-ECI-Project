@@ -52,8 +52,9 @@ def signup():
     role = data.get("role", "participant")
 
     # Validation
-    if not phone or not password:
-        return jsonify({"error": "Phone and password are required"}), 400
+    if not phone or not email or not password:
+        return jsonify({"error": "Phone, email, and password are required"}), 400
+
 
     # Check if user already exists
     if User.query.filter((User.phone == phone) | (User.email == email)).first():

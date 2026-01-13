@@ -115,9 +115,9 @@
     │   ├── assets/
     │   │   └── react.svg
     │   ├── components/                    # UI components for authentication
-    │   │   ├── About.jsx
-    │   │   ├── Loginform.jsx
-    │   │   └── Signupform.jsx
+    │   │   ├── Main.jsx
+    │   │   ├── SignIn.jsx
+    │   │   └── SignUp.jsx
     │   ├── main.jsx                       # Renders the React root component
     │   └── pages/
     │       └── UserDashboard.jsx          # Simple user dashboard after login
