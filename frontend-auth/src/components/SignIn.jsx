@@ -4,24 +4,19 @@ import axios from "axios";
 
 function SignIn({ onSwitch }) {
   const initialValues = {
-    emailOrPhone: "",
+    phone: "",
     password: "",
   };
 
   const validationSchema = Yup.object({
-    emailOrPhone: Yup.string().required("Email or phone is required"),
+    phone: Yup.string().required("Phone number is required"),
     password: Yup.string().required("Password is required"),
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const payload = {
-        email: values.emailOrPhone.includes("@")
-          ? values.emailOrPhone
-          : null,
-        phone: values.emailOrPhone.includes("@")
-          ? null
-          : values.emailOrPhone,
+        phone: values.phone,
         password: values.password,
       };
 
@@ -66,12 +61,13 @@ function SignIn({ onSwitch }) {
         {({ isSubmitting }) => (
           <Form className="auth-form">
             <Field
-              name="emailOrPhone"
-              placeholder="Email or Phone"
+              type="tel"
+              name="phone"
+              placeholder="Phone number"
               className="auth-input"
             />
             <ErrorMessage
-              name="emailOrPhone"
+              name="phone"
               component="div"
               className="auth-error"
             />

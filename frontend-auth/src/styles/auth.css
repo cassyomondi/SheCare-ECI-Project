@@ -1,28 +1,29 @@
 .auth-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
 }
+
 
 /* LEFT */
 .auth-left {
   flex: 1;
-  position: relative;
+  height: 100vh;
   background: url("https://shecare.africa/static/img/Gemini_Generated_Image_3yw8783yw8783yw8.png")
     center / cover no-repeat;
 }
+
 
 .auth-left-content {
   position: relative;
   z-index: 1;
   height: 100%;
-  padding: 40px;
+  padding-top: 40px;
   display: flex;
   flex-direction: column;
-  align-items: center;       /* ✅ center horizontally */
+  align-items: center;
   justify-content: flex-start;
 }
-
 
 
 
@@ -36,8 +37,11 @@
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  align-items: center;
   padding: 60px;
+  overflow-y: auto; /* ✅ key fix */
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Ensure the right side starts from the top, not the middle */
@@ -178,3 +182,5 @@
   color: #d32f2f;
   margin-top: -10px;
 }
+
+
