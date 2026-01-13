@@ -171,3 +171,10 @@
   padding: 0;
   cursor: pointer;
 }
+
+
+.auth-error {
+  font-size: 13px;
+  color: #d32f2f;
+  margin-top: -10px;
+}

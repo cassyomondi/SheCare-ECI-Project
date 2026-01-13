@@ -53,23 +53,83 @@ function SignUp({ onSwitch }) {
       >
         {({ isSubmitting }) => (
           <Form className="auth-form">
-            <Field name="first_name" placeholder="First Name" className="auth-input" />
-            <ErrorMessage name="first_name" component="div" />
+              <Field
+                name="first_name"
+                placeholder="First Name"
+                className="auth-input"
+              />
+              <ErrorMessage
+                name="first_name"
+                component="div"
+                className="auth-error"
+              />
 
-            <Field name="last_name" placeholder="Last Name" className="auth-input" />
-            <ErrorMessage name="last_name" component="div" />
+              <Field
+                name="last_name"
+                placeholder="Last Name"
+                className="auth-input"
+              />
+              <ErrorMessage
+                name="last_name"
+                component="div"
+                className="auth-error"
+              />
 
-            <Field name="email" placeholder="Email (optional)" className="auth-input" />
+              <Field
+                name="email"
+                placeholder="Email (optional)"
+                className="auth-input"
+              />
+              <ErrorMessage
+                name="email"
+                component="div"
+                className="auth-error"
+              />
 
-            <Field name="phone" placeholder="Phone number" className="auth-input" />
+              <Field
+                name="phone"
+                placeholder="Phone number"
+                className="auth-input"
+              />
+              <ErrorMessage
+                name="phone"
+                component="div"
+                className="auth-error"
+              />
 
-            <Field type="password" name="password" placeholder="Password" className="auth-input" />
-            <Field type="password" name="confirm" placeholder="Confirm Password" className="auth-input" />
+              <Field
+                type="password"
+                name="password"
+                placeholder="Password"
+                className="auth-input"
+              />
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="auth-error"
+              />
 
-            <button type="submit" className="auth-submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Sign Up"}
-            </button>
-          </Form>
+              <Field
+                type="password"
+                name="confirm"
+                placeholder="Confirm Password"
+                className="auth-input"
+              />
+              <ErrorMessage
+                name="confirm"
+                component="div"
+                className="auth-error"
+              />
+
+              <button
+                type="submit"
+                className="auth-submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Creating..." : "Sign Up"}
+              </button>
+           </Form>
+
         )}
       </Formik>
 
