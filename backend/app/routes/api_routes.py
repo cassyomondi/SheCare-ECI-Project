@@ -105,7 +105,7 @@ def login():
     if email:
         email = email.strip().lower()
     if phone:
-        phone = phone.strip()
+        phone = "".join(phone.split())   # removes spaces anywhere in the number
 
     email_or_phone = email or phone
 
