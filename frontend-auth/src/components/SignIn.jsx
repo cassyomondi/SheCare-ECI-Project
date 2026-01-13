@@ -4,14 +4,13 @@ import * as Yup from "yup";
 import axios from "axios";
 
 function SignIn({ onSwitch }) {
-  const [apiError, setApiError] = useState(""); // <-- state for API error
+  const [apiError, setApiError] = useState("");
 
   const initialValues = {
     phone: "",
     password: "",
   };
 
-  // Updated validation: phone must start with optional +, followed by digits only
   const validationSchema = Yup.object({
     phone: Yup.string()
       .required("Phone number is required")
@@ -20,15 +19,12 @@ function SignIn({ onSwitch }) {
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    setApiError(""); // clear previous error
+    setApiError("");
     try {
-      const payload = {
-        phone: values.phone,
-        password: values.password,
-      };
-
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/login`, payload);
-      const loggedInUser = res.data.user;
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/login`,
+        values
+      );
 
       if (res.data.access_token) {
         localStorage.setItem("token", res.data.access_token);
@@ -36,7 +32,7 @@ function SignIn({ onSwitch }) {
 
       resetForm();
 
-      if (loggedInUser.role === "admin") {
+      if (res.data.user.role === "admin") {
         window.location.href = "http://127.0.0.1:5174";
       } else {
         window.location.href = "/user-dashboard";
@@ -48,10 +44,8 @@ function SignIn({ onSwitch }) {
     }
   };
 
-  // Optional: prevent invalid characters while typing
   const handlePhoneChange = (e, setFieldValue) => {
-    const value = e.target.value;
-    const sanitized = value.replace(/[^0-9+]/g, ""); // remove invalid characters
+    const sanitized = e.target.value.replace(/[^0-9+]/g, "");
     setFieldValue("phone", sanitized);
   };
 
@@ -68,7 +62,7 @@ function SignIn({ onSwitch }) {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting, setFieldValue }) => (
+        {({ isSubmitting, setFieldValue, submitCount }) => (
           <Form className="auth-form">
             <Field
               type="tel"
@@ -77,7 +71,9 @@ function SignIn({ onSwitch }) {
               className="auth-input"
               onChange={(e) => handlePhoneChange(e, setFieldValue)}
             />
-            <ErrorMessage name="phone" component="div" className="auth-error" />
+            {submitCount > 0 && (
+              <ErrorMessage name="phone" component="div" className="auth-error" />
+            )}
 
             <Field
               type="password"
@@ -85,9 +81,19 @@ function SignIn({ onSwitch }) {
               placeholder="Password"
               className="auth-input"
             />
-            <ErrorMessage name="password" component="div" className="auth-error" />
+            {submitCount > 0 && (
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="auth-error"
+              />
+            )}
 
-            <button type="submit" className="auth-submit" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Signing in..." : "Sign In"}
             </button>
           </Form>
