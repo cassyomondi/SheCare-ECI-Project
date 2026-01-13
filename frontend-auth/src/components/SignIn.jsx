@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 
 function SignIn({ onSwitch }) {
+  const [apiError, setApiError] = useState(""); // <-- state for API error
+
   const initialValues = {
     phone: "",
     password: "",
@@ -14,34 +17,29 @@ function SignIn({ onSwitch }) {
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    setApiError(""); // clear previous error
     try {
       const payload = {
         phone: values.phone,
         password: values.password,
       };
 
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/login`,
-        payload
-      );
-
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/login`, payload);
       const loggedInUser = res.data.user;
 
-      // Optional: persist token if returned
       if (res.data.access_token) {
         localStorage.setItem("token", res.data.access_token);
       }
 
       resetForm();
 
-      // Redirect based on role
       if (loggedInUser.role === "admin") {
         window.location.href = "http://127.0.0.1:5174";
       } else {
         window.location.href = "/user-dashboard";
       }
     } catch (err) {
-      alert(err.response?.data?.error || "Login failed");
+      setApiError(err.response?.data?.error || "Login failed");
     } finally {
       setSubmitting(false);
     }
@@ -53,6 +51,8 @@ function SignIn({ onSwitch }) {
         Sign In to talk to SheCare on WhatsApp
       </h2>
 
+      {apiError && <div className="auth-error-banner">{apiError}</div>}
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -60,35 +60,13 @@ function SignIn({ onSwitch }) {
       >
         {({ isSubmitting }) => (
           <Form className="auth-form">
-            <Field
-              type="tel"
-              name="phone"
-              placeholder="Phone number"
-              className="auth-input"
-            />
-            <ErrorMessage
-              name="phone"
-              component="div"
-              className="auth-error"
-            />
+            <Field type="tel" name="phone" placeholder="Phone number" className="auth-input" />
+            <ErrorMessage name="phone" component="div" className="auth-error" />
 
-            <Field
-              type="password"
-              name="password"
-              placeholder="Password"
-              className="auth-input"
-            />
-            <ErrorMessage
-              name="password"
-              component="div"
-              className="auth-error"
-            />
+            <Field type="password" name="password" placeholder="Password" className="auth-input" />
+            <ErrorMessage name="password" component="div" className="auth-error" />
 
-            <button
-              type="submit"
-              className="auth-submit"
-              disabled={isSubmitting}
-            >
+            <button type="submit" className="auth-submit" disabled={isSubmitting}>
               {isSubmitting ? "Signing in..." : "Sign In"}
             </button>
           </Form>
@@ -97,11 +75,7 @@ function SignIn({ onSwitch }) {
 
       <p className="auth-footer">
         No account yet?{" "}
-        <button
-          type="button"
-          className="auth-link link-btn"
-          onClick={onSwitch}
-        >
+        <button type="button" className="auth-link link-btn" onClick={onSwitch}>
           Sign Up
         </button>
       </p>
