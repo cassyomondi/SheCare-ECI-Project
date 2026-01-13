@@ -1,12 +1,8 @@
-import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 
 function SignUp({ onSwitch }) {
-  const [apiError, setApiError] = useState(""); // <-- state for API error
-  const [apiSuccess, setApiSuccess] = useState(""); // optional success message
-
   const initialValues = {
     first_name: "",
     last_name: "",
@@ -26,22 +22,17 @@ function SignUp({ onSwitch }) {
       .required("Required"),
   });
 
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    setApiError("");
-    setApiSuccess("");
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const payload = { ...values };
       delete payload.confirm;
 
       await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
 
-      setApiSuccess("Signup successful!");
-      resetForm();
-
-      // redirect to sign in after short delay
-      setTimeout(onSwitch, 1000);
+      alert("Signup successful");
+      onSwitch();
     } catch (err) {
-      setApiError(err.response?.data?.error || "Signup failed");
+      alert(err.response?.data?.error || "Signup failed");
     } finally {
       setSubmitting(false);
     }
@@ -53,9 +44,6 @@ function SignUp({ onSwitch }) {
         Sign Up to talk to SheCare on WhatsApp
       </h2>
 
-      {apiError && <div className="auth-error-banner">{apiError}</div>}
-      {apiSuccess && <div className="auth-success-banner">{apiSuccess}</div>}
-
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -63,22 +51,68 @@ function SignUp({ onSwitch }) {
       >
         {({ isSubmitting }) => (
           <Form className="auth-form">
-            <Field name="first_name" placeholder="First Name" className="auth-input" />
-            <ErrorMessage name="first_name" component="div" className="auth-error" />
+            <Field
+              name="first_name"
+              placeholder="First Name"
+              className="auth-input"
+            />
+            <ErrorMessage
+              name="first_name"
+              component="div"
+              className="auth-error"
+            />
 
-            <Field name="last_name" placeholder="Last Name" className="auth-input" />
-            <ErrorMessage name="last_name" component="div" className="auth-error" />
+            <Field
+              name="last_name"
+              placeholder="Last Name"
+              className="auth-input"
+            />
+            <ErrorMessage
+              name="last_name"
+              component="div"
+              className="auth-error"
+            />
 
-            <Field name="phone" placeholder="Phone number" className="auth-input" />
-            <ErrorMessage name="phone" component="div" className="auth-error" />
+            <Field
+              name="phone"
+              placeholder="Phone number"
+              className="auth-input"
+            />
+            <ErrorMessage
+              name="phone"
+              component="div"
+              className="auth-error"
+            />
 
-            <Field type="password" name="password" placeholder="Password" className="auth-input" />
-            <ErrorMessage name="password" component="div" className="auth-error" />
+            <Field
+              type="password"
+              name="password"
+              placeholder="Password"
+              className="auth-input"
+            />
+            <ErrorMessage
+              name="password"
+              component="div"
+              className="auth-error"
+            />
 
-            <Field type="password" name="confirm" placeholder="Confirm Password" className="auth-input" />
-            <ErrorMessage name="confirm" component="div" className="auth-error" />
+            <Field
+              type="password"
+              name="confirm"
+              placeholder="Confirm Password"
+              className="auth-input"
+            />
+            <ErrorMessage
+              name="confirm"
+              component="div"
+              className="auth-error"
+            />
 
-            <button type="submit" className="auth-submit" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Creating..." : "Sign Up"}
             </button>
           </Form>
