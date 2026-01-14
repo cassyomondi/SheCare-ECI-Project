@@ -67,6 +67,9 @@ def signup():
 
     phone = "".join(phone.split()) if phone else None
     email = email.strip().lower() if email else None
+    first_name = first_name.strip() if first_name else None
+    last_name = last_name.strip() if last_name else None
+
 
     if not phone or not email or not password:
         return jsonify({"error": "Phone, email, and password are required"}), 400
