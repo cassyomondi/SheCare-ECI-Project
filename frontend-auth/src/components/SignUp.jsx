@@ -45,7 +45,7 @@ function SignUp({ onSwitch }) {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     setApiError("");
-    setApiSuccess("");
+    
     try {
       const payload = { ...values };
       delete payload.confirm;
@@ -54,11 +54,12 @@ function SignUp({ onSwitch }) {
       payload.email = payload.email.trim().toLowerCase();
       payload.phone = payload.phone.trim();
 
-      await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
 
-      setApiSuccess("Signup successful!");
-      resetForm();
-      setTimeout(onSwitch, 1000);
+      localStorage.setItem("token", res.data.access_token);
+
+      window.location.href = "/user-dashboard";
+      
     } catch (err) {
       setApiError(err.response?.data?.error || "Signup failed");
     } finally {
