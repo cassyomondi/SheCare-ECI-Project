@@ -74,8 +74,12 @@ def signup():
     if not phone or not email or not password:
         return jsonify({"error": "Phone, email, and password are required"}), 400
 
-    if User.query.filter((User.phone == phone) | (User.email == email)).first():
-        return jsonify({"error": "User already exists"}), 400
+    if User.query.filter(User.email == email).first():
+        return jsonify({"error": "The email is taken"}), 409
+
+    if User.query.filter(User.phone == phone).first():
+        return jsonify({"error": "The phone number is taken"}), 409
+
 
     # Create new user
     user = User(
