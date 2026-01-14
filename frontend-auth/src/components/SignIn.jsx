@@ -53,10 +53,7 @@ function SignIn({ onSwitch }) {
 
       resetForm();
 
-      window.location.href =
-        res.data.user.role === "admin"
-          ? "http://127.0.0.1:5174"
-          : "/user-dashboard";
+      window.location.href = "/user-dashboard";
 
     } catch (err) {
       setApiError(err.response?.data?.error || "Login failed");
