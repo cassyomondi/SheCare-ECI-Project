@@ -11,10 +11,20 @@ function App() {
 
   // Hydrate from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
-    setLoading(false); // Finished loading
+  const token = localStorage.getItem("token");
+  if (!token) {
+    setLoading(false);
+    return;
+  }
+
+  axios.get(`${import.meta.env.VITE_API_URL}/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  .then(res => setUser(res.data))
+  .catch(() => localStorage.removeItem("token"))
+  .finally(() => setLoading(false));
   }, []);
+
 
   const handleSetUser = (userData) => {
     setUser(userData);
