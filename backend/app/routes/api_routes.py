@@ -81,15 +81,24 @@ def signup():
         db.session.add(participant)
         db.session.commit()
 
+
+    access_token = create_access_token(
+    identity={"user_id": user.id, "email": user.email, "role": user.role},
+    expires_delta=timedelta(hours=12)
+    )
+
+
     return jsonify({
-        "message": "User registered successfully",
-        "user": {
-            "id": user.id,
-            "email": user.email,
-            "phone": user.phone,
-            "role": user.role
-        }
+    "message": "User registered successfully",
+    "access_token": access_token,
+    "user": {
+        "id": user.id,
+        "email": user.email,
+        "phone": user.phone,
+        "role": user.role
+    }
     }), 201
+
 
 
 # -----------------------------
