@@ -65,7 +65,7 @@ def signup():
     last_name = data.get("last_name")
     role = data.get("role", "participant")
 
-    phone = phone.strip() if phone else None
+    phone = "".join(phone.split()) if phone else None
     email = email.strip().lower() if email else None
 
     if not phone or not email or not password:
