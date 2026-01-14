@@ -4,6 +4,8 @@ import Main from "./components/Main";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import UserDashboard from "./pages/UserDashboard";
+import axios from "axios";
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -28,7 +30,6 @@ function App() {
 
   const handleSetUser = (userData) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   if (loading) return <div>Loading...</div>; // wait for hydration
@@ -43,6 +44,7 @@ function App() {
           path="/user-dashboard"
           element={user ? <UserDashboard user={user} /> : <Navigate to="/signin" />}
         />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

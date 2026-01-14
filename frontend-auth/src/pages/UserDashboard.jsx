@@ -1,37 +1,6 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import "../App.css";
 
-function UserDashboard() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      window.location.href = "/"; // not logged in
-      return;
-    }
-
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        setUser(res.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        localStorage.removeItem("token");
-        window.location.href = "/";
-      });
-  }, []);
-
-  if (loading) return <div className="dashboard-overlay">Loading…</div>;
-
+function UserDashboard({ user }) {
   return (
     <div className="dashboard-overlay">
       <div className="dashboard-card">

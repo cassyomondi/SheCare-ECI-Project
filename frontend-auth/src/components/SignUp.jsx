@@ -2,11 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-function SignUp({ onSwitch }) {
+function SignUp({ onSwitch, setUser }) {
+
   const [apiError, setApiError] = useState("");
-
   const topRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (apiError) {
@@ -55,9 +57,23 @@ function SignUp({ onSwitch }) {
 
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
 
-      localStorage.setItem("token", res.data.access_token);
+      const token = res.data?.access_token;
+      if (!token) {
+        setApiError("Sign Up succeeded but no token was returned.");
+        return;
+      }
 
-      window.location.href = "/user-dashboard";
+      localStorage.setItem("token", token);
+
+      // IMPORTANT: set App user state
+      setUser({
+        user_id: res.data.user.id,
+        email: res.data.user.email,
+        role: res.data.user.role
+      });
+
+      resetForm();
+      navigate("/user-dashboard");
       
     } catch (err) {
       setApiError(err.response?.data?.error || "Signup failed");
@@ -113,7 +129,7 @@ function SignUp({ onSwitch }) {
 
       <p className="auth-footer">
         Already have an account?{" "}
-        <button type="button" className="auth-link link-btn" onClick={onSwitch}>
+        <button type="button" className="auth-link link-btn" onClick={() => (onSwitch ? onSwitch() : navigate("/signin"))}>
           Sign In
         </button>
       </p>
