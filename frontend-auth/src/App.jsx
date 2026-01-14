@@ -37,7 +37,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Main />} />
+        <Route path="/" element={<Main setUser={handleSetUser} />} />
         <Route path="/signin" element={<SignIn setUser={handleSetUser} />} />
         <Route path="/signup" element={<SignUp setUser={handleSetUser} />} />
         <Route

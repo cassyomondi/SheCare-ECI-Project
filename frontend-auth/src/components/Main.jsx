@@ -3,7 +3,7 @@ import "../App.css";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 
-function Main() {
+function Main({ setUser }) {
   const [mode, setMode] = useState("signin"); // "signin" | "signup"
 
   return (
@@ -28,9 +28,9 @@ function Main() {
           key={mode}
         >
           {mode === "signin" ? (
-            <SignIn onSwitch={() => setMode("signup")} />
+            <SignIn setUser={setUser} onSwitch={() => setMode("signup")} />
           ) : (
-            <SignUp onSwitch={() => setMode("signin")} />
+            <SignUp setUser={setUser} onSwitch={() => setMode("signin")} />
           )}
         </div>
       </div>
