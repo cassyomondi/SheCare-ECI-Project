@@ -50,7 +50,8 @@ function SignUp({ onSwitch }) {
 
       
       payload.email = payload.email.trim().toLowerCase();
-      payload.phone = payload.phone.trim();
+      payload.phone = payload.phone.replace(/\s+/g, "");
+
 
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
 
