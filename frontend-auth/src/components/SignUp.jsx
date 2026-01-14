@@ -5,16 +5,14 @@ import axios from "axios";
 
 function SignUp({ onSwitch }) {
   const [apiError, setApiError] = useState("");
-  const [apiSuccess, setApiSuccess] = useState("");
 
   const topRef = useRef(null);
 
   useEffect(() => {
-    if (apiError || apiSuccess) {
+    if (apiError) {
       topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }, [apiError, apiSuccess]);
-
+  }, [apiError]);
 
   const initialValues = {
     first_name: "",
@@ -74,12 +72,10 @@ function SignUp({ onSwitch }) {
 
   return (
     <>
-
       <div ref={topRef} />
       <h2 className="auth-title">Sign Up to talk to SheCare on WhatsApp</h2>
 
       {apiError && <div className="auth-error-banner">{apiError}</div>}
-      {apiSuccess && <div className="auth-success-banner">{apiSuccess}</div>}
 
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
         {({ isSubmitting, setFieldValue, submitCount }) => (
