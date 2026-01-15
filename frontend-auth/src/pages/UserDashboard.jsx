@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 
 
-function UserDashboard({ user }) {
+function UserDashboard({ user, setUser }) {
+
   const navigate = useNavigate();
   const [active, setActive] = useState("dashboard"); // "dashboard" | "profile"
   const [fading, setFading] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
 
   // Prefer a real name if you later add it to /me; fallback to email prefix.
   const username = useMemo(() => {
@@ -37,9 +40,21 @@ function UserDashboard({ user }) {
   };
 
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    navigate("/"); // or "/signin" if you prefer
+    setShowLogoutConfirm(true);
   };
+
+  const confirmSignOut = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    setShowLogoutConfirm(false);
+    navigate("/", { replace: true });
+};
+
+
+  const cancelSignOut = () => {
+    setShowLogoutConfirm(false);
+  };
+
 
   return (
     <div className="sd-shell">
@@ -51,7 +66,11 @@ function UserDashboard({ user }) {
             alt="SheCare"
             className="sd-logo"
           />
+          
         </div>
+
+
+        <div className="sd-navSpacer" />
 
 
         <nav className="sd-nav">
@@ -69,7 +88,8 @@ function UserDashboard({ user }) {
                 />
               </svg>
             </span>
-            <span>Dashboard</span>
+            <span className="sd-navLabel">Dashboard</span>
+
           </button>
 
           <button
@@ -86,7 +106,8 @@ function UserDashboard({ user }) {
                 />
               </svg>
             </span>
-            <span>Profile</span>
+            <span className="sd-navLabel">Profile</span>
+
           </button>
         </nav>
 
@@ -118,15 +139,10 @@ function UserDashboard({ user }) {
                   rel="noopener noreferrer"
                 >
                   <span className="sd-waIcon" aria-hidden="true">
-                    {/* whatsapp icon */}
-                    <svg viewBox="0 0 32 32" width="18" height="18">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
                       <path
-                        d="M19.1 17.6c-.3-.1-1.7-.8-2-.9s-.5-.1-.7.1-.8.9-1 1.1-.4.2-.7.1c-.3-.1-1.3-.5-2.5-1.6-.9-.8-1.6-1.9-1.7-2.2s0-.5.1-.6l.5-.6c.1-.2.2-.4.3-.6s0-.4 0-.6c-.1-.1-.7-1.6-1-2.2-.3-.6-.6-.5-.7-.5h-.6c-.2 0-.6.1-.9.4s-1.1 1-1.1 2.5 1.1 2.9 1.2 3.1c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 1.9-1.3.2-.6.2-1.2.1-1.3-.1-.1-.3-.2-.6-.3z"
                         fill="currentColor"
-                      />
-                      <path
-                        d="M26.7 5.3A13.7 13.7 0 0 0 4.5 21.9L3 29l7.3-1.9A13.7 13.7 0 0 0 29 16a13.6 13.6 0 0 0-2.3-10.7zM16 27a11 11 0 0 1-5.6-1.5l-.4-.2-4.3 1.1 1.1-4.2-.2-.4A11 11 0 1 1 16 27z"
-                        fill="currentColor"
+                        d="M20.52 3.48A11.86 11.86 0 0 0 12.06 0C5.51 0 .2 5.3.2 11.83c0 2.08.54 4.11 1.57 5.9L0 24l6.42-1.69a11.86 11.86 0 0 0 5.64 1.43h.01c6.55 0 11.86-5.3 11.86-11.83 0-3.16-1.23-6.14-3.41-8.43ZM12.06 21.7h-.01a9.9 9.9 0 0 1-5.05-1.39l-.36-.21-3.81 1 1.02-3.71-.24-.38a9.86 9.86 0 0 1-1.52-5.18c0-5.45 4.46-9.89 9.96-9.89 2.66 0 5.16 1.03 7.04 2.9a9.82 9.82 0 0 1 2.92 6.99c0 5.45-4.46 9.89-9.95 9.89Zm5.77-7.41c-.31-.16-1.84-.9-2.12-1-.28-.1-.49-.16-.7.16-.2.31-.8 1-.98 1.2-.18.2-.36.23-.67.08-.31-.16-1.3-.48-2.47-1.52-.91-.8-1.52-1.79-1.7-2.1-.18-.31-.02-.48.14-.64.14-.14.31-.36.47-.54.16-.18.2-.31.31-.51.1-.2.05-.39-.03-.54-.08-.16-.7-1.67-.96-2.29-.25-.6-.51-.52-.7-.53l-.6-.01c-.2 0-.52.08-.8.39-.28.31-1.06 1.04-1.06 2.53s1.08 2.93 1.23 3.13c.16.2 2.12 3.23 5.14 4.53.72.31 1.28.5 1.72.64.72.23 1.37.2 1.89.12.58-.09 1.84-.75 2.1-1.47.26-.72.26-1.33.18-1.47-.08-.13-.28-.2-.6-.36Z"
                       />
                     </svg>
                   </span>
@@ -141,6 +157,27 @@ function UserDashboard({ user }) {
           )}
         </div>
       </main>
+
+      {showLogoutConfirm && (
+            <div className="sd-modalOverlay">
+              <div className="sd-modal">
+                <h3 className="sd-modalTitle">Sign out?</h3>
+                <p className="sd-modalText">
+                  Are you sure you want to sign out of your SheCare account?
+                </p>
+
+                <div className="sd-modalActions">
+                  <button type="button" className="sd-modalCancel" onClick={cancelSignOut}>
+                    Cancel
+                  </button>
+                  <button type="button" className="sd-modalConfirm" onClick={confirmSignOut}>
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
     </div>
   );
 }

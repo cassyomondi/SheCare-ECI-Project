@@ -50,8 +50,9 @@ function App() {
 
         <Route
           path="/user-dashboard"
-          element={user ? <UserDashboard user={user} /> : <Navigate to="/signin" />}
+          element={user ? <UserDashboard user={user} setUser={handleSetUser} /> : <Navigate to="/signin" />}
         />
+
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
