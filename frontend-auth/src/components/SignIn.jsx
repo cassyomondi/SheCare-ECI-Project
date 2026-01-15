@@ -114,7 +114,8 @@ function SignIn({ onSwitch, setUser }) {
         <button
           type="button"
           className="auth-link link-btn"
-          onClick={() => (onSwitch ? onSwitch() : navigate("/signup"))}
+          onClick={onSwitch}
+
         >
           Sign Up
         </button>

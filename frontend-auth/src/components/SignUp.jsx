@@ -129,7 +129,7 @@ function SignUp({ onSwitch, setUser }) {
 
       <p className="auth-footer">
         Already have an account?{" "}
-        <button type="button" className="auth-link link-btn" onClick={() => (onSwitch ? onSwitch() : navigate("/signin"))}>
+        <button type="button" className="auth-link link-btn" onClick={onSwitch}>
           Sign In
         </button>
       </p>
