@@ -38,8 +38,16 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Main setUser={handleSetUser} />} />
-        <Route path="/signin" element={<SignIn setUser={handleSetUser} />} />
-        <Route path="/signup" element={<SignUp setUser={handleSetUser} />} />
+        <Route
+          path="/signin"
+          element={!user ? <SignIn setUser={handleSetUser} /> : <Navigate to="/user-dashboard" />}
+        />
+
+        <Route
+          path="/signup"
+          element={!user ? <SignUp setUser={handleSetUser} /> : <Navigate to="/user-dashboard" />}
+        />
+
         <Route
           path="/user-dashboard"
           element={user ? <UserDashboard user={user} /> : <Navigate to="/signin" />}

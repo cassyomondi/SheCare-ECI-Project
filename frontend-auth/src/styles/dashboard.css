@@ -1,0 +1,249 @@
+/* --- SHECARE DASHBOARD --- */
+
+:root {
+  --sd-bg: #f6f7fb;
+  --sd-card: #ffffff;
+  --sd-text: #111827;
+  --sd-muted: #6b7280;
+  --sd-border: #e5e7eb;
+  --sd-accent: #00c2a8;
+  --sd-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+}
+
+.sd-shell {
+  min-height: 100vh;
+  background: radial-gradient(circle at 20% 20%, #ffffff 0%, var(--sd-bg) 45%, #f3f4f6 100%);
+  display: grid;
+  grid-template-columns: 290px 1px 1fr;
+}
+
+.sd-sidebar {
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sd-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 18px;
+}
+
+.sd-logo {
+  height: 34px;
+  width: auto;
+}
+
+.sd-profile {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--sd-border);
+  border-radius: 16px;
+  padding: 18px 14px;
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.sd-avatarWrap {
+  width: 74px;
+  height: 74px;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 auto 10px;
+  border: 3px solid rgba(0, 194, 168, 0.18);
+  background: #fff;
+}
+
+.sd-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sd-userName {
+  font-weight: 700;
+  color: var(--sd-text);
+  font-size: 15px;
+}
+
+.sd-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.sd-navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #374151;
+  padding: 12px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: left;
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.sd-navItem:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--sd-border);
+  transform: translateY(-1px);
+}
+
+.sd-navItem.is-active {
+  background: rgba(0, 194, 168, 0.10);
+  border-color: rgba(0, 194, 168, 0.18);
+  color: var(--sd-text);
+}
+
+.sd-icon {
+  display: inline-flex;
+  color: #111827;
+  opacity: 0.9;
+}
+
+.sd-spacer {
+  flex: 1;
+}
+
+.sd-signout {
+  width: 100%;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 999px;
+  background: var(--sd-accent);
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 194, 168, 0.25);
+  transition: transform 140ms ease, filter 140ms ease;
+}
+
+.sd-signout:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.98);
+}
+
+.sd-divider {
+  background: var(--sd-border);
+  margin: 18px 0; /* spacing top & bottom as requested */
+  border-radius: 999px;
+}
+
+.sd-main {
+  padding: 28px 28px;
+  display: flex;
+}
+
+.sd-content {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--sd-border);
+  border-radius: 18px;
+  box-shadow: var(--sd-shadow);
+  padding: 26px 26px;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.sd-content.is-fading {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.sd-panel {
+  min-height: calc(100vh - 56px - 56px); /* rough padding compensation */
+  display: flex;
+  flex-direction: column;
+}
+
+.sd-header {
+  margin-bottom: 28px;
+}
+
+.sd-title {
+  font-size: 26px;
+  margin: 0 0 6px;
+  color: var(--sd-text);
+  font-weight: 800;
+}
+
+.sd-subtitle {
+  margin: 0;
+  color: var(--sd-muted);
+  font-weight: 600;
+}
+
+.sd-center {
+  flex: 1;
+  display: grid;
+  place-items: center;
+}
+
+.sd-whatsappBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 999px;
+  background: #111827;
+  color: #ffffff;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 14px 24px rgba(17, 24, 39, 0.20);
+  transition: transform 140ms ease, filter 140ms ease;
+}
+
+.sd-whatsappBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.sd-waIcon {
+  display: inline-flex;
+}
+
+.sd-panelBlank {
+  background: transparent;
+}
+
+/* Responsive: collapse sidebar on smaller screens */
+@media (max-width: 900px) {
+  .sd-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sd-divider {
+    display: none;
+  }
+
+  .sd-sidebar {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .sd-profile {
+    display: none;
+  }
+
+  .sd-nav {
+    flex-direction: row;
+    margin: 0;
+  }
+
+  .sd-signout {
+    width: auto;
+    padding: 10px 14px;
+    margin-left: auto;
+  }
+
+  .sd-main {
+    padding: 18px;
+  }
+}
