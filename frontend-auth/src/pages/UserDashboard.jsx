@@ -25,11 +25,7 @@ function UserDashboard({ user }) {
     return "User";
   }, [user]);
 
-  const avatarUrl = useMemo(() => {
-    // Cartoon lady avatar generator (no email shown in UI; used only to vary the avatar)
-    const seed = encodeURIComponent(username || "shecare");
-    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&accessories=round&top=longHairStraight&eyes=happy&mouth=smile`;
-  }, [username]);
+  
 
   const switchTab = (tab) => {
     if (tab === active) return;
@@ -57,12 +53,6 @@ function UserDashboard({ user }) {
           />
         </div>
 
-        <div className="sd-profile">
-          <div className="sd-avatarWrap">
-            <img src={avatarUrl} alt="Profile" className="sd-avatar" />
-          </div>
-          <div className="sd-userName">{username}</div>
-        </div>
 
         <nav className="sd-nav">
           <button
