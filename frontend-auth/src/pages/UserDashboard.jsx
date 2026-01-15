@@ -131,6 +131,26 @@ function UserDashboard({ user, setUser }) {
                 <p className="sd-subtitle">We&apos;re glad to have you here.</p>
               </header>
 
+              {/* FEATURES ROW */}
+              <div className="sd-features">
+                <div className="sd-featureCard sd-feature1">
+                  <div className="sd-featureTitle">Check Symptoms Privately</div>
+                </div>
+
+                <div className="sd-featureCard sd-feature2">
+                  <div className="sd-featureTitle">Find Verified Clinics Near You</div>
+                </div>
+
+                <div className="sd-featureCard sd-feature3">
+                  <div className="sd-featureTitle">Access Prescription Support</div>
+                </div>
+
+                <div className="sd-featureCard sd-feature4">
+                  <div className="sd-featureTitle">Receive Daily Health Tips</div>
+                </div>
+              </div>
+
+              {/* WHATSAPP CTA */}
               <div className="sd-center">
                 <a
                   className="sd-whatsappBtn"
@@ -149,6 +169,8 @@ function UserDashboard({ user, setUser }) {
                   Chat with SheCare on WhatsApp
                 </a>
               </div>
+
+              
             </section>
           ) : (
             <section className="sd-panel sd-panelBlank" aria-label="Profile">
