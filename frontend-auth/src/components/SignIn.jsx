@@ -1,3 +1,4 @@
+// SignIn.jsx
 import { useState, useEffect, useRef } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -5,7 +6,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function SignIn({ onSwitch, setUser }) {
-
   const navigate = useNavigate();
   const [apiError, setApiError] = useState("");
   const topRef = useRef(null);
@@ -15,7 +15,6 @@ function SignIn({ onSwitch, setUser }) {
       topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [apiError]);
-
 
   const initialValues = {
     emailOrPhone: "",
@@ -28,10 +27,7 @@ function SignIn({ onSwitch, setUser }) {
       .test("email-or-phone", "Enter a valid email or phone number", (value) => {
         if (!value) return false;
         const v = value.trim();
-        return (
-          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ||
-          /^\+?\d{10,15}$/.test(v)
-        );
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || /^\+?\d{10,15}$/.test(v);
       }),
     password: Yup.string().required("Password is required"),
   });
@@ -40,13 +36,11 @@ function SignIn({ onSwitch, setUser }) {
     setApiError("");
     try {
       const input = values.emailOrPhone.trim();
-
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
 
       const payload = {
         email: isEmail ? input.toLowerCase() : null,
         phone: isEmail ? null : input.replace(/\s+/g, ""),
-
         password: values.password,
       };
 
@@ -60,16 +54,14 @@ function SignIn({ onSwitch, setUser }) {
 
       localStorage.setItem("token", token);
 
-      // IMPORTANT: set App user state
       setUser({
         user_id: res.data.user.id,
         email: res.data.user.email,
-        role: res.data.user.role
+        role: res.data.user.role,
       });
 
       resetForm();
       navigate("/user-dashboard");
-
     } catch (err) {
       setApiError(err.response?.data?.error || "Login failed");
     } finally {
@@ -91,16 +83,23 @@ function SignIn({ onSwitch, setUser }) {
               name="emailOrPhone"
               placeholder="Email or phone number"
               className="auth-input"
+              autoComplete="username"
+              inputMode="email"
             />
-            {submitCount > 0 && <ErrorMessage name="emailOrPhone" component="div" className="auth-error" />}
+            {submitCount > 0 && (
+              <ErrorMessage name="emailOrPhone" component="div" className="auth-error" />
+            )}
 
             <Field
               type="password"
               name="password"
               placeholder="Password"
               className="auth-input"
+              autoComplete="current-password"
             />
-            {submitCount > 0 && <ErrorMessage name="password" component="div" className="auth-error" />}
+            {submitCount > 0 && (
+              <ErrorMessage name="password" component="div" className="auth-error" />
+            )}
 
             <button type="submit" className="auth-submit" disabled={isSubmitting}>
               {isSubmitting ? "Signing in..." : "Sign In"}
@@ -111,12 +110,7 @@ function SignIn({ onSwitch, setUser }) {
 
       <p className="auth-footer">
         No account yet?{" "}
-        <button
-          type="button"
-          className="auth-link link-btn"
-          onClick={onSwitch}
-
-        >
+        <button type="button" className="auth-link link-btn" onClick={onSwitch}>
           Sign Up
         </button>
       </p>

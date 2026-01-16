@@ -1,9 +1,10 @@
+/* auth.css */
+
 .auth-layout {
   display: flex;
   height: 100vh;
   width: 100%;
 }
-
 
 /* LEFT */
 .auth-left {
@@ -12,7 +13,6 @@
   background: url("https://shecare.africa/static/img/Gemini_Generated_Image_3yw8783yw8783yw8.png")
     center / cover no-repeat;
 }
-
 
 .auth-left-content {
   position: relative;
@@ -24,8 +24,6 @@
   align-items: center;
   justify-content: flex-start;
 }
-
-
 
 .auth-logo {
   width: 120px;
@@ -39,31 +37,28 @@
   flex-direction: column;
   align-items: center;
   padding: 60px;
-  overflow-y: auto; /* ✅ key fix */
+  overflow-y: auto;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Ensure the right side starts from the top, not the middle */
 .auth-right-centered {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Aligns content to the top */
-  padding-top: 60px;           /* Adds breathing room at the very top */
+  justify-content: flex-start;
+  padding-top: 60px;
 }
 
-/* Specific styling for the new top logo position */
 .auth-logo-top {
-  width: 120px;                /* Adjust size as needed */
+  width: 120px;
   height: auto;
-  margin-bottom: 40px;         /* Creates space between logo and title */
+  margin-bottom: 40px;
 }
 
-/* Optional: If you want the form itself to stay centered lower down */
 .auth-content-container {
   width: 100%;
-  max-width: 400px;            /* Keeps the form neat */
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -104,36 +99,28 @@
   gap: 20px;
 }
 
-
-
 .auth-input,
 .auth-submit {
   width: 100%;
 }
 
 .auth-input {
-  width: 100%;
   padding: 18px 16px;
   font-size: 15px;
-
-  background-color: #f5f5f5;   /* ✅ inputs are grey */
+  background-color: #f5f5f5;
   border-radius: 10px;
   border: 1px solid #e0e0e0;
 }
 
 .auth-input:focus {
-  background-color: #ffffff;  /* optional UX polish */
+  background-color: #ffffff;
   border-color: #00c2a8;
 }
 
-
 .auth-submit {
-  width: 100%;
   padding: 18px;
-
-  background-color: #00c2a8;  /* ✅ green CTA */
+  background-color: #00c2a8;
   color: #ffffff;
-
   font-size: 16px;
   font-weight: 600;
   border: none;
@@ -146,12 +133,10 @@
   background-color: #00a893;
 }
 
-
 /* UTILITIES */
 .centered-text {
   text-align: center;
 }
-
 
 .fade {
   animation: fadeIn 0.35s ease;
@@ -168,14 +153,12 @@
   }
 }
 
-/* Make auth-link clickable like text */
 .link-btn {
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
 }
-
 
 .auth-error {
   font-size: 13px;
@@ -199,4 +182,98 @@
   margin-bottom: 15px;
   border-radius: 5px;
   text-align: center;
+}
+
+/* =========================
+   MOBILE: single-pane layout
+   ========================= */
+@media (max-width: 900px) {
+  /* remove split screen */
+  .auth-layout {
+    display: block;
+    height: 100dvh;
+    min-height: 100dvh;
+    width: 100%;
+    background: #ffffff;
+  }
+
+  .auth-left {
+    display: none;
+  }
+
+  /* right becomes full width */
+  .auth-right {
+    width: 100%;
+    flex: none;
+    min-height: 100dvh;
+    padding: 28px 18px 22px;
+    overflow-y: auto;
+  }
+
+  .auth-right-centered {
+    padding-top: 22px;
+  }
+
+  /* tighten sizes so nothing feels oversized */
+  .auth-logo-top {
+    width: 96px;
+    margin-bottom: 22px;
+  }
+
+  .auth-content-container {
+    max-width: 420px;
+  }
+
+  .auth-title {
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+  }
+
+  .auth-form {
+    gap: 14px;
+    max-width: 420px;
+  }
+
+  .auth-input {
+    padding: 14px 14px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  .auth-submit {
+    padding: 14px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .auth-footer {
+    margin-top: 18px;
+    font-size: 13px;
+  }
+
+  .auth-error {
+    font-size: 12px;
+    margin-top: -8px;
+  }
+
+  .auth-error-banner,
+  .auth-success-banner {
+    padding: 10px;
+    font-size: 13px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .auth-right {
+    padding: 22px 14px 18px;
+  }
+
+  .auth-logo-top {
+    width: 88px;
+  }
+
+  .auth-title {
+    font-size: 1rem;
+  }
 }
