@@ -1,46 +1,55 @@
+/* dashboard.css */
 /* --- SHECARE DASHBOARD --- */
 
 :root {
-  --sd-bg: #ffffff;     /* CHANGED */
+  --sd-bg: #ffffff;
   --sd-card: #ffffff;
   --sd-text: #111827;
   --sd-muted: #6b7280;
   --sd-border: #e5e7eb;
   --sd-accent: #00c2a8;
   --sd-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
-  --wa-green: #25D366;  /* NEW */
-  --wa-green-hover: #1fb85a; /* NEW */
+  --wa-green: #25D366;
+  --wa-green-hover: #1fb85a;
 }
 
+/* =========================
+   DESKTOP LAYOUT (unchanged)
+   ========================= */
 .sd-shell {
   min-height: 100vh;
-  background: #ffffff; /* CHANGED (remove gradient) */
+  background: #ffffff;
   display: grid;
   grid-template-columns: 290px 1px 1fr;
 }
 
+/* Mobile topbar hidden on desktop */
+.sd-topbar {
+  display: none;
+}
 
 .sd-sidebar {
   padding: 22px 18px;
   display: flex;
   flex-direction: column;
-  background: transparent;   /* optional, but keeps it flat */
+  background: transparent;
 }
-
 
 .sd-brand {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px 0 28px;  /* was 18px */
+  padding: 10px 0 28px;
 }
 
-
 .sd-logo {
-  height: 96px;   /* was 46px */
+  height: 96px;
   width: auto;
 }
 
+.sd-drawerHeader {
+  display: none; /* desktop */
+}
 
 .sd-nav {
   display: flex;
@@ -50,9 +59,8 @@
 }
 
 .sd-navSpacer {
-  flex: 0.2; /* adjust between 0.4 and 1.2 until it feels centered */
+  flex: 0.2;
 }
-
 
 .sd-navItem {
   display: flex;
@@ -83,20 +91,18 @@
 }
 
 .sd-navLabel {
-  display: inline-flex; /* NEW */
-  align-items: center;  /* NEW */
-  line-height: 1;       /* NEW */
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
-
 
 .sd-icon {
   display: inline-flex;
-  align-items: center; /* NEW */
-  line-height: 0;      /* NEW: prevents baseline lift */
+  align-items: center;
+  line-height: 0;
   color: #111827;
   opacity: 0.9;
 }
-
 
 .sd-spacer {
   flex: 1;
@@ -122,7 +128,7 @@
 
 .sd-divider {
   background: var(--sd-border);
-  margin: 18px 0; /* spacing top & bottom as requested */
+  margin: 18px 0;
   border-radius: 999px;
 }
 
@@ -133,14 +139,13 @@
 
 .sd-content {
   width: 100%;
-  background: transparent;           /* CHANGED */
-  border: none;                      /* CHANGED */
-  border-radius: 0;                  /* CHANGED */
-  box-shadow: none;                  /* CHANGED */
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   padding: 26px 26px;
   transition: opacity 120ms ease, transform 120ms ease;
 }
-
 
 .sd-content.is-fading {
   opacity: 0;
@@ -148,7 +153,7 @@
 }
 
 .sd-panel {
-  min-height: calc(100vh - 56px - 56px); /* rough padding compensation */
+  min-height: calc(100vh - 56px - 56px);
   display: flex;
   flex-direction: column;
 }
@@ -170,19 +175,17 @@
   font-weight: 600;
 }
 
-
-/* --- DASHBOARD FEATURES (Expandable Hover) --- */
+/* =========================
+   FEATURES (desktop hover behavior)
+   ========================= */
 .sd-features {
   display: flex;
   gap: 16px;
   margin-top: 8px;
   margin-bottom: 26px;
-
-  /* sets a consistent “card row” height */
   height: 160px;
 }
 
-/* default: equal cards */
 .sd-featureCard {
   flex: 1 1 0;
   height: 100%;
@@ -191,7 +194,6 @@
   overflow: hidden;
   box-shadow: 0 14px 26px rgba(17, 24, 39, 0.08);
   cursor: default;
-
   transition:
     flex 320ms cubic-bezier(.2,.8,.2,1),
     border-radius 320ms cubic-bezier(.2,.8,.2,1),
@@ -199,17 +201,14 @@
     filter 220ms ease;
 }
 
-/* keep your gradients */
 .sd-feature1 { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
 .sd-feature2 { background: linear-gradient(135deg, #0ea5e9, #38bdf8); }
 .sd-feature3 { background: linear-gradient(135deg, #f97316, #fb923c); }
 .sd-feature4 { background: linear-gradient(135deg, #10b981, #34d399); }
 
-/* image sits behind text but above background */
-/* 5. Ensure images don't overlap the bottom-left title too much */
 .sd-featureImg {
   position: absolute;
-  right: -20px; /* Pulled slightly more to the right */
+  right: -20px;
   top: 66%;
   transform: translateY(-50%);
   height: 85%;
@@ -220,18 +219,15 @@
   transition: all 320ms cubic-bezier(.2,.8,.2,1);
 }
 
-/* text container */
 .sd-featureText {
   position: absolute;
   left: 18px;
   right: 18px;
-  bottom: 18px; /* Anchor to bottom by default */
+  bottom: 18px;
   z-index: 3;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* Keeps title at the bottom */
-  
-  /* Remove top/transform from here so it doesn't float up yet */
+  justify-content: flex-end;
   transition: all 320ms cubic-bezier(.2,.8,.2,1);
 }
 
@@ -240,7 +236,6 @@
   color: #ffffff;
   font-size: 14px;
   letter-spacing: 0.1px;
-  /* 4. Added a subtle shadow to ensure readability against images */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
@@ -250,97 +245,51 @@
   font-size: 14px;
   line-height: 1.3;
   max-width: 85%;
-
-  /* Initial state: totally hidden and collapsed */
   opacity: 0;
-  max-height: 0; 
+  max-height: 0;
   margin-top: 0;
   overflow: hidden;
   transform: translateY(10px);
   transition: all 280ms ease;
 }
 
-/* --- Hover expansion behavior (requires :has) --- */
 .sd-features:has(.sd-featureCard:hover) .sd-featureCard {
-  /* squeeze non-hovered cards into slim pills */
   flex: 0 0 54px;
   border-radius: 999px;
 }
 
-/* hide contents of the squeezed cards */
 .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureImg,
 .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureText {
   opacity: 0;
 }
 
-/* hovered card becomes the large rectangle */
 .sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover {
   flex: 1 1 auto;
   border-radius: 22px;
   filter: saturate(1.02);
 }
 
-/* hovered: title shifts slightly above center, subtitle appears */
-/* hovered: shift the whole text block up slightly for balance */
 .sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover .sd-featureText {
-  bottom: 24px; /* Move up slightly from the 18px default */
+  bottom: 24px;
 }
 
 .sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover .sd-featureTitle {
-  font-size: 18px; /* Growth effect */
+  font-size: 18px;
 }
 
 .sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover .sd-featureSub {
   opacity: 1;
-  max-height: 80px; /* Large enough to fit text */
+  max-height: 80px;
   margin-top: 10px;
   transform: translateY(0);
 }
 
-/* hovered: image gets larger but stays on the right */
 .sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover .sd-featureImg {
   height: 110%;
   right: -18px;
   top: 60%;
   opacity: 0.98;
 }
-
-/* Responsive: stack into 2 rows */
-@media (max-width: 1100px) {
-  .sd-features {
-    flex-wrap: wrap;
-    height: auto;
-  }
-
-  .sd-featureCard {
-    flex: 1 1 calc(50% - 8px);
-    height: 160px;
-  }
-
-  /* on small screens, don’t do “squeeze to pills” */
-  .sd-features:has(.sd-featureCard:hover) .sd-featureCard {
-    flex: 1 1 calc(50% - 8px);
-    border-radius: 22px;
-  }
-
-  .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureImg,
-  .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureText {
-    opacity: 1;
-  }
-
-  .sd-featureSub {
-    max-width: 72%;
-  }
-}
-
-@media (max-width: 520px) {
-  .sd-featureCard {
-    flex: 1 1 100%;
-  }
-}
-
-
-
 
 .sd-center {
   flex: 1;
@@ -354,20 +303,24 @@
   gap: 10px;
   padding: 14px 18px;
   border-radius: 999px;
-  background: var(--wa-green);              /* CHANGED */
+  background: var(--wa-green);
   color: #ffffff;
   font-weight: 800;
   text-decoration: none;
-  box-shadow: 0 14px 24px rgba(37, 211, 102, 0.22);  /* CHANGED */
-  transition: transform 140ms ease, filter 140ms ease, background 140ms ease;
+  box-shadow: 0 14px 24px rgba(37, 211, 102, 0.22);
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1),
+              background 140ms ease,
+              filter 140ms ease;
+  will-change: transform;
+  animation: sdCtaFloat 3.2s ease-in-out infinite;
 }
 
 .sd-whatsappBtn:hover {
+  animation: sdCtaBounce 420ms ease-out both;
   transform: translateY(-1px);
-  background: var(--wa-green-hover);        /* NEW */
-  filter: none;                             /* CHANGED */
+  background: var(--wa-green-hover);
+  filter: none;
 }
-
 
 .sd-waIcon {
   display: inline-flex;
@@ -377,38 +330,12 @@
   background: transparent;
 }
 
-/* Responsive: collapse sidebar on smaller screens */
-@media (max-width: 900px) {
-  .sd-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .sd-divider {
-    display: none;
-  }
-
-  .sd-sidebar {
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .sd-nav {
-    flex-direction: row;
-    margin: 0;
-  }
-
-  .sd-signout {
-    width: auto;
-    padding: 10px 14px;
-    margin-left: auto;
-  }
-
-  .sd-main {
-    padding: 18px;
-  }
+/* =========================
+   MOBILE NAV OVERLAY (hidden on desktop)
+   ========================= */
+.sd-mobileOverlay {
+  display: none;
 }
-
 
 /* --- LOGOUT MODAL --- */
 .sd-modalOverlay {
@@ -432,8 +359,8 @@
 }
 
 @keyframes sdModalPop {
-  from { transform: scale(.94); opacity: 0 }
-  to   { transform: scale(1); opacity: 1 }
+  from { transform: scale(.94); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
 
 .sd-modalTitle {
@@ -479,8 +406,7 @@
   filter: brightness(0.96);
 }
 
-
-/* --- WHATSAPP CTA: subtle bouncy hover --- */
+/* --- WHATSAPP CTA ANIMATIONS --- */
 @keyframes sdCtaBounce {
   0%   { transform: translateY(0) scale(1); }
   35%  { transform: translateY(-4px) scale(1.02); }
@@ -488,55 +414,304 @@
   100% { transform: translateY(0) scale(1); }
 }
 
-/* enhance existing button behaviour */
-.sd-whatsappBtn {
-  transition: transform 220ms cubic-bezier(.2,.8,.2,1),
-              background 140ms ease,
-              filter 140ms ease;
-  will-change: transform;
-}
-
-.sd-whatsappBtn:hover {
-  animation: sdCtaBounce 420ms ease-out both;
-}
-
-/* keyboard focus support */
-.sd-whatsappBtn:focus-visible {
-  outline: 3px solid rgba(37, 211, 102, 0.35);
-  outline-offset: 3px;
-  animation: sdCtaBounce 420ms ease-out both;
-}
-
-/* respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .sd-whatsappBtn:hover,
-  .sd-whatsappBtn:focus-visible {
-    animation: none;
-  }
-}
-
-
-/* --- Idle floating animation (always-on subtle motion) --- */
 @keyframes sdCtaFloat {
   0%   { transform: translateY(0); }
   50%  { transform: translateY(-6px); }
   100% { transform: translateY(0); }
 }
 
-/* Apply idle motion */
-.sd-whatsappBtn {
-  animation: sdCtaFloat 3.2s ease-in-out infinite;
-}
-
-/* When user interacts, prioritize hover bounce instead */
-.sd-whatsappBtn:hover,
 .sd-whatsappBtn:focus-visible {
+  outline: 3px solid rgba(37, 211, 102, 0.35);
+  outline-offset: 3px;
   animation: sdCtaBounce 420ms ease-out both;
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .sd-whatsappBtn {
     animation: none;
+  }
+  .sd-whatsappBtn:hover,
+  .sd-whatsappBtn:focus-visible {
+    animation: none;
+  }
+}
+
+/* ==========================================
+   RESPONSIVE BEHAVIOR
+   - Desktop stays dual pane
+   - Mobile becomes topbar + drawer + single pane
+   ========================================== */
+
+/* Keep your existing mid breakpoint behavior for features (2x2) */
+@media (max-width: 1100px) {
+  .sd-features {
+    flex-wrap: wrap;
+    height: auto;
+  }
+
+  .sd-featureCard {
+    flex: 1 1 calc(50% - 8px);
+    height: 160px;
+  }
+
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard {
+    flex: 1 1 calc(50% - 8px);
+    border-radius: 22px;
+  }
+
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureImg,
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureText {
+    opacity: 1;
+  }
+
+  .sd-featureSub {
+    max-width: 72%;
+  }
+}
+
+/* =========================
+   MOBILE (<= 900px)
+   ========================= */
+@media (max-width: 900px) {
+  .sd-shell {
+    grid-template-columns: 1fr; /* single pane */
+  }
+
+  .sd-divider {
+    display: none;
+  }
+
+  /* Top bar */
+  .sd-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 1200;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--sd-border);
+  }
+
+  .sd-hamburger {
+    border: 1px solid var(--sd-border);
+    background: #ffffff;
+    color: #111827;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .sd-topbarBrand {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+  }
+
+  .sd-topbarLogo {
+    height: 34px; /* smaller logo on mobile */
+    width: auto;
+    display: block;
+  }
+
+  /* Drawer overlay (click to close) */
+  .sd-mobileOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.42);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+    z-index: 1100;
+    border: none;
+    padding: 0;
+  }
+
+  .sd-mobileOverlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Sidebar becomes an off-canvas drawer */
+  .sd-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 86vw;
+    max-width: 320px;
+    background: #ffffff;
+    border-right: 1px solid var(--sd-border);
+    z-index: 1150;
+
+    padding: 16px 14px;
+    transform: translateX(-105%);
+    transition: transform 220ms cubic-bezier(.2,.8,.2,1);
+    box-shadow: 0 20px 60px rgba(17, 24, 39, 0.18);
+  }
+
+  .sd-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  /* Hide desktop brand inside drawer (use drawer header instead) */
+  .sd-brand {
+    display: none;
+  }
+
+  .sd-drawerHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 4px 14px;
+    border-bottom: 1px solid var(--sd-border);
+    margin-bottom: 14px;
+  }
+
+  .sd-drawerLogo {
+    height: 44px;
+    width: auto;
+    display: block;
+  }
+
+  .sd-drawerClose {
+    border: 1px solid var(--sd-border);
+    background: #ffffff;
+    color: #111827;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .sd-navSpacer {
+    display: none;
+  }
+
+  .sd-nav {
+    margin-top: 10px;
+  }
+
+  .sd-signout {
+    margin-top: 14px;
+  }
+
+  /* Main content: under topbar, single pane */
+  .sd-main {
+    padding: 16px 14px 18px;
+    display: block;
+  }
+
+  .sd-content {
+    padding: 16px 0;
+  }
+
+  /* Header sizing for mobile */
+  .sd-header {
+    margin-bottom: 16px;
+  }
+
+  .sd-title {
+    font-size: 20px;
+  }
+
+  .sd-subtitle {
+    font-size: 14px;
+  }
+
+  /* FEATURES: vertical stack + subtitle always visible + disable hover behavior */
+  .sd-features {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .sd-featureCard {
+    flex: 1 1 auto;
+    height: 132px; /* slightly smaller */
+    border-radius: 18px;
+  }
+
+  .sd-featureImg {
+    height: 78%;
+    right: -16px;
+    top: 62%;
+    opacity: 0.92;
+  }
+
+  .sd-featureText {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .sd-featureTitle {
+    font-size: 14px;
+  }
+
+  .sd-featureSub {
+    opacity: 1;         /* always visible on mobile */
+    max-height: 120px;  /* allow content to show */
+    margin-top: 8px;
+    transform: translateY(0);
+    overflow: visible;
+    max-width: 86%;
+    font-size: 13px;    /* slightly smaller */
+    line-height: 1.35;
+  }
+
+  /* Disable "squeeze to pills" hover effect on mobile */
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard {
+    flex: 1 1 auto;
+    border-radius: 18px;
+  }
+
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureImg,
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureText {
+    opacity: 1;
+  }
+
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover {
+    filter: none;
+  }
+
+  /* CTA stays centered beneath cards */
+  .sd-center {
+    place-items: center;
+  }
+
+  .sd-whatsappBtn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Optional tighter breakpoint for very small phones */
+@media (max-width: 380px) {
+  .sd-featureCard {
+    height: 140px;
+  }
+
+  .sd-featureImg {
+    height: 72%;
+    right: -18px;
+  }
+
+  .sd-whatsappBtn {
+    width: 100%;
+    justify-content: center;
   }
 }

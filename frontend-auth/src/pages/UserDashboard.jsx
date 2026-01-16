@@ -1,15 +1,16 @@
+// UserDashboard.jsx
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 
-
 function UserDashboard({ user, setUser }) {
-
   const navigate = useNavigate();
   const [active, setActive] = useState("dashboard"); // "dashboard" | "profile"
   const [fading, setFading] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
+  // Mobile drawer
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Prefer a real name if you later add it to /me; fallback to email prefix.
   const username = useMemo(() => {
@@ -28,18 +29,18 @@ function UserDashboard({ user, setUser }) {
     return "User";
   }, [user]);
 
-  
-
   const switchTab = (tab) => {
     if (tab === active) return;
     setFading(true);
     window.setTimeout(() => {
       setActive(tab);
       setFading(false);
+      setMobileNavOpen(false); // close drawer on selection (mobile)
     }, 120); // quick fade
   };
 
   const handleSignOut = () => {
+    setMobileNavOpen(false);
     setShowLogoutConfirm(true);
   };
 
@@ -48,39 +49,93 @@ function UserDashboard({ user, setUser }) {
     setUser(null);
     setShowLogoutConfirm(false);
     navigate("/", { replace: true });
-};
-
+  };
 
   const cancelSignOut = () => {
     setShowLogoutConfirm(false);
   };
 
+  const closeMobileNav = () => setMobileNavOpen(false);
 
   return (
     <div className="sd-shell">
-      {/* LEFT SIDEBAR */}
-      <aside className="sd-sidebar">
+      {/* TOP BAR (Mobile) */}
+      <header className="sd-topbar" role="banner">
+        <button
+          type="button"
+          className="sd-hamburger"
+          aria-label="Open navigation menu"
+          aria-expanded={mobileNavOpen}
+          onClick={() => setMobileNavOpen(true)}
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path
+              d="M4 6.5h16a1 1 0 1 0 0-2H4a1 1 0 1 0 0 2Zm16 4.5H4a1 1 0 0 0 0 2h16a1 1 0 0 0 0-2Zm0 6H4a1 1 0 0 0 0 2h16a1 1 0 0 0 0-2Z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+
+        <div className="sd-topbarBrand" aria-label="SheCare">
+          <img
+            src="https://shecare-nu.vercel.app/images/logo.png"
+            alt="SheCare"
+            className="sd-topbarLogo"
+          />
+        </div>
+      </header>
+
+      {/* MOBILE DRAWER OVERLAY */}
+      <button
+        type="button"
+        className={`sd-mobileOverlay ${mobileNavOpen ? "is-open" : ""}`}
+        aria-label="Close navigation menu"
+        onClick={closeMobileNav}
+      />
+
+      {/* LEFT SIDEBAR (Desktop) + DRAWER (Mobile) */}
+      <aside className={`sd-sidebar ${mobileNavOpen ? "is-open" : ""}`}>
+        {/* Drawer header (mobile only) */}
+        <div className="sd-drawerHeader">
+          <img
+            src="https://shecare-nu.vercel.app/images/logo.png"
+            alt="SheCare"
+            className="sd-drawerLogo"
+          />
+
+          <button
+            type="button"
+            className="sd-drawerClose"
+            aria-label="Close navigation menu"
+            onClick={closeMobileNav}
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path
+                d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Desktop brand (desktop only) */}
         <div className="sd-brand">
           <img
             src="https://shecare-nu.vercel.app/images/logo.png"
             alt="SheCare"
             className="sd-logo"
           />
-          
         </div>
-
 
         <div className="sd-navSpacer" />
 
-
-        <nav className="sd-nav">
+        <nav className="sd-nav" aria-label="Dashboard navigation">
           <button
             className={`sd-navItem ${active === "dashboard" ? "is-active" : ""}`}
             onClick={() => switchTab("dashboard")}
             type="button"
           >
             <span className="sd-icon" aria-hidden="true">
-              {/* house icon */}
               <svg viewBox="0 0 24 24" width="18" height="18">
                 <path
                   d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10.5z"
@@ -89,7 +144,6 @@ function UserDashboard({ user, setUser }) {
               </svg>
             </span>
             <span className="sd-navLabel">Dashboard</span>
-
           </button>
 
           <button
@@ -98,7 +152,6 @@ function UserDashboard({ user, setUser }) {
             type="button"
           >
             <span className="sd-icon" aria-hidden="true">
-              {/* user icon */}
               <svg viewBox="0 0 24 24" width="18" height="18">
                 <path
                   d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"
@@ -107,7 +160,6 @@ function UserDashboard({ user, setUser }) {
               </svg>
             </span>
             <span className="sd-navLabel">Profile</span>
-
           </button>
         </nav>
 
@@ -118,7 +170,7 @@ function UserDashboard({ user, setUser }) {
         </button>
       </aside>
 
-      {/* DIVIDER */}
+      {/* DIVIDER (Desktop) */}
       <div className="sd-divider" />
 
       {/* MAIN CONTENT */}
@@ -131,10 +183,8 @@ function UserDashboard({ user, setUser }) {
                 <p className="sd-subtitle">We&apos;re glad to have you here.</p>
               </header>
 
-              {/* FEATURES ROW */}
-              
+              {/* FEATURES */}
               <div className="sd-features">
-
                 <div className="sd-featureCard sd-feature1">
                   <img
                     className="sd-featureImg"
@@ -145,7 +195,8 @@ function UserDashboard({ user, setUser }) {
                   <div className="sd-featureText">
                     <div className="sd-featureTitle">Check Symptoms Privately</div>
                     <div className="sd-featureSub">
-                      Use our confidential symptom checker to get personalized insights on your health.
+                      Use our confidential symptom checker to get personalized insights on your
+                      health.
                     </div>
                   </div>
                 </div>
@@ -159,9 +210,7 @@ function UserDashboard({ user, setUser }) {
                   />
                   <div className="sd-featureText">
                     <div className="sd-featureTitle">Find Verified Clinics Near You</div>
-                    <div className="sd-featureSub">
-                      Locate trusted clinics in your area with ease.
-                    </div>
+                    <div className="sd-featureSub">Locate trusted clinics in your area with ease.</div>
                   </div>
                 </div>
 
@@ -190,15 +239,12 @@ function UserDashboard({ user, setUser }) {
                   <div className="sd-featureText">
                     <div className="sd-featureTitle">Receive Daily Health Tips</div>
                     <div className="sd-featureSub">
-                      Get daily tips on reproductive health, wellness, and self-care to help you stay informed and empowered.
+                      Get daily tips on reproductive health, wellness, and self-care to help you stay
+                      informed and empowered.
                     </div>
                   </div>
                 </div>
-
-                
               </div>
-
-
 
               {/* WHATSAPP CTA */}
               <div className="sd-center">
@@ -219,8 +265,6 @@ function UserDashboard({ user, setUser }) {
                   Chat with SheCare on WhatsApp
                 </a>
               </div>
-
-              
             </section>
           ) : (
             <section className="sd-panel sd-panelBlank" aria-label="Profile">
@@ -231,25 +275,24 @@ function UserDashboard({ user, setUser }) {
       </main>
 
       {showLogoutConfirm && (
-            <div className="sd-modalOverlay">
-              <div className="sd-modal">
-                <h3 className="sd-modalTitle">Sign out?</h3>
-                <p className="sd-modalText">
-                  Are you sure you want to sign out of your SheCare account?
-                </p>
+        <div className="sd-modalOverlay">
+          <div className="sd-modal">
+            <h3 className="sd-modalTitle">Sign out?</h3>
+            <p className="sd-modalText">
+              Are you sure you want to sign out of your SheCare account?
+            </p>
 
-                <div className="sd-modalActions">
-                  <button type="button" className="sd-modalCancel" onClick={cancelSignOut}>
-                    Cancel
-                  </button>
-                  <button type="button" className="sd-modalConfirm" onClick={confirmSignOut}>
-                    Sign out
-                  </button>
-                </div>
-              </div>
+            <div className="sd-modalActions">
+              <button type="button" className="sd-modalCancel" onClick={cancelSignOut}>
+                Cancel
+              </button>
+              <button type="button" className="sd-modalConfirm" onClick={confirmSignOut}>
+                Sign out
+              </button>
             </div>
-          )}
-
+          </div>
+        </div>
+      )}
     </div>
   );
 }
