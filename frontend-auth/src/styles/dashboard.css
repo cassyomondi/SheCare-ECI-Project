@@ -21,22 +21,14 @@
   background: #ffffff;
   display: grid;
   grid-template-columns: 290px 1px 1fr;
-
-  /* IMPORTANT:
-     Ensure the document can scroll normally.
-     (If any parent gets overflow:hidden, scrolling will break on mobile.) */
   overflow: visible;
 }
 
-/* When drawer is open on mobile, lock background scroll
-   NOTE: This is OK while drawer is open, but it can be fragile on mobile.
-   The scroll fix below makes the main content the scroll container on mobile. */
 .sd-noScroll {
   height: 100vh;
   overflow: hidden;
 }
 
-/* Mobile topbar hidden on desktop */
 .sd-topbar {
   display: none;
 }
@@ -344,9 +336,12 @@
   background: transparent;
 }
 
-/* =========================
-   MOBILE NAV OVERLAY (hidden on desktop)
-   ========================= */
+/* Mobile fixed CTA container (hidden on desktop) */
+.sd-mobileCta {
+  display: none;
+}
+
+/* MOBILE NAV OVERLAY (hidden on desktop) */
 .sd-mobileOverlay {
   display: none;
 }
@@ -454,7 +449,6 @@
    RESPONSIVE BEHAVIOR
    ========================================== */
 
-/* Keep your existing mid breakpoint behavior for features (2x2) */
 @media (max-width: 1100px) {
   .sd-features {
     flex-wrap: wrap;
@@ -481,24 +475,18 @@
   }
 }
 
-/* =========================
-   MOBILE (<= 900px)
-   ========================= */
 @media (max-width: 900px) {
-  /* Make the content pane the explicit scroll container.
-     This avoids mobile browser quirks with vh/dvh + sticky + fixed drawer. */
   .sd-shell {
     grid-template-columns: 1fr;
-    height: 100dvh;         /* fixed viewport height */
+    height: 100dvh;
     min-height: 100dvh;
-    overflow: hidden;       /* prevent body scroll; main will scroll */
+    overflow: hidden;
   }
 
   .sd-divider {
     display: none;
   }
 
-  /* Top bar */
   .sd-topbar {
     display: flex;
     align-items: center;
@@ -537,7 +525,6 @@
     display: block;
   }
 
-  /* Drawer overlay */
   .sd-mobileOverlay {
     display: block;
     position: fixed;
@@ -556,7 +543,6 @@
     pointer-events: auto;
   }
 
-  /* Sidebar becomes an off-canvas drawer */
   .sd-sidebar {
     position: fixed;
     top: 0;
@@ -567,12 +553,10 @@
     background: #ffffff;
     border-right: 1px solid var(--sd-border);
     z-index: 1150;
-
     padding: 16px 14px;
     transform: translateX(-105%);
     transition: transform 220ms cubic-bezier(.2,.8,.2,1);
     box-shadow: 0 20px 60px rgba(17, 24, 39, 0.18);
-
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -626,19 +610,18 @@
     margin-top: 14px;
   }
 
-  /* MAIN CONTENT: this is now the scroll container */
+  /* MAIN CONTENT: scroll container */
   .sd-main {
     padding: 16px 14px 18px;
     display: block;
-
-    /* key fix */
     flex: 1;
-    height: calc(100dvh - 74px); /* 74px approximates topbar height */
+    height: calc(100dvh - 74px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-
-    /* avoid scroll chaining weirdness */
     overscroll-behavior: contain;
+
+    /* Reserve space so the fixed CTA doesn't cover the bottom content */
+    padding-bottom: calc(18px + 74px);
   }
 
   .sd-content {
@@ -649,7 +632,6 @@
     min-height: auto;
   }
 
-  /* Header sizing */
   .sd-header {
     margin-bottom: 16px;
   }
@@ -662,7 +644,6 @@
     font-size: 14px;
   }
 
-  /* FEATURES: vertical stack + subtitle always visible */
   .sd-features {
     display: flex;
     flex-direction: column;
@@ -705,7 +686,6 @@
     line-height: 1.35;
   }
 
-  /* Disable hover squeeze effect on mobile */
   .sd-features:has(.sd-featureCard:hover) .sd-featureCard {
     flex: 1 1 auto;
     border-radius: 18px;
@@ -720,17 +700,55 @@
     filter: none;
   }
 
+  /* Hide the in-flow CTA on mobile (we use fixed) */
   .sd-center {
-    place-items: center;
+    display: none;
   }
 
+  /* Fixed CTA: no white bar, not full width, translucent background (features visible behind) */
+  .sd-mobileCta {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+    z-index: 1050;
+    justify-content: center;
+    pointer-events: none; /* container doesn't eat taps */
+  }
+
+  .sd-whatsappBtnFixed {
+    pointer-events: auto;
+    /* keep original sizing/proportions */
+    padding: 14px 18px;
+    border-radius: 999px;
+
+    /* translucent/glassy, NOT a white bar */
+    background: rgba(37, 211, 102, 0.90);
+    backdrop-filter: blur(8px);
+
+    /* avoid full width */
+    width: auto;
+    max-width: calc(100% - 28px);
+
+    /* keep on top */
+    box-shadow: 0 18px 34px rgba(17, 24, 39, 0.18);
+
+    /* no idle float while fixed */
+    animation: none;
+  }
+
+  .sd-whatsappBtnFixed:hover {
+    background: rgba(31, 184, 90, 0.92);
+    transform: translateY(-1px);
+  }
+
+  /* On mobile, disable idle float globally (fixed CTA shouldn't drift) */
   .sd-whatsappBtn {
-    padding: 12px 16px;
-    font-size: 14px;
+    animation: none;
   }
 }
 
-/* Optional tighter breakpoint for very small phones */
 @media (max-width: 380px) {
   .sd-featureCard {
     height: 140px;
@@ -739,10 +757,5 @@
   .sd-featureImg {
     height: 72%;
     right: -18px;
-  }
-
-  .sd-whatsappBtn {
-    width: 100%;
-    justify-content: center;
   }
 }

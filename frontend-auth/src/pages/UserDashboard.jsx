@@ -12,7 +12,6 @@ function UserDashboard({ user, setUser }) {
   // Mobile drawer
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  // Prefer a real name if you later add it to /me; fallback to email prefix.
   const username = useMemo(() => {
     const maybeName =
       user?.first_name ||
@@ -35,8 +34,8 @@ function UserDashboard({ user, setUser }) {
     window.setTimeout(() => {
       setActive(tab);
       setFading(false);
-      setMobileNavOpen(false); // close drawer on selection (mobile)
-    }, 120); // quick fade
+      setMobileNavOpen(false);
+    }, 120);
   };
 
   const handleSignOut = () => {
@@ -247,7 +246,7 @@ function UserDashboard({ user, setUser }) {
                 </div>
               </div>
 
-              {/* WHATSAPP CTA */}
+              {/* WHATSAPP CTA (Desktop / non-mobile) */}
               <div className="sd-center">
                 <a
                   className="sd-whatsappBtn"
@@ -275,13 +274,33 @@ function UserDashboard({ user, setUser }) {
         </div>
       </main>
 
+      {/* FIXED MOBILE CTA (styled to match original proportions; translucent; not full width) */}
+      {active === "dashboard" && (
+        <div className="sd-mobileCta" role="region" aria-label="Chat with SheCare">
+          <a
+            className="sd-whatsappBtn sd-whatsappBtnFixed"
+            href="https://wa.me/+14155238886"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="sd-waIcon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+                <path
+                  fill="currentColor"
+                  d="M20.52 3.48A11.86 11.86 0 0 0 12.06 0C5.51 0 .2 5.3.2 11.83c0 2.08.54 4.11 1.57 5.9L0 24l6.42-1.69a11.86 11.86 0 0 0 5.64 1.43h.01c6.55 0 11.86-5.3 11.86-11.83 0-3.16-1.23-6.14-3.41-8.43ZM12.06 21.7h-.01a9.9 9.9 0 0 1-5.05-1.39l-.36-.21-3.81 1 1.02-3.71-.24-.38a9.86 9.86 0 0 1-1.52-5.18c0-5.45 4.46-9.89 9.96-9.89 2.66 0 5.16 1.03 7.04 2.9a9.82 9.82 0 0 1 2.92 6.99c0 5.45-4.46 9.89-9.95 9.89Zm5.77-7.41c-.31-.16-1.84-.9-2.12-1-.28-.1-.49-.16-.7.16-.2.31-.8 1-.98 1.2-.18.2-.36.23-.67.08-.31-.16-1.3-.48-2.47-1.52-.91-.8-1.52-1.79-1.7-2.1-.18-.31-.02-.48.14-.64.14-.14.31-.36.47-.54.16-.18.2-.31.31-.51.1-.2.05-.39-.03-.54-.08-.16-.7-1.67-.96-2.29-.25-.6-.51-.52-.7-.53l-.6-.01c-.2 0-.52.08-.8.39-.28.31-1.06 1.04-1.06 2.53s1.08 2.93 1.23 3.13c.16.2 2.12 3.23 5.14 4.53.72.31 1.28.5 1.72.64.72.23 1.37.2 1.89.12.58-.09 1.84-.75 2.1-1.47.26-.72.26-1.33.18-1.47-.08-.13-.28-.2-.6-.36Z"
+                />
+              </svg>
+            </span>
+            Chat with SheCare on WhatsApp
+          </a>
+        </div>
+      )}
+
       {showLogoutConfirm && (
         <div className="sd-modalOverlay">
           <div className="sd-modal">
             <h3 className="sd-modalTitle">Sign out?</h3>
-            <p className="sd-modalText">
-              Are you sure you want to sign out of your SheCare account?
-            </p>
+            <p className="sd-modalText">Are you sure you want to sign out of your SheCare account?</p>
 
             <div className="sd-modalActions">
               <button type="button" className="sd-modalCancel" onClick={cancelSignOut}>
