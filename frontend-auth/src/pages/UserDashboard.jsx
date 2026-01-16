@@ -142,7 +142,12 @@ function UserDashboard({ user, setUser }) {
                     alt=""
                     aria-hidden="true"
                   />
-                  <div className="sd-featureTitle">Check Symptoms Privately</div>
+                  <div className="sd-featureText">
+                    <div className="sd-featureTitle">Check Symptoms Privately</div>
+                    <div className="sd-featureSub">
+                      Answer a few questions and get guidance in minutes—confidentially.
+                    </div>
+                  </div>
                 </div>
 
                 <div className="sd-featureCard sd-feature2">
@@ -152,7 +157,12 @@ function UserDashboard({ user, setUser }) {
                     alt=""
                     aria-hidden="true"
                   />
-                  <div className="sd-featureTitle">Find Verified Clinics Near You</div>
+                  <div className="sd-featureText">
+                    <div className="sd-featureTitle">Find Verified Clinics Near You</div>
+                    <div className="sd-featureSub">
+                      Locate trusted providers nearby with directions and contact details.
+                    </div>
+                  </div>
                 </div>
 
                 <div className="sd-featureCard sd-feature3">
@@ -162,7 +172,12 @@ function UserDashboard({ user, setUser }) {
                     alt=""
                     aria-hidden="true"
                   />
-                  <div className="sd-featureTitle">Access Prescription Support</div>
+                  <div className="sd-featureText">
+                    <div className="sd-featureTitle">Access Prescription Support</div>
+                    <div className="sd-featureSub">
+                      Understand next steps and get help managing prescriptions safely.
+                    </div>
+                  </div>
                 </div>
 
                 <div className="sd-featureCard sd-feature4">
@@ -172,10 +187,17 @@ function UserDashboard({ user, setUser }) {
                     alt=""
                     aria-hidden="true"
                   />
-                  <div className="sd-featureTitle">Receive Daily Health Tips</div>
+                  <div className="sd-featureText">
+                    <div className="sd-featureTitle">Receive Daily Health Tips</div>
+                    <div className="sd-featureSub">
+                      Simple, personalized tips to support your wellbeing every day.
+                    </div>
+                  </div>
                 </div>
+
                 
               </div>
+
 
 
               {/* WHATSAPP CTA */}

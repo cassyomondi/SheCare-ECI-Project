@@ -170,91 +170,175 @@
   font-weight: 600;
 }
 
-/* --- DASHBOARD FEATURES --- */
+
+/* --- DASHBOARD FEATURES (Expandable Hover) --- */
 .sd-features {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
   gap: 16px;
   margin-top: 8px;
   margin-bottom: 26px;
+
+  /* sets a consistent “card row” height */
+  height: 160px;
 }
 
+/* default: equal cards */
 .sd-featureCard {
-  aspect-ratio: 1 / 1;      /* KEY: always a square */
-  height: auto;             /* don't force rectangle height */
+  flex: 1 1 0;
+  height: 100%;
   border-radius: 22px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 14px 26px rgba(17, 24, 39, 0.08);
+  cursor: default;
+
+  transition:
+    flex 320ms cubic-bezier(.2,.8,.2,1),
+    border-radius 320ms cubic-bezier(.2,.8,.2,1),
+    transform 220ms ease,
+    filter 220ms ease;
 }
 
-.sd-featureTitle {
-  position: absolute;
-  left: 14px;
-  bottom: 12px;
-  right: 14px;
-  font-weight: 900;
-  color: #ffffff;
-  font-size: 14px;
-  letter-spacing: 0.1px;
-  z-index: 3;               /* above the image */
-}
-
-.sd-featureImg {
-  position: absolute;
-  right: -26px;                 /* push further right */
-  top: 66%;                     /* push slightly downward */
-  transform: translateY(-50%);  /* keep vertical centering logic */
-  height: 88%;
-  width: auto;
-  z-index: 2;
-  opacity: 0.95;
-  pointer-events: none;
-}
-
-
-
-/* Optional: improve readability of title if image overlaps */
-.sd-featureTitle {
-  position: absolute;
-  left: 14px;
-  bottom: 12px;
-  right: 14px;
-  font-weight: 900;
-  color: #ffffff;
-  font-size: 14px;
-  letter-spacing: 0.1px;
-  z-index: 3;
-
-  /* Subtle, multi-layer shadow for contrast on light images */
-  text-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.35),
-    0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-
-/* Different fill colors (you can tweak these) */
+/* keep your gradients */
 .sd-feature1 { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
 .sd-feature2 { background: linear-gradient(135deg, #0ea5e9, #38bdf8); }
 .sd-feature3 { background: linear-gradient(135deg, #f97316, #fb923c); }
 .sd-feature4 { background: linear-gradient(135deg, #10b981, #34d399); }
 
-/* Make features wrap nicely on smaller screens */
+/* image sits behind text but above background */
+/* 5. Ensure images don't overlap the bottom-left title too much */
+.sd-featureImg {
+  position: absolute;
+  right: -20px; /* Pulled slightly more to the right */
+  top: 66%;
+  transform: translateY(-50%);
+  height: 85%;
+  width: auto;
+  z-index: 2;
+  opacity: 0.95;
+  pointer-events: none;
+  transition: all 320ms cubic-bezier(.2,.8,.2,1);
+}
+
+/* text container */
+.sd-featureText {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px; /* Anchor to bottom by default */
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Keeps title at the bottom */
+  
+  /* Remove top/transform from here so it doesn't float up yet */
+  transition: all 320ms cubic-bezier(.2,.8,.2,1);
+}
+
+.sd-featureTitle {
+  font-weight: 900;
+  color: #ffffff;
+  font-size: 14px;
+  letter-spacing: 0.1px;
+  /* 4. Added a subtle shadow to ensure readability against images */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.sd-featureSub {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.3;
+  max-width: 85%;
+
+  /* Initial state: totally hidden and collapsed */
+  opacity: 0;
+  max-height: 0; 
+  margin-top: 0;
+  overflow: hidden;
+  transform: translateY(10px);
+  transition: all 280ms ease;
+}
+
+/* --- Hover expansion behavior (requires :has) --- */
+.sd-features:has(.sd-featureCard:hover) .sd-featureCard {
+  /* squeeze non-hovered cards into slim pills */
+  flex: 0 0 54px;
+  border-radius: 999px;
+}
+
+/* hide contents of the squeezed cards */
+.sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureImg,
+.sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureText {
+  opacity: 0;
+}
+
+/* hovered card becomes the large rectangle */
+.sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover {
+  flex: 1 1 auto;
+  border-radius: 22px;
+  filter: saturate(1.02);
+}
+
+/* hovered: title shifts slightly above center, subtitle appears */
+/* hovered: shift the whole text block up slightly for balance */
+.sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover .sd-featureText {
+  bottom: 24px; /* Move up slightly from the 18px default */
+}
+
+.sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover .sd-featureTitle {
+  font-size: 18px; /* Growth effect */
+}
+
+.sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover .sd-featureSub {
+  opacity: 1;
+  max-height: 80px; /* Large enough to fit text */
+  margin-top: 10px;
+  transform: translateY(0);
+}
+
+/* hovered: image gets larger but stays on the right */
+.sd-features:has(.sd-featureCard:hover) .sd-featureCard:hover .sd-featureImg {
+  height: 110%;
+  right: -18px;
+  top: 60%;
+  opacity: 0.98;
+}
+
+/* Responsive: stack into 2 rows */
 @media (max-width: 1100px) {
   .sd-features {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex-wrap: wrap;
+    height: auto;
+  }
+
+  .sd-featureCard {
+    flex: 1 1 calc(50% - 8px);
+    height: 160px;
+  }
+
+  /* on small screens, don’t do “squeeze to pills” */
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard {
+    flex: 1 1 calc(50% - 8px);
+    border-radius: 22px;
+  }
+
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureImg,
+  .sd-features:has(.sd-featureCard:hover) .sd-featureCard:not(:hover) .sd-featureText {
+    opacity: 1;
+  }
+
+  .sd-featureSub {
+    max-width: 72%;
   }
 }
 
 @media (max-width: 520px) {
-  .sd-features {
-    grid-template-columns: 1fr;
-  }
-
   .sd-featureCard {
-    height: 140px;
+    flex: 1 1 100%;
   }
 }
+
 
 
 
