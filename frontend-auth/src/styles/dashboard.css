@@ -23,6 +23,12 @@
   grid-template-columns: 290px 1px 1fr;
 }
 
+/* When drawer is open on mobile, lock background scroll */
+.sd-noScroll {
+  height: 100vh;
+  overflow: hidden;
+}
+
 /* Mobile topbar hidden on desktop */
 .sd-topbar {
   display: none;
@@ -135,6 +141,7 @@
 .sd-main {
   padding: 28px 28px;
   display: flex;
+  min-width: 0;
 }
 
 .sd-content {
@@ -438,8 +445,6 @@
 
 /* ==========================================
    RESPONSIVE BEHAVIOR
-   - Desktop stays dual pane
-   - Mobile becomes topbar + drawer + single pane
    ========================================== */
 
 /* Keep your existing mid breakpoint behavior for features (2x2) */
@@ -474,7 +479,8 @@
    ========================= */
 @media (max-width: 900px) {
   .sd-shell {
-    grid-template-columns: 1fr; /* single pane */
+    grid-template-columns: 1fr;
+    min-height: 100dvh;
   }
 
   .sd-divider {
@@ -514,8 +520,9 @@
     min-height: 42px;
   }
 
+  /* Enlarge logo on mobile topbar */
   .sd-topbarLogo {
-    height: 34px; /* smaller logo on mobile */
+    height: 46px;
     width: auto;
     display: block;
   }
@@ -544,7 +551,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    height: 100vh;
+    height: 100dvh;
     width: 86vw;
     max-width: 320px;
     background: #ffffff;
@@ -555,29 +562,34 @@
     transform: translateX(-105%);
     transition: transform 220ms cubic-bezier(.2,.8,.2,1);
     box-shadow: 0 20px 60px rgba(17, 24, 39, 0.18);
+
+    /* allow drawer to scroll if content grows */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .sd-sidebar.is-open {
     transform: translateX(0);
   }
 
-  /* Hide desktop brand inside drawer (use drawer header instead) */
+  /* Hide desktop brand inside drawer */
   .sd-brand {
     display: none;
   }
 
+  /* Remove the grey line above nav items (no border on mobile drawer header) */
   .sd-drawerHeader {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 8px 4px 14px;
-    border-bottom: 1px solid var(--sd-border);
-    margin-bottom: 14px;
+    padding: 8px 4px 10px;
+    border-bottom: none;
+    margin-bottom: 10px;
   }
 
   .sd-drawerLogo {
-    height: 44px;
+    height: 52px;
     width: auto;
     display: block;
   }
@@ -600,21 +612,28 @@
   }
 
   .sd-nav {
-    margin-top: 10px;
+    margin-top: 8px;
   }
 
   .sd-signout {
     margin-top: 14px;
   }
 
-  /* Main content: under topbar, single pane */
+  /* MAIN CONTENT: ensure scrolling works */
   .sd-main {
     padding: 16px 14px 18px;
     display: block;
+    min-height: calc(100dvh - 74px); /* leaves room for sticky topbar */
+    overflow: visible;
   }
 
   .sd-content {
-    padding: 16px 0;
+    padding: 16px 0 24px;
+  }
+
+  /* Remove the desktop min-height constraint on mobile so content can extend + scroll */
+  .sd-panel {
+    min-height: auto;
   }
 
   /* Header sizing for mobile */
@@ -641,7 +660,7 @@
 
   .sd-featureCard {
     flex: 1 1 auto;
-    height: 132px; /* slightly smaller */
+    height: 132px;
     border-radius: 18px;
   }
 
@@ -663,13 +682,13 @@
   }
 
   .sd-featureSub {
-    opacity: 1;         /* always visible on mobile */
-    max-height: 120px;  /* allow content to show */
+    opacity: 1;
+    max-height: 120px;
     margin-top: 8px;
     transform: translateY(0);
     overflow: visible;
     max-width: 86%;
-    font-size: 13px;    /* slightly smaller */
+    font-size: 13px;
     line-height: 1.35;
   }
 

@@ -55,18 +55,19 @@ function UserDashboard({ user, setUser }) {
     setShowLogoutConfirm(false);
   };
 
+  const toggleMobileNav = () => setMobileNavOpen((v) => !v);
   const closeMobileNav = () => setMobileNavOpen(false);
 
   return (
-    <div className="sd-shell">
+    <div className={`sd-shell ${mobileNavOpen ? "sd-noScroll" : ""}`}>
       {/* TOP BAR (Mobile) */}
       <header className="sd-topbar" role="banner">
         <button
           type="button"
           className="sd-hamburger"
-          aria-label="Open navigation menu"
+          aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={mobileNavOpen}
-          onClick={() => setMobileNavOpen(true)}
+          onClick={toggleMobileNav}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
             <path
