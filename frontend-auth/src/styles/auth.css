@@ -37,11 +37,14 @@
   flex-direction: column;
   align-items: center;
   padding: 60px;
+
+  /* desktop scroll */
   overflow-y: auto;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
 }
 
+/* Ensure the right side starts from the top, not the middle */
 .auth-right-centered {
   display: flex;
   flex-direction: column;
@@ -50,12 +53,14 @@
   padding-top: 60px;
 }
 
+/* Specific styling for the new top logo position */
 .auth-logo-top {
   width: 120px;
   height: auto;
   margin-bottom: 40px;
 }
 
+/* Optional: keep the form neat */
 .auth-content-container {
   width: 100%;
   max-width: 400px;
@@ -185,36 +190,47 @@
 }
 
 /* =========================
-   MOBILE: single-pane layout
+   MOBILE: single-pane layout + reliable scroll
    ========================= */
 @media (max-width: 900px) {
-  /* remove split screen */
+  /* IMPORTANT:
+     Let the document behave normally, but make the auth pane the scroll container.
+     Avoid "display:block + min-height only" because some mobile browsers won't scroll reliably. */
   .auth-layout {
     display: block;
     height: 100dvh;
     min-height: 100dvh;
     width: 100%;
     background: #ffffff;
+
+    /* Avoid accidental scroll locking coming from elsewhere */
+    overflow: hidden;
   }
 
   .auth-left {
     display: none;
   }
 
-  /* right becomes full width */
+  /* Make this the explicit scroll container */
   .auth-right {
     width: 100%;
     flex: none;
-    min-height: 100dvh;
-    padding: 28px 18px 22px;
+
+    /* critical: fixed height + overflow */
+    height: 100dvh;
+    max-height: 100dvh;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    padding: 28px 18px 22px;
+    align-items: center;
   }
 
   .auth-right-centered {
     padding-top: 22px;
   }
 
-  /* tighten sizes so nothing feels oversized */
+  /* tighten sizes */
   .auth-logo-top {
     width: 96px;
     margin-bottom: 22px;
