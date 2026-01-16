@@ -180,7 +180,8 @@
 }
 
 .sd-featureCard {
-  height: 150px;
+  aspect-ratio: 1 / 1;      /* KEY: always a square */
+  height: auto;             /* don't force rectangle height */
   border-radius: 22px;
   position: relative;
   overflow: hidden;
@@ -196,7 +197,41 @@
   color: #ffffff;
   font-size: 14px;
   letter-spacing: 0.1px;
+  z-index: 3;               /* above the image */
 }
+
+.sd-featureImg {
+  position: absolute;
+  right: -26px;                 /* push further right */
+  top: 66%;                     /* push slightly downward */
+  transform: translateY(-50%);  /* keep vertical centering logic */
+  height: 88%;
+  width: auto;
+  z-index: 2;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+
+
+/* Optional: improve readability of title if image overlaps */
+.sd-featureTitle {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  right: 14px;
+  font-weight: 900;
+  color: #ffffff;
+  font-size: 14px;
+  letter-spacing: 0.1px;
+  z-index: 3;
+
+  /* Subtle, multi-layer shadow for contrast on light images */
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
 
 /* Different fill colors (you can tweak these) */
 .sd-feature1 { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
@@ -220,6 +255,7 @@
     height: 140px;
   }
 }
+
 
 
 .sd-center {
@@ -405,7 +441,7 @@
 
 /* Apply idle motion */
 .sd-whatsappBtn {
-  animation: sdCtaFloat 4.8s ease-in-out infinite;
+  animation: sdCtaFloat 3.2s ease-in-out infinite;
 }
 
 /* When user interacts, prioritize hover bounce instead */

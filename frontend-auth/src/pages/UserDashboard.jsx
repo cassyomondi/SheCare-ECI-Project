@@ -132,23 +132,51 @@ function UserDashboard({ user, setUser }) {
               </header>
 
               {/* FEATURES ROW */}
+              
               <div className="sd-features">
+
                 <div className="sd-featureCard sd-feature1">
+                  <img
+                    className="sd-featureImg"
+                    src="/images/features/symptoms.png"
+                    alt=""
+                    aria-hidden="true"
+                  />
                   <div className="sd-featureTitle">Check Symptoms Privately</div>
                 </div>
 
                 <div className="sd-featureCard sd-feature2">
+                  <img
+                    className="sd-featureImg"
+                    src="/images/features/clinics.png"
+                    alt=""
+                    aria-hidden="true"
+                  />
                   <div className="sd-featureTitle">Find Verified Clinics Near You</div>
                 </div>
 
                 <div className="sd-featureCard sd-feature3">
+                  <img
+                    className="sd-featureImg"
+                    src="/images/features/prescription.png"
+                    alt=""
+                    aria-hidden="true"
+                  />
                   <div className="sd-featureTitle">Access Prescription Support</div>
                 </div>
 
                 <div className="sd-featureCard sd-feature4">
+                  <img
+                    className="sd-featureImg"
+                    src="/images/features/tips.png"
+                    alt=""
+                    aria-hidden="true"
+                  />
                   <div className="sd-featureTitle">Receive Daily Health Tips</div>
                 </div>
+                
               </div>
+
 
               {/* WHATSAPP CTA */}
               <div className="sd-center">
