@@ -358,3 +358,65 @@
 .sd-modalConfirm:hover {
   filter: brightness(0.96);
 }
+
+
+/* --- WHATSAPP CTA: subtle bouncy hover --- */
+@keyframes sdCtaBounce {
+  0%   { transform: translateY(0) scale(1); }
+  35%  { transform: translateY(-4px) scale(1.02); }
+  70%  { transform: translateY(1px) scale(1.01); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* enhance existing button behaviour */
+.sd-whatsappBtn {
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1),
+              background 140ms ease,
+              filter 140ms ease;
+  will-change: transform;
+}
+
+.sd-whatsappBtn:hover {
+  animation: sdCtaBounce 420ms ease-out both;
+}
+
+/* keyboard focus support */
+.sd-whatsappBtn:focus-visible {
+  outline: 3px solid rgba(37, 211, 102, 0.35);
+  outline-offset: 3px;
+  animation: sdCtaBounce 420ms ease-out both;
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sd-whatsappBtn:hover,
+  .sd-whatsappBtn:focus-visible {
+    animation: none;
+  }
+}
+
+
+/* --- Idle floating animation (always-on subtle motion) --- */
+@keyframes sdCtaFloat {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+/* Apply idle motion */
+.sd-whatsappBtn {
+  animation: sdCtaFloat 4.8s ease-in-out infinite;
+}
+
+/* When user interacts, prioritize hover bounce instead */
+.sd-whatsappBtn:hover,
+.sd-whatsappBtn:focus-visible {
+  animation: sdCtaBounce 420ms ease-out both;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .sd-whatsappBtn {
+    animation: none;
+  }
+}
