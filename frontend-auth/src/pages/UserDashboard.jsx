@@ -145,7 +145,7 @@ function UserDashboard({ user, setUser }) {
                   <div className="sd-featureText">
                     <div className="sd-featureTitle">Check Symptoms Privately</div>
                     <div className="sd-featureSub">
-                      Answer a few questions and get guidance in minutes—confidentially.
+                      Use our confidential symptom checker to get personalized insights on your health.
                     </div>
                   </div>
                 </div>
@@ -160,7 +160,7 @@ function UserDashboard({ user, setUser }) {
                   <div className="sd-featureText">
                     <div className="sd-featureTitle">Find Verified Clinics Near You</div>
                     <div className="sd-featureSub">
-                      Locate trusted providers nearby with directions and contact details.
+                      Locate trusted clinics in your area with ease.
                     </div>
                   </div>
                 </div>
@@ -175,7 +175,7 @@ function UserDashboard({ user, setUser }) {
                   <div className="sd-featureText">
                     <div className="sd-featureTitle">Access Prescription Support</div>
                     <div className="sd-featureSub">
-                      Understand next steps and get help managing prescriptions safely.
+                      Get assistance with managing and understanding your prescriptions.
                     </div>
                   </div>
                 </div>
@@ -190,7 +190,7 @@ function UserDashboard({ user, setUser }) {
                   <div className="sd-featureText">
                     <div className="sd-featureTitle">Receive Daily Health Tips</div>
                     <div className="sd-featureSub">
-                      Simple, personalized tips to support your wellbeing every day.
+                      Get daily tips on reproductive health, wellness, and self-care to help you stay informed and empowered.
                     </div>
                   </div>
                 </div>
