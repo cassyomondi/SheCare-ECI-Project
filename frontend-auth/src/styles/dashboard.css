@@ -21,9 +21,16 @@
   background: #ffffff;
   display: grid;
   grid-template-columns: 290px 1px 1fr;
+
+  /* IMPORTANT:
+     Ensure the document can scroll normally.
+     (If any parent gets overflow:hidden, scrolling will break on mobile.) */
+  overflow: visible;
 }
 
-/* When drawer is open on mobile, lock background scroll */
+/* When drawer is open on mobile, lock background scroll
+   NOTE: This is OK while drawer is open, but it can be fragile on mobile.
+   The scroll fix below makes the main content the scroll container on mobile. */
 .sd-noScroll {
   height: 100vh;
   overflow: hidden;
@@ -478,9 +485,13 @@
    MOBILE (<= 900px)
    ========================= */
 @media (max-width: 900px) {
+  /* Make the content pane the explicit scroll container.
+     This avoids mobile browser quirks with vh/dvh + sticky + fixed drawer. */
   .sd-shell {
     grid-template-columns: 1fr;
+    height: 100dvh;         /* fixed viewport height */
     min-height: 100dvh;
+    overflow: hidden;       /* prevent body scroll; main will scroll */
   }
 
   .sd-divider {
@@ -520,14 +531,13 @@
     min-height: 42px;
   }
 
-  /* Enlarge logo on mobile topbar */
   .sd-topbarLogo {
     height: 46px;
     width: auto;
     display: block;
   }
 
-  /* Drawer overlay (click to close) */
+  /* Drawer overlay */
   .sd-mobileOverlay {
     display: block;
     position: fixed;
@@ -563,7 +573,6 @@
     transition: transform 220ms cubic-bezier(.2,.8,.2,1);
     box-shadow: 0 20px 60px rgba(17, 24, 39, 0.18);
 
-    /* allow drawer to scroll if content grows */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -572,12 +581,10 @@
     transform: translateX(0);
   }
 
-  /* Hide desktop brand inside drawer */
   .sd-brand {
     display: none;
   }
 
-  /* Remove the grey line above nav items (no border on mobile drawer header) */
   .sd-drawerHeader {
     display: flex;
     align-items: center;
@@ -619,24 +626,30 @@
     margin-top: 14px;
   }
 
-  /* MAIN CONTENT: ensure scrolling works */
+  /* MAIN CONTENT: this is now the scroll container */
   .sd-main {
     padding: 16px 14px 18px;
     display: block;
-    min-height: calc(100dvh - 74px); /* leaves room for sticky topbar */
-    overflow: visible;
+
+    /* key fix */
+    flex: 1;
+    height: calc(100dvh - 74px); /* 74px approximates topbar height */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    /* avoid scroll chaining weirdness */
+    overscroll-behavior: contain;
   }
 
   .sd-content {
     padding: 16px 0 24px;
   }
 
-  /* Remove the desktop min-height constraint on mobile so content can extend + scroll */
   .sd-panel {
     min-height: auto;
   }
 
-  /* Header sizing for mobile */
+  /* Header sizing */
   .sd-header {
     margin-bottom: 16px;
   }
@@ -649,7 +662,7 @@
     font-size: 14px;
   }
 
-  /* FEATURES: vertical stack + subtitle always visible + disable hover behavior */
+  /* FEATURES: vertical stack + subtitle always visible */
   .sd-features {
     display: flex;
     flex-direction: column;
@@ -692,7 +705,7 @@
     line-height: 1.35;
   }
 
-  /* Disable "squeeze to pills" hover effect on mobile */
+  /* Disable hover squeeze effect on mobile */
   .sd-features:has(.sd-featureCard:hover) .sd-featureCard {
     flex: 1 1 auto;
     border-radius: 18px;
@@ -707,7 +720,6 @@
     filter: none;
   }
 
-  /* CTA stays centered beneath cards */
   .sd-center {
     place-items: center;
   }
