@@ -23,7 +23,6 @@ function SignUp({ onSwitch, setUser }) {
     phone: "",
     password: "",
     confirm: "",
-    role: "participant",
   };
 
   const validationSchema = Yup.object({
@@ -43,6 +42,7 @@ function SignUp({ onSwitch, setUser }) {
     try {
       const payload = { ...values };
       delete payload.confirm;
+      delete payload.role;
 
       payload.email = payload.email.trim().toLowerCase();
       payload.phone = payload.phone.replace(/\s+/g, "");

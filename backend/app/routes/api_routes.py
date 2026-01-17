@@ -46,7 +46,24 @@ def get_users():
 @jwt_required()
 def me():
     identity = get_jwt_identity()
-    return jsonify(identity), 200
+    user_id = identity.get("user_id")
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # since public signup always participant, this should exist
+    participant = Participant.query.filter_by(user_id=user.id).first()
+
+    return jsonify({
+        "id": user.id,
+        "email": user.email,
+        "phone": user.phone,
+        "role": user.role,
+        "first_name": participant.first_name if participant else None,
+        "last_name": participant.last_name if participant else None,
+    }), 200
+
 
 
 
@@ -63,13 +80,14 @@ def signup():
     password = data.get("password")
     first_name = data.get("first_name")
     last_name = data.get("last_name")
-    role = data.get("role", "participant")
+
+    # ✅ Force role for public signup
+    role = "participant"
 
     phone = "".join(phone.split()) if phone else None
     email = email.strip().lower() if email else None
     first_name = first_name.strip() if first_name else None
     last_name = last_name.strip() if last_name else None
-
 
     if not phone or not email or not password:
         return jsonify({"error": "Phone, email, and password are required"}), 400
@@ -80,45 +98,41 @@ def signup():
     if User.query.filter(User.phone == phone).first():
         return jsonify({"error": "The phone number is taken"}), 409
 
-
-    # Create new user
     user = User(
-    email=email,
-    phone=phone,
-    password=generate_password_hash(password),
-    role=role
+        email=email,
+        phone=phone,
+        password=generate_password_hash(password),
+        role=role  # ✅ always participant
     )
 
     db.session.add(user)
     db.session.commit()
 
-    # If participant, create linked record
-    if role == "participant":
-        participant = Participant(
-            user_id=user.id,
-            first_name=first_name,
-            last_name=last_name
-        )
-        db.session.add(participant)
-        db.session.commit()
-
+    # ✅ Always create linked participant profile for public signup
+    participant = Participant(
+        user_id=user.id,
+        first_name=first_name,
+        last_name=last_name
+    )
+    db.session.add(participant)
+    db.session.commit()
 
     access_token = create_access_token(
-    identity={"user_id": user.id, "email": user.email, "role": user.role},
-    expires_delta=timedelta(hours=12)
+        identity={"user_id": user.id, "email": user.email, "role": user.role},
+        expires_delta=timedelta(hours=12)
     )
 
-
     return jsonify({
-    "message": "User registered successfully",
-    "access_token": access_token,
-    "user": {
-        "id": user.id,
-        "email": user.email,
-        "phone": user.phone,
-        "role": user.role
-    }
+        "message": "User registered successfully",
+        "access_token": access_token,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "phone": user.phone,
+            "role": user.role
+        }
     }), 201
+
 
 
 
