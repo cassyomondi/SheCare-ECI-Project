@@ -57,11 +57,11 @@ function SignUp({ onSwitch, setUser }) {
 
       localStorage.setItem("token", token);
 
-      setUser({
-        user_id: res.data.user.id,
-        email: res.data.user.email,
-        role: res.data.user.role,
+      const meRes = await axios.get(`${import.meta.env.VITE_API_URL}/me`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+
+      setUser(meRes.data);
 
       resetForm();
       navigate("/user-dashboard");

@@ -12,21 +12,8 @@ function UserDashboard({ user, setUser }) {
   // Mobile drawer
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const username = useMemo(() => {
-    const maybeName =
-      user?.first_name ||
-      user?.name ||
-      user?.full_name ||
-      user?.username ||
-      null;
-
-    if (maybeName) return maybeName;
-
-    const email = user?.email || "";
-    if (email.includes("@")) return email.split("@")[0];
-
-    return "User";
-  }, [user]);
+  const firstName = user?.first_name?.trim();
+  
 
   const switchTab = (tab) => {
     if (tab === active) return;
@@ -179,7 +166,7 @@ function UserDashboard({ user, setUser }) {
           {active === "dashboard" ? (
             <section className="sd-panel">
               <header className="sd-header">
-                <h1 className="sd-title">Hello, {username}</h1>
+                <h1 className="sd-title">Hello, {firstName}</h1>
                 <p className="sd-subtitle">We&apos;re glad to have you here.</p>
               </header>
 
