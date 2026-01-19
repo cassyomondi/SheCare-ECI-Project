@@ -66,6 +66,86 @@ def me():
 
 
 
+# -----------------------------
+# UPDATE CURRENT USER
+# -----------------------------
+@api_bp.route("/me", methods=["PATCH"])
+@jwt_required()
+def update_me():
+    identity = get_jwt_identity()
+    user_id = identity.get("user_id")
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    participant = Participant.query.filter_by(user_id=user.id).first()
+    if not participant:
+        # In your public signup, this should exist. Still, guard it.
+        participant = Participant(user_id=user.id)
+        db.session.add(participant)
+
+    data = request.get_json() or {}
+
+    # Incoming fields
+    first_name = data.get("first_name")
+    last_name = data.get("last_name")
+    email = data.get("email")
+    phone = data.get("phone")
+    password = data.get("password")
+
+    # Normalize
+    if email is not None:
+        email = email.strip().lower()
+    if phone is not None:
+        phone = "".join(str(phone).split())
+    if first_name is not None:
+        first_name = first_name.strip()
+    if last_name is not None:
+        last_name = last_name.strip()
+
+    # Uniqueness checks ONLY if changed
+    if email and email != user.email:
+        exists = User.query.filter(User.email == email, User.id != user.id).first()
+        if exists:
+            return jsonify({"error": "The email is taken"}), 409
+
+    if phone and phone != user.phone:
+        exists = User.query.filter(User.phone == phone, User.id != user.id).first()
+        if exists:
+            return jsonify({"error": "The phone number is taken"}), 409
+
+    # Apply updates (only if provided)
+    if email is not None and email != "":
+        user.email = email
+
+    if phone is not None and phone != "":
+        user.phone = phone
+
+    if first_name is not None:
+        participant.first_name = first_name
+
+    if last_name is not None:
+        participant.last_name = last_name
+
+    if password:
+        if len(password) < 8:
+            return jsonify({"error": "Password must be at least 8 characters"}), 400
+        user.password = generate_password_hash(password)
+
+    db.session.commit()
+
+    # Return the same shape as GET /me
+    return jsonify({
+        "id": user.id,
+        "email": user.email,
+        "phone": user.phone,
+        "role": user.role,
+        "first_name": participant.first_name,
+        "last_name": participant.last_name,
+    }), 200
+
+
 
 
 # -----------------------------
