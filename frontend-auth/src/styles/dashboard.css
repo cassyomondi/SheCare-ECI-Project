@@ -811,17 +811,27 @@
   width: 100%;
   padding: 12px 14px;
   border-radius: 14px;
-  border: 2px solid var(--sd-border);   /* light grey */
+  border: 2px solid var(--sd-border);
   background: #ffffff;
-  color: var(--sd-text);
+  color: #9ca3af;            /* muted grey */
   outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    color 120ms ease;
 }
+
+.sd-input.is-dirty {
+  color: #111827;            /* full black */
+}
+
 
 .sd-input:focus {
   border-color: var(--sd-accent);
   box-shadow: 0 0 0 3px rgba(0, 194, 168, 0.15);
+  color: #111827;            /* black on focus */
 }
+
 
 
 .sd-hint {
@@ -842,14 +852,16 @@
 }
 
 .sd-saveBtn {
-  padding: 12px 16px;
-  border-radius: 14px;
-  border: none;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--sd-border);
   cursor: not-allowed;
-  background: rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.65);
+  background: #f3f4f6;       /* visible light grey */
+  color: #9ca3af;
+  font-weight: 700;
   transition: transform 120ms ease, background 120ms ease, color 120ms ease;
 }
+
 
 .sd-saveBtn.is-active {
   cursor: pointer;
