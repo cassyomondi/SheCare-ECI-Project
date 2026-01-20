@@ -92,7 +92,10 @@ def update_me():
     last_name = data.get("last_name")
     email = data.get("email")
     phone = data.get("phone")
-    password = data.get("password")
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+
+    
 
     # Normalize
     if email is not None:
@@ -128,10 +131,18 @@ def update_me():
     if last_name is not None:
         participant.last_name = last_name
 
-    if password:
-        if len(password) < 8:
+    
+    if new_password:
+        if not current_password:
+            return jsonify({"error": "Current password is required to change your password"}), 400
+
+        if not check_password_hash(user.password, current_password):
+            return jsonify({"error": "Current password is incorrect"}), 401
+
+        if len(new_password) < 8:
             return jsonify({"error": "Password must be at least 8 characters"}), 400
-        user.password = generate_password_hash(password)
+
+        user.password = generate_password_hash(new_password)
 
     db.session.commit()
 
