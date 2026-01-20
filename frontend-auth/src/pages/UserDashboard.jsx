@@ -59,15 +59,16 @@ function UserDashboard({ user, setUser }) {
     if (!initialProfile) return false;
 
     const changedBasics =
-      profile.first_name !== initialProfile.first_name ||
-      profile.last_name !== initialProfile.last_name ||
-      profile.email !== initialProfile.email ||
-      profile.phone !== initialProfile.phone;
+      clean(profile.first_name) !== clean(initialProfile.first_name) ||
+      clean(profile.last_name) !== clean(initialProfile.last_name) ||
+      clean(profile.email).toLowerCase() !== clean(initialProfile.email).toLowerCase() ||
+      cleanPhone(profile.phone) !== cleanPhone(initialProfile.phone);
 
-    const changingPassword = profile.password.length > 0;
+    const changingPassword = clean(profile.password).length > 0;
 
     return changedBasics || changingPassword;
   }, [profile, initialProfile]);
+
 
   const passwordNeedsConfirm = clean(profile.password).length > 0;
 
