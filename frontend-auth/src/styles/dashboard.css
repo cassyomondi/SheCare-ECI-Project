@@ -16,12 +16,14 @@
 /* =========================
    DESKTOP LAYOUT (unchanged)
    ========================= */
+/* Make the whole dashboard a fixed-height app shell */
 .sd-shell {
+  height: 100vh;            /* was min-height */
   min-height: 100vh;
   background: #ffffff;
   display: grid;
   grid-template-columns: 290px 1px 1fr;
-  overflow: visible;
+  overflow: hidden;         /* important: prevents page-level scroll */
 }
 
 .sd-noScroll {
@@ -38,6 +40,11 @@
   display: flex;
   flex-direction: column;
   background: transparent;
+
+  position: sticky;
+  top: 0;
+  height: 100vh;            /* lock to viewport */
+  overflow: hidden;         /* keep items stable */
 }
 
 .sd-brand {
@@ -139,8 +146,12 @@
 
 .sd-main {
   padding: 28px 28px;
-  display: flex;
+  display: block;           /* was flex */
   min-width: 0;
+
+  height: 100vh;            /* lock to viewport */
+  overflow-y: auto;         /* desktop scroll */
+  -webkit-overflow-scrolling: touch;
 }
 
 .sd-content {
@@ -150,7 +161,6 @@
   border-radius: 0;
   box-shadow: none;
   padding: 26px 26px;
-  transition: opacity 120ms ease, transform 120ms ease;
 }
 
 .sd-content.is-fading {
@@ -159,7 +169,7 @@
 }
 
 .sd-panel {
-  min-height: calc(100vh - 56px - 56px);
+  min-height: auto;         /* was calc(100vh - ...) */
   display: flex;
   flex-direction: column;
 }
