@@ -467,9 +467,10 @@ function UserDashboard({ user, setUser }) {
                         placeholder="Confirm your current password"
                         autoComplete="current-password"
                       />
-                      {!profile.current_password && (
+                      {!clean(profile.current_password) && (
                         <div className="sd-inlineError">Enter your current password to change it.</div>
                       )}
+
                     </div>
 
                     <div className="sd-field">
@@ -482,12 +483,12 @@ function UserDashboard({ user, setUser }) {
                         placeholder="Confirm new password"
                         autoComplete="new-password"
                       />
-                      {profile.password.length > 0 &&
-                        profile.confirm_password.length > 0 &&
-                        profile.confirm_password !== profile.password && (
+                      {clean(profile.password).length > 0 &&
+                        clean(profile.confirm_password).length > 0 &&
+                        clean(profile.confirm_password) !== clean(profile.password) && (
                           <div className="sd-inlineError">Passwords do not match.</div>
                         )}
-                      {profile.password.length > 0 && profile.password.length < 8 && (
+                      {clean(profile.password).length > 0 && clean(profile.password).length < 8 && (
                         <div className="sd-inlineError">Password must be at least 8 characters.</div>
                       )}
                     </div>
