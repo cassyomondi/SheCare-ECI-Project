@@ -24,10 +24,9 @@ function UserDashboard({ user, setUser }) {
     email: "",
     phone: "",
     current_password: "",
-    password: "",           // new password
+    password: "", // new password
     confirm_password: "",
   });
-
 
   const [initialProfile, setInitialProfile] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -43,6 +42,7 @@ function UserDashboard({ user, setUser }) {
       last_name: user.last_name || "",
       email: user.email || "",
       phone: user.phone || "",
+      current_password: "",
       password: "",
       confirm_password: "",
     };
@@ -70,8 +70,9 @@ function UserDashboard({ user, setUser }) {
   const canSave = useMemo(() => {
     if (!isDirty || saving) return false;
 
-    // If password is being changed, confirm must match
+    // If password is being changed, current password required + confirm must match
     if (passwordNeedsConfirm) {
+      if (!profile.current_password) return false;
       if (profile.password.length < 8) return false;
       if (profile.confirm_password !== profile.password) return false;
     }
@@ -121,8 +122,10 @@ function UserDashboard({ user, setUser }) {
         phone: profile.phone.replace(/\s+/g, ""),
       };
 
+      // If password is being changed, send current + new password
       if (profile.password) {
-        payload.password = profile.password;
+        payload.current_password = profile.current_password;
+        payload.new_password = profile.password;
       }
 
       const res = await axios.patch(`${import.meta.env.VITE_API_URL}/me`, payload, {
@@ -138,6 +141,7 @@ function UserDashboard({ user, setUser }) {
         last_name: res.data.last_name || "",
         email: res.data.email || "",
         phone: res.data.phone || "",
+        current_password: "",
         password: "",
         confirm_password: "",
       };
@@ -423,7 +427,7 @@ function UserDashboard({ user, setUser }) {
                 </div>
 
                 <div className="sd-field">
-                  <label className="sd-label">Password</label>
+                  <label className="sd-label">New password</label>
                   <input
                     className="sd-input"
                     type="password"
@@ -436,25 +440,42 @@ function UserDashboard({ user, setUser }) {
                 </div>
 
                 {passwordNeedsConfirm && (
-                  <div className="sd-field">
-                    <label className="sd-label">Confirm password</label>
-                    <input
-                      className="sd-input"
-                      type="password"
-                      value={profile.confirm_password}
-                      onChange={onProfileChange("confirm_password")}
-                      placeholder="Confirm new password"
-                      autoComplete="new-password"
-                    />
-                    {profile.password.length > 0 &&
-                      profile.confirm_password.length > 0 &&
-                      profile.confirm_password !== profile.password && (
-                        <div className="sd-inlineError">Passwords do not match.</div>
+                  <>
+                    <div className="sd-field">
+                      <label className="sd-label">Current password</label>
+                      <input
+                        className="sd-input"
+                        type="password"
+                        value={profile.current_password}
+                        onChange={onProfileChange("current_password")}
+                        placeholder="Confirm your current password"
+                        autoComplete="current-password"
+                      />
+                      {!profile.current_password && (
+                        <div className="sd-inlineError">Enter your current password to change it.</div>
                       )}
-                    {profile.password.length > 0 && profile.password.length < 8 && (
-                      <div className="sd-inlineError">Password must be at least 8 characters.</div>
-                    )}
-                  </div>
+                    </div>
+
+                    <div className="sd-field">
+                      <label className="sd-label">Confirm new password</label>
+                      <input
+                        className="sd-input"
+                        type="password"
+                        value={profile.confirm_password}
+                        onChange={onProfileChange("confirm_password")}
+                        placeholder="Confirm new password"
+                        autoComplete="new-password"
+                      />
+                      {profile.password.length > 0 &&
+                        profile.confirm_password.length > 0 &&
+                        profile.confirm_password !== profile.password && (
+                          <div className="sd-inlineError">Passwords do not match.</div>
+                        )}
+                      {profile.password.length > 0 && profile.password.length < 8 && (
+                        <div className="sd-inlineError">Password must be at least 8 characters.</div>
+                      )}
+                    </div>
+                  </>
                 )}
 
                 <div className="sd-profileActions">
