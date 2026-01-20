@@ -813,7 +813,8 @@
   border-radius: 14px;
   border: 2px solid var(--sd-border);
   background: #ffffff;
-  color: #9ca3af;            /* muted grey */
+  color: #9ca3af;            /* muted grey (default) */
+  font-weight: 600;          /* 👈 ADD THIS */
   outline: none;
   transition:
     border-color 120ms ease,
@@ -821,9 +822,8 @@
     color 120ms ease;
 }
 
-.sd-input.is-dirty {
-  color: #111827;            /* full black */
-}
+
+
 
 
 .sd-input:focus {
