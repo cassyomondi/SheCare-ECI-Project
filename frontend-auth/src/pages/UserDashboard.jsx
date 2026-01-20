@@ -23,9 +23,11 @@ function UserDashboard({ user, setUser }) {
     last_name: "",
     email: "",
     phone: "",
-    password: "",
+    current_password: "",
+    password: "",           // new password
     confirm_password: "",
   });
+
 
   const [initialProfile, setInitialProfile] = useState(null);
   const [saving, setSaving] = useState(false);
