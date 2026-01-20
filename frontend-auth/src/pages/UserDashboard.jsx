@@ -75,21 +75,25 @@ function UserDashboard({ user, setUser }) {
   const canSave = useMemo(() => {
     if (!isDirty || saving) return false;
 
+    const newPass = clean(profile.password);
+    const currentPass = clean(profile.current_password);
+    const confirmPass = clean(profile.confirm_password);
+
     // If password is being changed, current password required + confirm must match
-    if (passwordNeedsConfirm) {
-      if (!profile.current_password) return false;
-      if (profile.password.length < 8) return false;
-      if (profile.confirm_password !== profile.password) return false;
+    if (newPass.length > 0) {
+      if (!currentPass) return false;
+      if (newPass.length < 8) return false;
+      if (confirmPass !== newPass) return false;
     }
 
-    // Optional: basic required validation (you can loosen/tighten as needed)
-    if (!profile.first_name.trim()) return false;
-    if (!profile.last_name.trim()) return false;
-    if (!profile.email.trim()) return false;
-    if (!profile.phone.trim()) return false;
+    if (!clean(profile.first_name)) return false;
+    if (!clean(profile.last_name)) return false;
+    if (!clean(profile.email)) return false;
+    if (!clean(profile.phone)) return false;
 
     return true;
-  }, [isDirty, saving, passwordNeedsConfirm, profile]);
+  }, [isDirty, saving, profile]);
+
 
   const onProfileChange = (field) => (e) => {
     setProfileError("");
