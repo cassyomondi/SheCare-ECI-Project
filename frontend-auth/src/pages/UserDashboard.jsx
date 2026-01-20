@@ -15,6 +15,10 @@ function UserDashboard({ user, setUser }) {
 
   const firstName = user?.first_name?.trim() || "User";
 
+  const clean = (v) => (typeof v === "string" ? v.trim() : "");
+  const cleanPhone = (v) => (typeof v === "string" ? v.replace(/\s+/g, "") : "");
+
+
   // -------------------------
   // PROFILE FORM STATE
   // -------------------------
@@ -65,7 +69,8 @@ function UserDashboard({ user, setUser }) {
     return changedBasics || changingPassword;
   }, [profile, initialProfile]);
 
-  const passwordNeedsConfirm = profile.password.length > 0;
+  const passwordNeedsConfirm = clean(profile.password).length > 0;
+
 
   const canSave = useMemo(() => {
     if (!isDirty || saving) return false;
