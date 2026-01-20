@@ -123,28 +123,33 @@ function UserDashboard({ user, setUser }) {
         return;
       }
 
-      // Only send fields that matter
-      const payload = {
-        first_name: profile.first_name.trim(),
-        last_name: profile.last_name.trim(),
-        email: profile.email.trim().toLowerCase(),
-        phone: profile.phone.replace(/\s+/g, ""),
-      };
+      const first_name = clean(profile.first_name);
+      const last_name = clean(profile.last_name);
+      const email = clean(profile.email).toLowerCase();
+      const phone = cleanPhone(profile.phone);
 
-      // If password is being changed, send current + new password
-      if (profile.password) {
-        payload.current_password = profile.current_password;
-        payload.new_password = profile.password;
+      const new_password = clean(profile.password);
+      const current_password = clean(profile.current_password);
+
+      // Only send non-empty fields (prevents blanks reaching backend)
+      const payload = {};
+      if (first_name) payload.first_name = first_name;
+      if (last_name) payload.last_name = last_name;
+      if (email) payload.email = email;
+      if (phone) payload.phone = phone;
+
+      // If password is being changed, send current + new password (trimmed)
+      if (new_password) {
+        payload.current_password = current_password; // canSave guarantees it's present
+        payload.new_password = new_password;
       }
 
       const res = await axios.patch(`${import.meta.env.VITE_API_URL}/me`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Update global app user state
       setUser(res.data);
 
-      // Reset password fields + baseline
       const reset = {
         first_name: res.data.first_name || "",
         last_name: res.data.last_name || "",
@@ -164,6 +169,7 @@ function UserDashboard({ user, setUser }) {
       setSaving(false);
     }
   };
+
 
   // -------------------------
   // NAV / LAYOUT
