@@ -370,6 +370,39 @@ function UserDashboard({ user, setUser }) {
                 </div>
               </div>
 
+              {/* SETUP INSTRUCTIONS */}
+              <div className="sd-setup" aria-label="Setup instructions">
+                <div className="sd-setupTitle">Setup instructions</div>
+
+                <div className="sd-steps">
+                  <div className="sd-step">
+                    <div className="sd-stepNum">1</div>
+                    <div className="sd-stepText">Tap the <strong>Chat with SheCare on WhatsApp</strong> button below.</div>
+                  </div>
+
+                  <div className="sd-step">
+                    <div className="sd-stepNum">2</div>
+                    <div className="sd-stepText">When WhatsApp opens, send <strong>Hi</strong> to start the chatbot.</div>
+                  </div>
+
+                  <div className="sd-step">
+                    <div className="sd-stepNum">3</div>
+                    <div className="sd-stepText">SheCare will reply with a menu of options you can choose from.</div>
+                  </div>
+
+                  <div className="sd-step">
+                    <div className="sd-stepNum">4</div>
+                    <div className="sd-stepText">Reply with the <strong>number</strong> of the option you want (for example: <strong>1</strong>).</div>
+                  </div>
+
+                  <div className="sd-step">
+                    <div className="sd-stepNum">5</div>
+                    <div className="sd-stepText">Continue replying to get guidance, clinic suggestions, or daily tips.</div>
+                  </div>
+                </div>
+              </div>
+
+
               {/* WHATSAPP CTA (Desktop / non-mobile) */}
               <div className="sd-center">
                 <a className="sd-whatsappBtn" href="https://wa.me/+14155238886" target="_blank" rel="noopener noreferrer">

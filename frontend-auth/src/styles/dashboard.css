@@ -313,6 +313,91 @@
   place-items: center;
 }
 
+
+/* =========================
+   SETUP INSTRUCTIONS
+   ========================= */
+.sd-setup {
+  margin: 8px 0 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centers the whole section */
+  text-align: center;
+}
+
+.sd-setupTitle {
+  font-weight: 800;
+  color: var(--sd-muted);
+  margin: 6px 0 14px;
+  letter-spacing: 0.2px;
+}
+
+.sd-steps {
+  width: 100%;
+  max-width: 760px;          /* keeps it neat on desktop */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;        /* centers each row container */
+}
+
+.sd-step {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;    /* keeps row content centered overall */
+}
+
+.sd-stepNum {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: #374151;
+  background: #f3f4f6;
+  border: 1px solid var(--sd-border);
+  flex: 0 0 34px;
+}
+
+.sd-stepText {
+  flex: 0 1 640px;           /* prevents overly wide lines */
+  text-align: left;           /* like the reference: number + text */
+  color: #4b5563;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Slightly tighter on mobile */
+@media (max-width: 900px) {
+  .sd-setup {
+    margin: 2px 0 14px;
+  }
+
+  .sd-setupTitle {
+    margin-bottom: 12px;
+  }
+
+  .sd-steps {
+    max-width: 520px;
+    gap: 10px;
+  }
+
+  .sd-stepNum {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+  }
+
+  .sd-stepText {
+    flex-basis: 420px;
+    font-size: 13px;
+  }
+}
+
+
 .sd-whatsappBtn {
   display: inline-flex;
   align-items: center;
