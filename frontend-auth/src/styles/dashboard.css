@@ -326,10 +326,13 @@
 }
 
 .sd-setupTitle {
-  font-weight: 800;
+  font-weight: 900;
   color: var(--sd-muted);
-  margin: 6px 0 14px;
+  margin: 6px 0 16px;
   letter-spacing: 0.2px;
+
+  /* bigger heading */
+  font-size: 20px;
 }
 
 .sd-steps {
@@ -350,8 +353,8 @@
 }
 
 .sd-stepNum {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
   display: grid;
   place-items: center;
@@ -359,7 +362,12 @@
   color: #374151;
   background: #f3f4f6;
   border: 1px solid var(--sd-border);
-  flex: 0 0 34px;
+
+  /* keep spacing stable */
+  flex: 0 0 44px;
+
+  /* bigger number */
+  font-size: 16px;
 }
 
 .sd-stepText {
@@ -377,6 +385,7 @@
   }
 
   .sd-setupTitle {
+    font-size: 18px;
     margin-bottom: 12px;
   }
 
@@ -386,11 +395,12 @@
   }
 
   .sd-stepNum {
-    width: 32px;
-    height: 32px;
-    flex: 0 0 32px;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    font-size: 15px;
   }
-
+  
   .sd-stepText {
     flex-basis: 420px;
     font-size: 13px;
