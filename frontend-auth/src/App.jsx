@@ -4,6 +4,8 @@ import Main from "./components/Main";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import UserDashboard from "./pages/UserDashboard";
+import ForgotPassword from "./pages/ForgotPassword";
+
 import axios from "axios";
 
 
