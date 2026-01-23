@@ -40,13 +40,13 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Main setUser={handleSetUser} />} />
-        
+
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         <Route
           path="/user-dashboard"
           element={user ? <UserDashboard user={user} setUser={handleSetUser} /> : <Navigate to="/signin" />}
         />
-
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
