@@ -102,6 +102,16 @@ function SignIn({ onSwitch, setUser }) {
               <ErrorMessage name="password" component="div" className="auth-error" />
             )}
 
+            <div className="auth-row">
+              <button
+                type="button"
+                className="auth-link link-btn"
+                onClick={() => navigate("/forgot-password")}
+              >
+                Forgot password?
+              </button>
+            </div>
+
             <button type="submit" className="auth-submit" disabled={isSubmitting}>
               {isSubmitting ? "Signing in..." : "Sign In"}
             </button>
