@@ -18,9 +18,7 @@ function ForgotPassword() {
     }
   }, [apiError, apiSuccess]);
 
-  const initialValues = {
-    emailOrPhone: "",
-  };
+  const initialValues = { emailOrPhone: "" };
 
   const validationSchema = Yup.object({
     emailOrPhone: Yup.string()
@@ -47,13 +45,11 @@ function ForgotPassword() {
         phone: isEmail ? null : input.replace(/\s+/g, ""),
       };
 
-      // Expected backend endpoint: POST /api/forgot-password
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/forgot-password`,
         payload
       );
 
-      // Always show a generic success message (anti-enumeration)
       setApiSuccess(
         res.data?.message ||
           "If an account exists for that email/phone, reset instructions have been sent."
@@ -61,72 +57,75 @@ function ForgotPassword() {
 
       resetForm();
     } catch (err) {
-      // Still avoid leaking whether the account exists
+      // Keep anti-enumeration behavior
       setApiSuccess(
         "If an account exists for that email/phone, reset instructions have been sent."
       );
-
-      // Optionally log the real error in dev only
-      // console.error(err);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <>
-      <div ref={topRef} />
+    <div className="auth-layout">
+      {/* Keep the left panel for desktop consistency; mobile hides it via CSS */}
+      <div className="auth-left" />
 
-      <h2 className="auth-title">Forgot your password?</h2>
+      <div className="auth-right auth-right-centered">
+        <div className="auth-content-container fade">
+          <div ref={topRef} />
 
-      <p className="auth-subtitle" style={{ marginTop: "-6px" }}>
-        Enter your email or phone number and we’ll help you reset your password.
-      </p>
+          {/* Optional: match your SignIn/SignUp top-logo layout if you use it there */}
+          {/* <img src="/path/to/logo.png" alt="SheCare" className="auth-logo-top" /> */}
 
-      {apiError && <div className="auth-error-banner">{apiError}</div>}
-      {apiSuccess && <div className="auth-success-banner">{apiSuccess}</div>}
+          <h2 className="auth-title">Forgot your password?</h2>
 
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ isSubmitting, submitCount }) => (
-          <Form className="auth-form">
-            <Field
-              type="text"
-              name="emailOrPhone"
-              placeholder="Email or phone number"
-              className="auth-input"
-              autoComplete="username"
-              inputMode="email"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
-                name="emailOrPhone"
-                component="div"
-                className="auth-error"
-              />
+          <p className="centered-text" style={{ marginTop: "-10px", marginBottom: 18, color: "#555" }}>
+            Enter your email or phone number and we’ll help you reset your password.
+          </p>
+
+          {apiError && <div className="auth-error-banner">{apiError}</div>}
+          {apiSuccess && <div className="auth-success-banner">{apiSuccess}</div>}
+
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting, submitCount }) => (
+              <Form className="auth-form">
+                <Field
+                  type="text"
+                  name="emailOrPhone"
+                  placeholder="Email or phone number"
+                  className="auth-input"
+                  autoComplete="username"
+                  inputMode="email"
+                />
+                {submitCount > 0 && (
+                  <ErrorMessage name="emailOrPhone" component="div" className="auth-error" />
+                )}
+
+                <button type="submit" className="auth-submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Sending..." : "Send reset instructions"}
+                </button>
+
+                <p className="auth-footer">
+                  Remembered your password?{" "}
+                  <button
+                    type="button"
+                    className="auth-link link-btn"
+                    onClick={() => navigate("/")}
+                  >
+                    Back to Sign In
+                  </button>
+                </p>
+              </Form>
             )}
-
-            <button type="submit" className="auth-submit" disabled={isSubmitting}>
-              {isSubmitting ? "Sending..." : "Send reset instructions"}
-            </button>
-
-            <p className="auth-footer" style={{ marginTop: 14 }}>
-              Remembered your password?{" "}
-              <button
-                type="button"
-                className="auth-link link-btn"
-                onClick={() => navigate("/")}
-              >
-                Back to Sign In
-              </button>
-            </p>
-          </Form>
-        )}
-      </Formik>
-    </>
+          </Formik>
+        </div>
+      </div>
+    </div>
   );
 }
 
