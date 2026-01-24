@@ -30,6 +30,7 @@ function ResetPassword() {
   );
 
   const validationSchema = Yup.object({
+    // Only require token if it's not present in the URL
     token: Yup.string().when([], {
       is: () => !urlToken,
       then: (schema) => schema.required("Reset token is required"),
@@ -50,7 +51,6 @@ function ResetPassword() {
     try {
       const tokenToUse = urlToken || values.token;
 
-      // Expected backend endpoint: POST /api/reset-password
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/reset-password`,
         {
@@ -60,10 +60,9 @@ function ResetPassword() {
       );
 
       setApiSuccess(res.data?.message || "Password updated successfully.");
-
       resetForm();
 
-      // Small UX: send them back to sign-in after success
+      // Redirect back to sign-in shortly after success
       setTimeout(() => navigate("/"), 900);
     } catch (err) {
       setApiError(err.response?.data?.error || "Password reset failed.");
@@ -73,85 +72,100 @@ function ResetPassword() {
   };
 
   return (
-    <>
-      <div ref={topRef} />
+    <div className="auth-layout">
+      {/* Keep the left panel for desktop consistency; mobile hides it via CSS */}
+      <div className="auth-left" />
 
-      <h2 className="auth-title">Reset your password</h2>
+      <div className="auth-right auth-right-centered">
+        <div className="auth-content-container fade">
+          <div ref={topRef} />
 
-      {apiError && <div className="auth-error-banner">{apiError}</div>}
-      {apiSuccess && <div className="auth-success-banner">{apiSuccess}</div>}
+          <h2 className="auth-title">Reset your password</h2>
 
-      <Formik
-        enableReinitialize
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ isSubmitting, submitCount }) => (
-          <Form className="auth-form">
-            {/* If token is NOT in the URL, allow manual entry */}
-            {!urlToken && (
-              <>
+          {apiError && <div className="auth-error-banner">{apiError}</div>}
+          {apiSuccess && <div className="auth-success-banner">{apiSuccess}</div>}
+
+          <Formik
+            enableReinitialize
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting, submitCount }) => (
+              <Form className="auth-form">
+                {/* If token is NOT in the URL, allow manual entry */}
+                {!urlToken && (
+                  <>
+                    <Field
+                      type="text"
+                      name="token"
+                      placeholder="Reset token"
+                      className="auth-input"
+                      autoComplete="one-time-code"
+                    />
+                    {submitCount > 0 && (
+                      <ErrorMessage
+                        name="token"
+                        component="div"
+                        className="auth-error"
+                      />
+                    )}
+                  </>
+                )}
+
                 <Field
-                  type="text"
-                  name="token"
-                  placeholder="Reset token"
+                  type="password"
+                  name="password"
+                  placeholder="New password"
                   className="auth-input"
-                  autoComplete="one-time-code"
+                  autoComplete="new-password"
                 />
                 {submitCount > 0 && (
                   <ErrorMessage
-                    name="token"
+                    name="password"
                     component="div"
                     className="auth-error"
                   />
                 )}
-              </>
+
+                <Field
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Confirm new password"
+                  className="auth-input"
+                  autoComplete="new-password"
+                />
+                {submitCount > 0 && (
+                  <ErrorMessage
+                    name="confirmPassword"
+                    component="div"
+                    className="auth-error"
+                  />
+                )}
+
+                <button
+                  type="submit"
+                  className="auth-submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Updating..." : "Update password"}
+                </button>
+
+                <p className="auth-footer">
+                  <button
+                    type="button"
+                    className="auth-link link-btn"
+                    onClick={() => navigate("/")}
+                  >
+                    Back to Sign In
+                  </button>
+                </p>
+              </Form>
             )}
-
-            <Field
-              type="password"
-              name="password"
-              placeholder="New password"
-              className="auth-input"
-              autoComplete="new-password"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage name="password" component="div" className="auth-error" />
-            )}
-
-            <Field
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm new password"
-              className="auth-input"
-              autoComplete="new-password"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
-                name="confirmPassword"
-                component="div"
-                className="auth-error"
-              />
-            )}
-
-            <button type="submit" className="auth-submit" disabled={isSubmitting}>
-              {isSubmitting ? "Updating..." : "Update password"}
-            </button>
-
-            <p className="auth-footer" style={{ marginTop: 14 }}>
-              <button
-                type="button"
-                className="auth-link link-btn"
-                onClick={() => navigate("/")}
-              >
-                Back to Sign In
-              </button>
-            </p>
-          </Form>
-        )}
-      </Formik>
-    </>
+          </Formik>
+        </div>
+      </div>
+    </div>
   );
 }
 
