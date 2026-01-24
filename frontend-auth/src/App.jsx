@@ -47,7 +47,7 @@ function App() {
 
         <Route
           path="/user-dashboard"
-          element={user ? <UserDashboard user={user} setUser={handleSetUser} /> : <Navigate to="/signin" />}
+          element={user ? <UserDashboard user={user} setUser={handleSetUser} /> : <Navigate to="/" />}
         />
 
         <Route path="*" element={<Navigate to="/" />} />
