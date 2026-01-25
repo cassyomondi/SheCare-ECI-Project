@@ -239,6 +239,16 @@
     align-items: center;
   }
 
+  .auth-right {
+    scrollbar-gutter: stable;
+  }
+
+  @supports not (scrollbar-gutter: stable) {
+    .auth-right {
+      overflow-y: scroll;
+    }
+  }
+
   .auth-right-centered {
     padding-top: 22px;
   }
