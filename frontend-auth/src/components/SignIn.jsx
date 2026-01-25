@@ -1,4 +1,4 @@
-// SignIn.jsx
+// src/components/SignIn.jsx
 import { useState, useEffect, useRef } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -44,7 +44,10 @@ function SignIn({ onSwitch, setUser }) {
         password: values.password,
       };
 
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/login`, payload);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/login`,
+        payload
+      );
 
       const token = res.data?.access_token;
       if (!token) {
@@ -57,7 +60,6 @@ function SignIn({ onSwitch, setUser }) {
       const meRes = await axios.get(`${import.meta.env.VITE_API_URL}/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
 
       setUser(meRes.data);
 
@@ -76,7 +78,11 @@ function SignIn({ onSwitch, setUser }) {
       <h2 className="auth-title">Sign In to talk to SheCare on WhatsApp</h2>
       {apiError && <div className="auth-error-banner">{apiError}</div>}
 
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
         {({ isSubmitting, submitCount }) => (
           <Form className="auth-form">
             <Field
@@ -88,7 +94,11 @@ function SignIn({ onSwitch, setUser }) {
               inputMode="email"
             />
             {submitCount > 0 && (
-              <ErrorMessage name="emailOrPhone" component="div" className="auth-error" />
+              <ErrorMessage
+                name="emailOrPhone"
+                component="div"
+                className="auth-error"
+              />
             )}
 
             <Field
@@ -99,7 +109,11 @@ function SignIn({ onSwitch, setUser }) {
               autoComplete="current-password"
             />
             {submitCount > 0 && (
-              <ErrorMessage name="password" component="div" className="auth-error" />
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="auth-error"
+              />
             )}
 
             <div className="auth-row">
@@ -112,7 +126,11 @@ function SignIn({ onSwitch, setUser }) {
               </button>
             </div>
 
-            <button type="submit" className="auth-submit" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Signing in..." : "Sign In"}
             </button>
           </Form>
