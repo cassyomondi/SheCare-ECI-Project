@@ -1,4 +1,4 @@
-// SignUp.jsx
+// src/components/SignUp.jsx
 import { useState, useEffect, useRef } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -28,12 +28,19 @@ function SignUp({ onSwitch, setUser }) {
   const validationSchema = Yup.object({
     first_name: Yup.string().required("Required"),
     last_name: Yup.string().required("Required"),
-    email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
+    email: Yup.string()
+      .trim()
+      .email("Enter a valid email")
+      .required("Email is required"),
     phone: Yup.string()
       .required("Phone number is required")
       .matches(/^\+?\d+$/, "Phone number can only contain digits and +"),
-    password: Yup.string().min(8, "Password must be at least 8 characters").required("Required"),
-    confirm: Yup.string().oneOf([Yup.ref("password")], "Passwords must match").required("Required"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .required("Required"),
+    confirm: Yup.string()
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Required"),
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
@@ -47,7 +54,10 @@ function SignUp({ onSwitch, setUser }) {
       payload.email = payload.email.trim().toLowerCase();
       payload.phone = payload.phone.replace(/\s+/g, "");
 
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/signup`,
+        payload
+      );
 
       const token = res.data?.access_token;
       if (!token) {
@@ -84,21 +94,51 @@ function SignUp({ onSwitch, setUser }) {
 
       {apiError && <div className="auth-error-banner">{apiError}</div>}
 
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
         {({ isSubmitting, setFieldValue, submitCount }) => (
           <Form className="auth-form">
-            <Field name="first_name" placeholder="First Name" className="auth-input" autoComplete="given-name" />
+            <Field
+              name="first_name"
+              placeholder="First Name"
+              className="auth-input"
+              autoComplete="given-name"
+            />
             {submitCount > 0 && (
-              <ErrorMessage name="first_name" component="div" className="auth-error" />
+              <ErrorMessage
+                name="first_name"
+                component="div"
+                className="auth-error"
+              />
             )}
 
-            <Field name="last_name" placeholder="Last Name" className="auth-input" autoComplete="family-name" />
+            <Field
+              name="last_name"
+              placeholder="Last Name"
+              className="auth-input"
+              autoComplete="family-name"
+            />
             {submitCount > 0 && (
-              <ErrorMessage name="last_name" component="div" className="auth-error" />
+              <ErrorMessage
+                name="last_name"
+                component="div"
+                className="auth-error"
+              />
             )}
 
-            <Field type="email" name="email" placeholder="Email" className="auth-input" autoComplete="email" />
-            {submitCount > 0 && <ErrorMessage name="email" component="div" className="auth-error" />}
+            <Field
+              type="email"
+              name="email"
+              placeholder="Email"
+              className="auth-input"
+              autoComplete="email"
+            />
+            {submitCount > 0 && (
+              <ErrorMessage name="email" component="div" className="auth-error" />
+            )}
 
             <Field
               name="phone"
@@ -108,15 +148,45 @@ function SignUp({ onSwitch, setUser }) {
               autoComplete="tel"
               onChange={(e) => handlePhoneChange(e, setFieldValue)}
             />
-            {submitCount > 0 && <ErrorMessage name="phone" component="div" className="auth-error" />}
+            {submitCount > 0 && (
+              <ErrorMessage name="phone" component="div" className="auth-error" />
+            )}
 
-            <Field type="password" name="password" placeholder="Password" className="auth-input" autoComplete="new-password" />
-            {submitCount > 0 && <ErrorMessage name="password" component="div" className="auth-error" />}
+            <Field
+              type="password"
+              name="password"
+              placeholder="Password"
+              className="auth-input"
+              autoComplete="new-password"
+            />
+            {submitCount > 0 && (
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="auth-error"
+              />
+            )}
 
-            <Field type="password" name="confirm" placeholder="Confirm Password" className="auth-input" autoComplete="new-password" />
-            {submitCount > 0 && <ErrorMessage name="confirm" component="div" className="auth-error" />}
+            <Field
+              type="password"
+              name="confirm"
+              placeholder="Confirm Password"
+              className="auth-input"
+              autoComplete="new-password"
+            />
+            {submitCount > 0 && (
+              <ErrorMessage
+                name="confirm"
+                component="div"
+                className="auth-error"
+              />
+            )}
 
-            <button type="submit" className="auth-submit" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Creating..." : "Sign Up"}
             </button>
           </Form>
