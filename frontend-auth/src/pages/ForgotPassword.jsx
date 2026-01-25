@@ -68,65 +68,66 @@ function ForgotPassword() {
   };
 
   return (
-    <div className="auth-layout">
-      {/* Keep the left panel for desktop consistency; mobile hides it via CSS */}
-      <div className="auth-left" />
+    <AuthShell contentKey="forgot-password">
+      <div ref={topRef} />
 
-      <div className="auth-right auth-right-centered">
-        <div className="auth-content-container fade">
-          <div ref={topRef} />
+      <h2 className="auth-title">Forgot your password?</h2>
 
-          {/* Optional: match your SignIn/SignUp top-logo layout if you use it there */}
-          {/* <img src="/path/to/logo.png" alt="SheCare" className="auth-logo-top" /> */}
+      <p
+        className="centered-text"
+        style={{ marginTop: "-10px", marginBottom: 18, color: "#555" }}
+      >
+        Enter your email or phone number and we’ll help you reset your password.
+      </p>
 
-          <h2 className="auth-title">Forgot your password?</h2>
+      {apiError && <div className="auth-error-banner">{apiError}</div>}
+      {apiSuccess && <div className="auth-success-banner">{apiSuccess}</div>}
 
-          <p className="centered-text" style={{ marginTop: "-10px", marginBottom: 18, color: "#555" }}>
-            Enter your email or phone number and we’ll help you reset your password.
-          </p>
-
-          {apiError && <div className="auth-error-banner">{apiError}</div>}
-          {apiSuccess && <div className="auth-success-banner">{apiSuccess}</div>}
-
-          <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-          >
-            {({ isSubmitting, submitCount }) => (
-              <Form className="auth-form">
-                <Field
-                  type="text"
-                  name="emailOrPhone"
-                  placeholder="Email or phone number"
-                  className="auth-input"
-                  autoComplete="username"
-                  inputMode="email"
-                />
-                {submitCount > 0 && (
-                  <ErrorMessage name="emailOrPhone" component="div" className="auth-error" />
-                )}
-
-                <button type="submit" className="auth-submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Sending..." : "Send reset instructions"}
-                </button>
-
-                <p className="auth-footer">
-                  Remembered your password?{" "}
-                  <button
-                    type="button"
-                    className="auth-link link-btn"
-                    onClick={() => navigate("/")}
-                  >
-                    Back to Sign In
-                  </button>
-                </p>
-              </Form>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting, submitCount }) => (
+          <Form className="auth-form">
+            <Field
+              type="text"
+              name="emailOrPhone"
+              placeholder="Email or phone number"
+              className="auth-input"
+              autoComplete="username"
+              inputMode="email"
+            />
+            {submitCount > 0 && (
+              <ErrorMessage
+                name="emailOrPhone"
+                component="div"
+                className="auth-error"
+              />
             )}
-          </Formik>
-        </div>
-      </div>
-    </div>
+
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Sending..." : "Send reset instructions"}
+            </button>
+
+            <p className="auth-footer">
+              Remembered your password?{" "}
+              <button
+                type="button"
+                className="auth-link link-btn"
+                onClick={() => navigate("/")}
+              >
+                Back to Sign In
+              </button>
+            </p>
+          </Form>
+        )}
+      </Formik>
+    </AuthShell>
   );
 }
 
