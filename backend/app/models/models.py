@@ -291,3 +291,52 @@ class ChatMemory(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f"<ChatMemory user_id={self.user_id} sender={self.sender}>"
+
+##############################################################
+# PASSWORD RESET TOKENS
+##############################################################
+class PasswordResetToken(db.Model):
+    __tablename__ = "password_reset_tokens"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+
+    # Store only a hash of the token (never store raw token)
+    token_hash = db.Column(db.String(64), nullable=False, unique=True, index=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False, index=True)
+    used = db.Column(db.Boolean, default=False, nullable=False)
+    used_at = db.Column(db.DateTime, nullable=True)
+
+    # optional: basic telemetry / abuse protection
+    request_ip = db.Column(db.String(64), nullable=True)
+    user_agent = db.Column(db.String(255), nullable=True)
+
+    user = db.relationship("User")
+
+    @staticmethod
+    def _hash_token(raw_token: str) -> str:
+        return hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
+
+    @classmethod
+    def mint(cls, user_id: int, ttl_minutes: int = 30, request_ip: str = None, user_agent: str = None):
+        raw = secrets.token_urlsafe(48)
+        token_hash = cls._hash_token(raw)
+
+        obj = cls(
+            user_id=user_id,
+            token_hash=token_hash,
+            expires_at=datetime.utcnow() + timedelta(minutes=ttl_minutes),
+            request_ip=request_ip,
+            user_agent=user_agent,
+        )
+        return obj, raw
+
+    def is_valid(self) -> bool:
+        if self.used:
+            return False
+        if datetime.utcnow() > self.expires_at:
+            return False
+        return True
