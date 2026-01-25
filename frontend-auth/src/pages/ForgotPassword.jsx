@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import AuthShell from "../components/AuthShell";
 
 function ForgotPassword() {
   const navigate = useNavigate();
