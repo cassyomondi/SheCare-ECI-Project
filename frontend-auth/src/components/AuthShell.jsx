@@ -1,12 +1,15 @@
+// src/components/AuthShell.jsx
 import React from "react";
 
-function AuthShell({ children }) {
+function AuthShell({ children, contentKey }) {
   return (
     <div className="auth-layout">
+      {/* LEFT (Desktop only via CSS) */}
       <div className="auth-left" aria-hidden="true">
         <div className="auth-left-content" />
       </div>
 
+      {/* RIGHT */}
       <div className="auth-right auth-right-centered">
         <img
           src="https://shecare-nu.vercel.app/images/logo.png"
@@ -14,7 +17,10 @@ function AuthShell({ children }) {
           className="auth-logo-top"
         />
 
-        <div className="auth-content-container fade">{children}</div>
+        {/* contentKey is optional, but keeps your fade animation behavior consistent */}
+        <div className="auth-content-container fade" key={contentKey}>
+          {children}
+        </div>
       </div>
     </div>
   );
