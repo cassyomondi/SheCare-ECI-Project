@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import validates
 from sqlalchemy_serializer import SerializerMixin
 from app.utils.db import db
+import hashlib
 
 ##############################################################
 # USERS TABLE — Base identity for all user roles

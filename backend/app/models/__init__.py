@@ -14,8 +14,9 @@ from app.models.models import (
     Prescription,
     Tip,
     ChatSession,
-    HealthTip,      # ✅ add this
-    ChatMemory      # ✅ add this
+    HealthTip,      
+    ChatMemory,     
+    PasswordResetToken,      
 )
 
 __all__ = [
@@ -31,6 +32,7 @@ __all__ = [
     "Prescription",
     "Tip",
     "ChatSession",
-    "HealthTip",     # ✅ add this
-    "ChatMemory"     # ✅ add this
+    "HealthTip",     
+    "ChatMemory",
+    "PasswordResetToken",   
 ]
