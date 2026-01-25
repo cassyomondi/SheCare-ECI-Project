@@ -44,6 +44,19 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* Keep centered items (logo) from shifting when scrollbars appear/disappear */
+.auth-right {
+  scrollbar-gutter: stable;
+}
+
+/* Fallback for browsers that don't support scrollbar-gutter */
+@supports not (scrollbar-gutter: stable) {
+  .auth-right {
+    overflow-y: scroll; /* always reserve scrollbar space */
+  }
+}
+
+
 /* Ensure the right side starts from the top, not the middle */
 .auth-right-centered {
   display: flex;
