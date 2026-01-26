@@ -240,7 +240,7 @@ def signup():
         # fallback if unique constraints race
         return jsonify({"error": "Email or phone already exists"}), 409
 
-    except Exception:
+    except Exception as e:
         db.session.rollback()
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
