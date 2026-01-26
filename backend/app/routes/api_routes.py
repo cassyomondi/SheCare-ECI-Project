@@ -1,5 +1,6 @@
 # backend/app/routes/api_routes.py
 from sqlalchemy.exc import IntegrityError
+import traceback
 from werkzeug.exceptions import BadRequest
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -241,7 +242,8 @@ def signup():
 
     except Exception:
         db.session.rollback()
-        return jsonify({"error": "Signup failed"}), 500
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
 
 
