@@ -1,4 +1,6 @@
 # backend/app/routes/api_routes.py
+from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import BadRequest
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -164,7 +166,7 @@ def update_me():
 # -----------------------------
 @api_bp.route("/signup", methods=["POST"])
 def signup():
-    data = request.get_json()
+    data = request.get_json() or {}
 
     phone = data.get("phone")
     email = data.get("email")
@@ -172,61 +174,74 @@ def signup():
     first_name = data.get("first_name")
     last_name = data.get("last_name")
 
-    # ✅ Force role for public signup
     role = "participant"
 
-    phone = "".join(phone.split()) if phone else None
+    phone = "".join(str(phone).split()) if phone else None
     email = email.strip().lower() if email else None
     first_name = first_name.strip() if first_name else None
     last_name = last_name.strip() if last_name else None
 
-    if not first_name or not last_name:
-        return jsonify({"error": "First name and last name are required"}), 400
-
     if not phone or not email or not password or not first_name or not last_name:
         return jsonify({"error": "First name, last name, phone, email, and password are required"}), 400
 
+    # Optional: enforce length here too (faster, clearer than model-level)
+    if len(phone.replace("+", "")) < 10:
+        return jsonify({"error": "Phone number must be at least 10 digits"}), 400
 
-    if User.query.filter(User.email == email).first():
-        return jsonify({"error": "The email is taken"}), 409
+    if len(password) < 8:
+        return jsonify({"error": "Password must be at least 8 characters"}), 400
 
-    if User.query.filter(User.phone == phone).first():
-        return jsonify({"error": "The phone number is taken"}), 409
+    try:
+        if User.query.filter(User.email == email).first():
+            return jsonify({"error": "The email is taken"}), 409
+        if User.query.filter(User.phone == phone).first():
+            return jsonify({"error": "The phone number is taken"}), 409
 
-    user = User(
-        email=email,
-        phone=phone,
-        password=generate_password_hash(password),
-        role=role  # ✅ always participant
-    )
+        user = User(
+            email=email,
+            phone=phone,
+            password=generate_password_hash(password),
+            role=role
+        )
+        db.session.add(user)
+        db.session.commit()
 
-    db.session.add(user)
-    db.session.commit()
+        participant = Participant(
+            user_id=user.id,
+            first_name=first_name,
+            last_name=last_name
+        )
+        db.session.add(participant)
+        db.session.commit()
 
-    # ✅ Always create linked participant profile for public signup
-    participant = Participant(
-        user_id=user.id,
-        first_name=first_name,
-        last_name=last_name
-    )
-    db.session.add(participant)
-    db.session.commit()
+        access_token = create_access_token(
+            identity={"user_id": user.id, "email": user.email, "role": user.role},
+            expires_delta=timedelta(hours=12)
+        )
 
-    access_token = create_access_token(
-        identity={"user_id": user.id, "email": user.email, "role": user.role},
-        expires_delta=timedelta(hours=12)
-    )
+        return jsonify({
+            "message": "User registered successfully",
+            "access_token": access_token,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "phone": user.phone,
+                "role": user.role
+            }
+        }), 201
 
-    return jsonify({
-        "message": "User registered successfully",
-        "access_token": access_token,
-        "user": {
-            "id": user.id,
-            "email": user.email,
-            "phone": user.phone,
-            "role": user.role
-        }
-    }), 201
+    except ValueError as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
+    except IntegrityError:
+        db.session.rollback()
+        # fallback if unique constraints race
+        return jsonify({"error": "Email or phone already exists"}), 409
+
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "Signup failed"}), 500
 
 
 

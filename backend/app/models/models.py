@@ -31,11 +31,21 @@ class User(db.Model, SerializerMixin):
     chat_memory = db.relationship('ChatMemory', back_populates='user', cascade='all, delete-orphan')
 
     # Validators
-    @validates('phone')
+    @validates("phone")
     def validate_phone(self, key, phone):
-        if not phone or len(phone) < 10:
+        if not phone:
+            raise ValueError("Phone number is required")
+
+        cleaned = "".join(str(phone).split())
+        digits = cleaned.lstrip("+")
+        if not digits.isdigit():
+            raise ValueError("Phone number can only contain digits and +")
+
+        if len(digits) < 10:
             raise ValueError("Phone number must be at least 10 digits")
-        return phone
+
+        return cleaned
+
 
     @validates('email')
     def validate_email(self, key, email):
