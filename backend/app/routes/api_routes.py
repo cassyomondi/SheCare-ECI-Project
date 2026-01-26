@@ -180,8 +180,9 @@ def signup():
     first_name = first_name.strip() if first_name else None
     last_name = last_name.strip() if last_name else None
 
-    if not phone or not email or not password:
-        return jsonify({"error": "Phone, email, and password are required"}), 400
+    if not phone or not email or not password or not first_name or not last_name:
+        return jsonify({"error": "First name, last name, phone, email, and password are required"}), 400
+
 
     if User.query.filter(User.email == email).first():
         return jsonify({"error": "The email is taken"}), 409
