@@ -221,20 +221,12 @@ function SignUp({ onSwitch, setUser }) {
               {/* ✅ Minimalist phone row */}
               <div className="phone-min-row">
                 {/* Flag dropdown (left) */}
-                <div className="phone-flag-wrap">
-                  <select
-                    className="phone-flag-select"
-                    value={values.country}
-                    onChange={(e) => setFieldValue("country", e.target.value)}
-                    aria-label="Select country"
-                  >
-                    {COUNTRY_OPTIONS.map((opt) => (
-                      <option key={opt.code} value={opt.code}>
-                        {opt.flag} {opt.name} {opt.dial}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FlagSelect
+                  value={values.country}
+                  options={COUNTRY_OPTIONS}
+                  onChange={(code) => setFieldValue("country", code)}
+                />
+
 
                 {/* Fixed prefix + editable local digits */}
                 <div className="phone-input-wrap">
