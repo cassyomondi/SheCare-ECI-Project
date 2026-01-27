@@ -204,7 +204,13 @@ function UserDashboard({ user, setUser }) {
     if (!clean(profile.first_name)) return false;
     if (!clean(profile.last_name)) return false;
     if (!clean(profile.email)) return false;
-    if (!clean(profile.phone)) return false;
+    
+    const c = getCountryByCode(profile.country);
+    const localDigits = cleanPhone(profile.phone_local).replace(/[^\d]/g, "");
+
+    if (!localDigits) return false;
+    if (localDigits.length < (c.minLocalDigits ?? 8)) return false;
+
 
     return true;
   }, [isDirty, saving, profile]);
