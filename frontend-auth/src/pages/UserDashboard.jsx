@@ -204,7 +204,7 @@ function UserDashboard({ user, setUser }) {
     if (!clean(profile.first_name)) return false;
     if (!clean(profile.last_name)) return false;
     if (!clean(profile.email)) return false;
-    
+
     const c = getCountryByCode(profile.country);
     const localDigits = cleanPhone(profile.phone_local).replace(/[^\d]/g, "");
 
@@ -221,15 +221,22 @@ function UserDashboard({ user, setUser }) {
     setProfileSuccess("");
     const value = e.target.value;
 
-    // Keep phone clean-ish (digits and + only)
-    if (field === "phone") {
-      const sanitized = value.replace(/[^0-9+]/g, "");
-      setProfile((p) => ({ ...p, phone: sanitized }));
+    if (field === "phone_local") {
+      const sanitized = value.replace(/[^\d]/g, "");
+      setProfile((p) => ({ ...p, phone_local: sanitized }));
       return;
     }
 
     setProfile((p) => ({ ...p, [field]: value }));
   };
+  
+
+  const onCountryChange = (code) => {
+    setProfileError("");
+    setProfileSuccess("");
+    setProfile((p) => ({ ...p, country: code }));
+  };
+
 
   const saveProfile = async () => {
     setProfileError("");
