@@ -5,7 +5,9 @@ from werkzeug.exceptions import BadRequest
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from datetime import timedelta
+import os
+import hashlib
+from datetime import timedelta, datetime
 from app.utils.db import db
 from app.models.models import (
     User,
