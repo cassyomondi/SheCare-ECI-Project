@@ -229,7 +229,7 @@ function UserDashboard({ user, setUser }) {
 
     setProfile((p) => ({ ...p, [field]: value }));
   };
-  
+
 
   const onCountryChange = (code) => {
     setProfileError("");
@@ -254,7 +254,10 @@ function UserDashboard({ user, setUser }) {
       const first_name = clean(profile.first_name);
       const last_name = clean(profile.last_name);
       const email = clean(profile.email).toLowerCase();
-      const phone = cleanPhone(profile.phone);
+      const c = getCountryByCode(profile.country);
+      const localDigits = cleanPhone(profile.phone_local).replace(/[^\d]/g, "");
+      const phone = `${c.dial}${localDigits}`;
+
 
       const new_password = clean(profile.password);
       const current_password = clean(profile.current_password);
@@ -278,15 +281,19 @@ function UserDashboard({ user, setUser }) {
 
       setUser(res.data);
 
+      const parsed = parseE164Phone(res.data.phone || "");
+
       const reset = {
         first_name: res.data.first_name || "",
         last_name: res.data.last_name || "",
         email: res.data.email || "",
-        phone: res.data.phone || "",
+        country: parsed.country || "KE",
+        phone_local: parsed.local || "",
         current_password: "",
         password: "",
         confirm_password: "",
       };
+
 
       setProfile(reset);
       setInitialProfile(reset);
