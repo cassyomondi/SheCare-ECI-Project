@@ -147,11 +147,14 @@ function UserDashboard({ user, setUser }) {
   useEffect(() => {
     if (!user) return;
 
+    const parsed = parseE164Phone(user.phone || "");
+
     const hydrated = {
       first_name: user.first_name || "",
       last_name: user.last_name || "",
       email: user.email || "",
-      phone: user.phone || "",
+      country: parsed.country || "KE",
+      phone_local: parsed.local || "",
       current_password: "",
       password: "",
       confirm_password: "",
@@ -160,6 +163,7 @@ function UserDashboard({ user, setUser }) {
     setProfile(hydrated);
     setInitialProfile(hydrated);
   }, [user]);
+
 
   const isDirty = useMemo(() => {
     if (!initialProfile) return false;
