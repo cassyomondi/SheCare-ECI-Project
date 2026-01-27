@@ -316,3 +316,79 @@
     font-size: 1rem;
   }
 }
+
+/* Minimal phone picker row */
+.phone-min-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Flag dropdown */
+.phone-flag-wrap {
+  position: relative;
+}
+
+.phone-flag-select {
+  width: 100%;
+  height: 44px;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 10px;
+  cursor: pointer;
+  appearance: none;
+  text-align: center;
+}
+
+/* Subtle dropdown chevron */
+.phone-flag-wrap::after {
+  content: "▾";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Fixed prefix + input */
+.phone-input-wrap {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.phone-prefix-fixed {
+  padding: 0 12px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  background: rgba(0,0,0,0.03);
+  border-right: 1px solid rgba(0,0,0,0.10);
+  white-space: nowrap;
+}
+
+.phone-local-input {
+  border: none !important;
+  outline: none !important;
+  height: 100%;
+  border-radius: 0 !important;
+  flex: 1;
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  .phone-min-row {
+    grid-template-columns: 64px 1fr;
+  }
+}

@@ -5,15 +5,13 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// Minimal list (add more as needed)
 const COUNTRY_OPTIONS = [
-  { code: "KE", label: "Kenya", dial: "+254", minLocalDigits: 9 }, // 7XXXXXXXX
-  { code: "UG", label: "Uganda", dial: "+256", minLocalDigits: 9 },
-  { code: "TZ", label: "Tanzania", dial: "+255", minLocalDigits: 9 },
-  { code: "RW", label: "Rwanda", dial: "+250", minLocalDigits: 9 },
-  { code: "BI", label: "Burundi", dial: "+257", minLocalDigits: 8 },
-  { code: "ET", label: "Ethiopia", dial: "+251", minLocalDigits: 9 },
-  { code: "SS", label: "South Sudan", dial: "+211", minLocalDigits: 9 },
-  { code: "SO", label: "Somalia", dial: "+252", minLocalDigits: 8 },
+  { code: "KE", name: "Kenya", dial: "+254", flag: "🇰🇪", minLocalDigits: 9 },
+  { code: "UG", name: "Uganda", dial: "+256", flag: "🇺🇬", minLocalDigits: 9 },
+  { code: "TZ", name: "Tanzania", dial: "+255", flag: "🇹🇿", minLocalDigits: 9 },
+  { code: "RW", name: "Rwanda", dial: "+250", flag: "🇷🇼", minLocalDigits: 9 },
+  { code: "ET", name: "Ethiopia", dial: "+251", flag: "🇪🇹", minLocalDigits: 9 },
 ];
 
 function SignUp({ onSwitch, setUser }) {
@@ -31,8 +29,8 @@ function SignUp({ onSwitch, setUser }) {
     first_name: "",
     last_name: "",
     email: "",
-    country: "KE",
-    phone_local: "",
+    country: "KE",       // ✅ default Kenya
+    phone_local: "",     // editable part ONLY
     password: "",
     confirm: "",
   };
@@ -40,53 +38,37 @@ function SignUp({ onSwitch, setUser }) {
   const validationSchema = Yup.object({
     first_name: Yup.string().required("Required"),
     last_name: Yup.string().required("Required"),
-    email: Yup.string()
-      .trim()
-      .email("Enter a valid email")
-      .required("Email is required"),
+    email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
     country: Yup.string().required("Required"),
     phone_local: Yup.string()
       .required("Phone number is required")
       .matches(/^\d+$/, "Phone number can only contain digits")
       .test("min-digits", "Phone number is too short", function (value) {
         const { country } = this.parent;
-        const countryObj = COUNTRY_OPTIONS.find((c) => c.code === country);
-        const minDigits = countryObj?.minLocalDigits ?? 8;
+        const c = COUNTRY_OPTIONS.find((x) => x.code === country);
+        const minDigits = c?.minLocalDigits ?? 8;
         return (value || "").length >= minDigits;
       }),
-    password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .required("Required"),
-    confirm: Yup.string()
-      .oneOf([Yup.ref("password")], "Passwords must match")
-      .required("Required"),
+    password: Yup.string().min(8, "Password must be at least 8 characters").required("Required"),
+    confirm: Yup.string().oneOf([Yup.ref("password")], "Passwords must match").required("Required"),
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     setApiError("");
-
     try {
-      const countryObj = COUNTRY_OPTIONS.find((c) => c.code === values.country);
-      const dial = countryObj?.dial || "+254";
-
-      // digits only for local part
+      const c = COUNTRY_OPTIONS.find((x) => x.code === values.country) || COUNTRY_OPTIONS[0];
       const localDigits = (values.phone_local || "").replace(/\D/g, "");
-
-      // Build E.164: +2547XXXXXXXX (no spaces)
-      const fullPhone = `${dial}${localDigits}`;
+      const fullPhone = `${c.dial}${localDigits}`; // ✅ full E.164 output
 
       const payload = {
-        first_name: values.first_name?.trim(),
-        last_name: values.last_name?.trim(),
-        email: values.email?.trim().toLowerCase(),
+        first_name: values.first_name.trim(),
+        last_name: values.last_name.trim(),
+        email: values.email.trim().toLowerCase(),
         phone: fullPhone,
         password: values.password,
       };
 
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/signup`,
-        payload
-      );
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/signup`, payload);
 
       const token = res.data?.access_token;
       if (!token) {
@@ -101,7 +83,6 @@ function SignUp({ onSwitch, setUser }) {
       });
 
       setUser(meRes.data);
-
       resetForm();
       navigate("/user-dashboard");
     } catch (err) {
@@ -112,7 +93,7 @@ function SignUp({ onSwitch, setUser }) {
   };
 
   const handleLocalPhoneChange = (e, setFieldValue) => {
-    // digits only
+    // digits only; prefix is separate so user cannot erase it
     const sanitized = e.target.value.replace(/[^\d]/g, "");
     setFieldValue("phone_local", sanitized);
   };
@@ -124,14 +105,9 @@ function SignUp({ onSwitch, setUser }) {
 
       {apiError && <div className="auth-error-banner">{apiError}</div>}
 
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
+      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
         {({ isSubmitting, setFieldValue, submitCount, values }) => {
-          const countryObj = COUNTRY_OPTIONS.find((c) => c.code === values.country);
-          const dial = countryObj?.dial || "+254";
+          const c = COUNTRY_OPTIONS.find((x) => x.code === values.country) || COUNTRY_OPTIONS[0];
 
           return (
             <Form className="auth-form">
@@ -141,9 +117,7 @@ function SignUp({ onSwitch, setUser }) {
                 className="auth-input"
                 autoComplete="given-name"
               />
-              {submitCount > 0 && (
-                <ErrorMessage name="first_name" component="div" className="auth-error" />
-              )}
+              {submitCount > 0 && <ErrorMessage name="first_name" component="div" className="auth-error" />}
 
               <Field
                 name="last_name"
@@ -151,9 +125,7 @@ function SignUp({ onSwitch, setUser }) {
                 className="auth-input"
                 autoComplete="family-name"
               />
-              {submitCount > 0 && (
-                <ErrorMessage name="last_name" component="div" className="auth-error" />
-              )}
+              {submitCount > 0 && <ErrorMessage name="last_name" component="div" className="auth-error" />}
 
               <Field
                 type="email"
@@ -162,33 +134,34 @@ function SignUp({ onSwitch, setUser }) {
                 className="auth-input"
                 autoComplete="email"
               />
-              {submitCount > 0 && (
-                <ErrorMessage name="email" component="div" className="auth-error" />
-              )}
+              {submitCount > 0 && <ErrorMessage name="email" component="div" className="auth-error" />}
 
-              {/* Phone: country code picker + local digits */}
-              <div className="phone-row">
-                <div className="phone-country">
-                  <Field
-                    as="select"
-                    name="country"
-                    className="auth-input"
+              {/* ✅ Minimalist phone row */}
+              <div className="phone-min-row">
+                {/* Flag dropdown (left) */}
+                <div className="phone-flag-wrap">
+                  <select
+                    className="phone-flag-select"
+                    value={values.country}
                     onChange={(e) => setFieldValue("country", e.target.value)}
+                    aria-label="Select country"
                   >
-                    {COUNTRY_OPTIONS.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.label} ({c.dial})
+                    {COUNTRY_OPTIONS.map((opt) => (
+                      <option key={opt.code} value={opt.code}>
+                        {opt.flag} {opt.name} {opt.dial}
                       </option>
                     ))}
-                  </Field>
+                  </select>
                 </div>
 
-                <div className="phone-local">
-                  <div className="phone-prefix">{dial}</div>
+                {/* Fixed prefix + editable local digits */}
+                <div className="phone-input-wrap">
+                  <span className="phone-prefix-fixed">{c.dial}</span>
+
                   <Field
                     name="phone_local"
                     placeholder="Phone number"
-                    className="auth-input phone-input"
+                    className="auth-input phone-local-input"
                     inputMode="tel"
                     autoComplete="tel"
                     onChange={(e) => handleLocalPhoneChange(e, setFieldValue)}
@@ -196,9 +169,7 @@ function SignUp({ onSwitch, setUser }) {
                 </div>
               </div>
 
-              {submitCount > 0 && (
-                <ErrorMessage name="phone_local" component="div" className="auth-error" />
-              )}
+              {submitCount > 0 && <ErrorMessage name="phone_local" component="div" className="auth-error" />}
 
               <Field
                 type="password"
@@ -207,9 +178,7 @@ function SignUp({ onSwitch, setUser }) {
                 className="auth-input"
                 autoComplete="new-password"
               />
-              {submitCount > 0 && (
-                <ErrorMessage name="password" component="div" className="auth-error" />
-              )}
+              {submitCount > 0 && <ErrorMessage name="password" component="div" className="auth-error" />}
 
               <Field
                 type="password"
@@ -218,9 +187,7 @@ function SignUp({ onSwitch, setUser }) {
                 className="auth-input"
                 autoComplete="new-password"
               />
-              {submitCount > 0 && (
-                <ErrorMessage name="confirm" component="div" className="auth-error" />
-              )}
+              {submitCount > 0 && <ErrorMessage name="confirm" component="div" className="auth-error" />}
 
               <button type="submit" className="auth-submit" disabled={isSubmitting}>
                 {isSubmitting ? "Creating..." : "Sign Up"}
