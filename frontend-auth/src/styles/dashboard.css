@@ -1013,3 +1013,110 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Phone picker row in Profile */
+.sd-phoneRow {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.sd-phoneInputWrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.sd-phonePrefixFixed {
+  position: absolute;
+  left: 12px;
+  font-size: 14px;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.sd-phoneLocalInput {
+  padding-left: 62px; /* leaves room for +254 */
+}
+
+/* Reuse the dropdown styles (same as signup) */
+.flag-dd {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.flag-dd-btn {
+  height: 44px;
+  min-width: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.flag-dd-flag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.flag-dd-chevron {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.flag-dd-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  width: 260px;
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  padding: 6px;
+}
+
+.flag-dd-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.flag-dd-option:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.flag-dd-option.is-selected {
+  background: rgba(0,0,0,0.07);
+}
+
+.flag-dd-option-flag {
+  width: 24px;
+  font-size: 16px;
+}
+
+.flag-dd-option-name {
+  flex: 1;
+  font-size: 14px;
+}
+
+.flag-dd-option-dial {
+  font-size: 13px;
+  opacity: 0.7;
+}
