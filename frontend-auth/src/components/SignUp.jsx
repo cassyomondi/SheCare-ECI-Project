@@ -14,6 +14,88 @@ const COUNTRY_OPTIONS = [
   { code: "ET", name: "Ethiopia", dial: "+251", flag: "🇪🇹", minLocalDigits: 9 },
 ];
 
+function FlagSelect({ value, onChange, options }) {
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef(null);
+  const listRef = useRef(null);
+
+  const selected = options.find((o) => o.code === value) || options[0];
+
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (
+        btnRef.current?.contains(e.target) ||
+        listRef.current?.contains(e.target)
+      ) {
+        return;
+      }
+      setOpen(false);
+    };
+
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  const handleSelect = (code) => {
+    onChange(code);
+    setOpen(false);
+    // focus back to button for accessibility
+    btnRef.current?.focus();
+  };
+
+  return (
+    <div className="flag-dd">
+      <button
+        type="button"
+        className="flag-dd-btn"
+        ref={btnRef}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        title={`${selected.name} ${selected.dial}`}
+      >
+        <span className="flag-dd-flag">{selected.flag}</span>
+        <span className="flag-dd-chevron">▾</span>
+      </button>
+
+      {open && (
+        <div
+          className="flag-dd-menu"
+          role="listbox"
+          ref={listRef}
+          tabIndex={-1}
+        >
+          {options.map((opt) => (
+            <button
+              type="button"
+              key={opt.code}
+              role="option"
+              aria-selected={opt.code === value}
+              className={`flag-dd-option ${
+                opt.code === value ? "is-selected" : ""
+              }`}
+              onClick={() => handleSelect(opt.code)}
+            >
+              <span className="flag-dd-option-flag">{opt.flag}</span>
+              <span className="flag-dd-option-name">{opt.name}</span>
+              <span className="flag-dd-option-dial">{opt.dial}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 function SignUp({ onSwitch, setUser }) {
   const [apiError, setApiError] = useState("");
   const topRef = useRef(null);
