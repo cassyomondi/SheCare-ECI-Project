@@ -5,6 +5,17 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const COUNTRY_OPTIONS = [
+  { code: "KE", label: "Kenya", dial: "+254", minLocalDigits: 9 }, // 7XXXXXXXX
+  { code: "UG", label: "Uganda", dial: "+256", minLocalDigits: 9 },
+  { code: "TZ", label: "Tanzania", dial: "+255", minLocalDigits: 9 },
+  { code: "RW", label: "Rwanda", dial: "+250", minLocalDigits: 9 },
+  { code: "BI", label: "Burundi", dial: "+257", minLocalDigits: 8 },
+  { code: "ET", label: "Ethiopia", dial: "+251", minLocalDigits: 9 },
+  { code: "SS", label: "South Sudan", dial: "+211", minLocalDigits: 9 },
+  { code: "SO", label: "Somalia", dial: "+252", minLocalDigits: 8 },
+];
+
 function SignUp({ onSwitch, setUser }) {
   const [apiError, setApiError] = useState("");
   const topRef = useRef(null);
@@ -20,7 +31,8 @@ function SignUp({ onSwitch, setUser }) {
     first_name: "",
     last_name: "",
     email: "",
-    phone: "",
+    country: "KE",
+    phone_local: "",
     password: "",
     confirm: "",
   };
@@ -32,9 +44,16 @@ function SignUp({ onSwitch, setUser }) {
       .trim()
       .email("Enter a valid email")
       .required("Email is required"),
-    phone: Yup.string()
+    country: Yup.string().required("Required"),
+    phone_local: Yup.string()
       .required("Phone number is required")
-      .matches(/^\+?\d+$/, "Phone number can only contain digits and +"),
+      .matches(/^\d+$/, "Phone number can only contain digits")
+      .test("min-digits", "Phone number is too short", function (value) {
+        const { country } = this.parent;
+        const countryObj = COUNTRY_OPTIONS.find((c) => c.code === country);
+        const minDigits = countryObj?.minLocalDigits ?? 8;
+        return (value || "").length >= minDigits;
+      }),
     password: Yup.string()
       .min(8, "Password must be at least 8 characters")
       .required("Required"),
@@ -47,12 +66,22 @@ function SignUp({ onSwitch, setUser }) {
     setApiError("");
 
     try {
-      const payload = { ...values };
-      delete payload.confirm;
-      delete payload.role;
+      const countryObj = COUNTRY_OPTIONS.find((c) => c.code === values.country);
+      const dial = countryObj?.dial || "+254";
 
-      payload.email = payload.email.trim().toLowerCase();
-      payload.phone = payload.phone.replace(/\s+/g, "");
+      // digits only for local part
+      const localDigits = (values.phone_local || "").replace(/\D/g, "");
+
+      // Build E.164: +2547XXXXXXXX (no spaces)
+      const fullPhone = `${dial}${localDigits}`;
+
+      const payload = {
+        first_name: values.first_name?.trim(),
+        last_name: values.last_name?.trim(),
+        email: values.email?.trim().toLowerCase(),
+        phone: fullPhone,
+        password: values.password,
+      };
 
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/signup`,
@@ -82,9 +111,10 @@ function SignUp({ onSwitch, setUser }) {
     }
   };
 
-  const handlePhoneChange = (e, setFieldValue) => {
-    const sanitized = e.target.value.replace(/[^0-9+]/g, "");
-    setFieldValue("phone", sanitized);
+  const handleLocalPhoneChange = (e, setFieldValue) => {
+    // digits only
+    const sanitized = e.target.value.replace(/[^\d]/g, "");
+    setFieldValue("phone_local", sanitized);
   };
 
   return (
@@ -99,98 +129,105 @@ function SignUp({ onSwitch, setUser }) {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting, setFieldValue, submitCount }) => (
-          <Form className="auth-form">
-            <Field
-              name="first_name"
-              placeholder="First Name"
-              className="auth-input"
-              autoComplete="given-name"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
+        {({ isSubmitting, setFieldValue, submitCount, values }) => {
+          const countryObj = COUNTRY_OPTIONS.find((c) => c.code === values.country);
+          const dial = countryObj?.dial || "+254";
+
+          return (
+            <Form className="auth-form">
+              <Field
                 name="first_name"
-                component="div"
-                className="auth-error"
+                placeholder="First Name"
+                className="auth-input"
+                autoComplete="given-name"
               />
-            )}
+              {submitCount > 0 && (
+                <ErrorMessage name="first_name" component="div" className="auth-error" />
+              )}
 
-            <Field
-              name="last_name"
-              placeholder="Last Name"
-              className="auth-input"
-              autoComplete="family-name"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
+              <Field
                 name="last_name"
-                component="div"
-                className="auth-error"
+                placeholder="Last Name"
+                className="auth-input"
+                autoComplete="family-name"
               />
-            )}
+              {submitCount > 0 && (
+                <ErrorMessage name="last_name" component="div" className="auth-error" />
+              )}
 
-            <Field
-              type="email"
-              name="email"
-              placeholder="Email"
-              className="auth-input"
-              autoComplete="email"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage name="email" component="div" className="auth-error" />
-            )}
+              <Field
+                type="email"
+                name="email"
+                placeholder="Email"
+                className="auth-input"
+                autoComplete="email"
+              />
+              {submitCount > 0 && (
+                <ErrorMessage name="email" component="div" className="auth-error" />
+              )}
 
-            <Field
-              name="phone"
-              placeholder="Phone number"
-              className="auth-input"
-              inputMode="tel"
-              autoComplete="tel"
-              onChange={(e) => handlePhoneChange(e, setFieldValue)}
-            />
-            {submitCount > 0 && (
-              <ErrorMessage name="phone" component="div" className="auth-error" />
-            )}
+              {/* Phone: country code picker + local digits */}
+              <div className="phone-row">
+                <div className="phone-country">
+                  <Field
+                    as="select"
+                    name="country"
+                    className="auth-input"
+                    onChange={(e) => setFieldValue("country", e.target.value)}
+                  >
+                    {COUNTRY_OPTIONS.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.label} ({c.dial})
+                      </option>
+                    ))}
+                  </Field>
+                </div>
 
-            <Field
-              type="password"
-              name="password"
-              placeholder="Password"
-              className="auth-input"
-              autoComplete="new-password"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
+                <div className="phone-local">
+                  <div className="phone-prefix">{dial}</div>
+                  <Field
+                    name="phone_local"
+                    placeholder="Phone number"
+                    className="auth-input phone-input"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    onChange={(e) => handleLocalPhoneChange(e, setFieldValue)}
+                  />
+                </div>
+              </div>
+
+              {submitCount > 0 && (
+                <ErrorMessage name="phone_local" component="div" className="auth-error" />
+              )}
+
+              <Field
+                type="password"
                 name="password"
-                component="div"
-                className="auth-error"
+                placeholder="Password"
+                className="auth-input"
+                autoComplete="new-password"
               />
-            )}
+              {submitCount > 0 && (
+                <ErrorMessage name="password" component="div" className="auth-error" />
+              )}
 
-            <Field
-              type="password"
-              name="confirm"
-              placeholder="Confirm Password"
-              className="auth-input"
-              autoComplete="new-password"
-            />
-            {submitCount > 0 && (
-              <ErrorMessage
+              <Field
+                type="password"
                 name="confirm"
-                component="div"
-                className="auth-error"
+                placeholder="Confirm Password"
+                className="auth-input"
+                autoComplete="new-password"
               />
-            )}
+              {submitCount > 0 && (
+                <ErrorMessage name="confirm" component="div" className="auth-error" />
+              )}
 
-            <button
-              type="submit"
-              className="auth-submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Creating..." : "Sign Up"}
-            </button>
-          </Form>
-        )}
+              <button type="submit" className="auth-submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating..." : "Sign Up"}
+              </button>
+            </Form>
+          );
+        }}
       </Formik>
 
       <p className="auth-footer">
