@@ -345,12 +345,94 @@ def forgot_password():
 
         if email and user.email:
             html = f"""
-            <p>Hello,</p>
-            <p>We received a request to reset your SheCare password.</p>
-            <p><a href="{reset_link}">Reset your password</a></p>
-            <p>This link expires in 30 minutes.</p>
-            <p>If you didn’t request this, ignore this email.</p>
-            """
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>Reset your SheCare password</title>
+                    </head>
+                    <body style="margin:0;padding:0;background-color:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                        <tr>
+                        <td align="center" style="padding:40px 16px;">
+
+                            <!-- Container -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+                            <tr>
+                                <td align="center" style="padding-bottom:24px;">
+                                <!-- Logo -->
+                                <img
+                                    src="https://shecare-nu.vercel.app/images/logo.png"
+                                    alt="SheCare"
+                                    width="120"
+                                    style="display:block;"
+                                />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td
+                                style="
+                                    background:#ffffff;
+                                    border-radius:12px;
+                                    padding:32px 24px;
+                                    text-align:center;
+                                    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+                                "
+                                >
+                                <h2 style="margin:0 0 12px;font-size:22px;color:#111;">
+                                    Reset your password
+                                </h2>
+
+                                <p style="margin:0 0 20px;color:#555;font-size:15px;line-height:1.6;">
+                                    We received a request to reset your SheCare password.
+                                    Click the button below to choose a new one.
+                                </p>
+
+                                <!-- CTA Button -->
+                                <a
+                                    href="{reset_link}"
+                                    style="
+                                    display:inline-block;
+                                    background:#6b5cff;
+                                    color:#ffffff;
+                                    text-decoration:none;
+                                    padding:12px 22px;
+                                    border-radius:8px;
+                                    font-size:15px;
+                                    font-weight:600;
+                                    "
+                                >
+                                    Reset Password
+                                </a>
+
+                                <p style="margin:20px 0 0;color:#777;font-size:13px;">
+                                    This link expires in <strong>30 minutes</strong>.
+                                </p>
+
+                                <p style="margin:16px 0 0;color:#999;font-size:12px;">
+                                    If you didn’t request this, you can safely ignore this email.
+                                </p>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td align="center" style="padding-top:20px;color:#aaa;font-size:12px;">
+                                © {datetime.utcnow().year} SheCare
+                                </td>
+                            </tr>
+                            </table>
+
+                        </td>
+                        </tr>
+                    </table>
+
+                    </body>
+                    </html>
+                    """
+
 
             send_email(
                 to_email=user.email,
