@@ -7,12 +7,23 @@ import { useNavigate } from "react-router-dom";
 
 // Minimal list (add more as needed)
 const COUNTRY_OPTIONS = [
-  { code: "KE", name: "Kenya", dial: "+254", flag: "🇰🇪", minLocalDigits: 9 },
-  { code: "UG", name: "Uganda", dial: "+256", flag: "🇺🇬", minLocalDigits: 9 },
-  { code: "TZ", name: "Tanzania", dial: "+255", flag: "🇹🇿", minLocalDigits: 9 },
-  { code: "RW", name: "Rwanda", dial: "+250", flag: "🇷🇼", minLocalDigits: 9 },
+  { code: "AE", name: "United Arab Emirates", dial: "+971", flag: "🇦🇪", minLocalDigits: 9 },
+  { code: "CA", name: "Canada", dial: "+1", flag: "🇨🇦", minLocalDigits: 10 },
+  { code: "DE", name: "Germany", dial: "+49", flag: "🇩🇪", minLocalDigits: 10 },
   { code: "ET", name: "Ethiopia", dial: "+251", flag: "🇪🇹", minLocalDigits: 9 },
+  { code: "FR", name: "France", dial: "+33", flag: "🇫🇷", minLocalDigits: 9 },
+  { code: "GH", name: "Ghana", dial: "+233", flag: "🇬🇭", minLocalDigits: 9 },
+  { code: "IN", name: "India", dial: "+91", flag: "🇮🇳", minLocalDigits: 10 },
+  { code: "KE", name: "Kenya", dial: "+254", flag: "🇰🇪", minLocalDigits: 9 },
+  { code: "NG", name: "Nigeria", dial: "+234", flag: "🇳🇬", minLocalDigits: 10 },
+  { code: "RW", name: "Rwanda", dial: "+250", flag: "🇷🇼", minLocalDigits: 9 },
+  { code: "SA", name: "South Africa", dial: "+27", flag: "🇿🇦", minLocalDigits: 9 },
+  { code: "TZ", name: "Tanzania", dial: "+255", flag: "🇹🇿", minLocalDigits: 9 },
+  { code: "UG", name: "Uganda", dial: "+256", flag: "🇺🇬", minLocalDigits: 9 },
+  { code: "UK", name: "United Kingdom", dial: "+44", flag: "🇬🇧", minLocalDigits: 10 },
+  { code: "US", name: "United States", dial: "+1", flag: "🇺🇸", minLocalDigits: 10 },
 ];
+
 
 function FlagSelect({ value, onChange, options }) {
   const [open, setOpen] = useState(false);
