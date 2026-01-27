@@ -4,6 +4,110 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/dashboard.css";
 
+// Same list (alphabetical by name)
+const COUNTRY_OPTIONS = [
+  { code: "AE", name: "United Arab Emirates", dial: "+971", flag: "🇦🇪", minLocalDigits: 9 },
+  { code: "CA", name: "Canada", dial: "+1", flag: "🇨🇦", minLocalDigits: 10 },
+  { code: "DE", name: "Germany", dial: "+49", flag: "🇩🇪", minLocalDigits: 10 },
+  { code: "ET", name: "Ethiopia", dial: "+251", flag: "🇪🇹", minLocalDigits: 9 },
+  { code: "FR", name: "France", dial: "+33", flag: "🇫🇷", minLocalDigits: 9 },
+  { code: "GH", name: "Ghana", dial: "+233", flag: "🇬🇭", minLocalDigits: 9 },
+  { code: "IN", name: "India", dial: "+91", flag: "🇮🇳", minLocalDigits: 10 },
+  { code: "KE", name: "Kenya", dial: "+254", flag: "🇰🇪", minLocalDigits: 9 },
+  { code: "NG", name: "Nigeria", dial: "+234", flag: "🇳🇬", minLocalDigits: 10 },
+  { code: "RW", name: "Rwanda", dial: "+250", flag: "🇷🇼", minLocalDigits: 9 },
+  { code: "SA", name: "South Africa", dial: "+27", flag: "🇿🇦", minLocalDigits: 9 },
+  { code: "TZ", name: "Tanzania", dial: "+255", flag: "🇹🇿", minLocalDigits: 9 },
+  { code: "UG", name: "Uganda", dial: "+256", flag: "🇺🇬", minLocalDigits: 9 },
+  { code: "UK", name: "United Kingdom", dial: "+44", flag: "🇬🇧", minLocalDigits: 10 },
+  { code: "US", name: "United States", dial: "+1", flag: "🇺🇸", minLocalDigits: 10 },
+];
+
+const getCountryByCode = (code) =>
+  COUNTRY_OPTIONS.find((c) => c.code === code) || COUNTRY_OPTIONS.find((c) => c.code === "KE") || COUNTRY_OPTIONS[0];
+
+const parseE164Phone = (rawPhone) => {
+  const p = (rawPhone || "").replace(/\s+/g, "");
+  // match the longest dial prefix first
+  const sorted = [...COUNTRY_OPTIONS].sort((a, b) => b.dial.length - a.dial.length);
+
+  for (const c of sorted) {
+    if (p.startsWith(c.dial)) {
+      return { country: c.code, local: p.slice(c.dial.length).replace(/\D/g, "") };
+    }
+  }
+
+  // fallback: assume Kenya if unknown format
+  return { country: "KE", local: p.replace(/^\+/, "").replace(/\D/g, "") };
+};
+
+function FlagSelect({ value, onChange, options }) {
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef(null);
+  const listRef = useRef(null);
+
+  const selected = options.find((o) => o.code === value) || options[0];
+
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (btnRef.current?.contains(e.target) || listRef.current?.contains(e.target)) return;
+      setOpen(false);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  const handleSelect = (code) => {
+    onChange(code);
+    setOpen(false);
+    btnRef.current?.focus();
+  };
+
+  return (
+    <div className="flag-dd">
+      <button
+        type="button"
+        className="flag-dd-btn"
+        ref={btnRef}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        title={`${selected.name} ${selected.dial}`}
+      >
+        <span className="flag-dd-flag">{selected.flag}</span>
+        <span className="flag-dd-chevron">▾</span>
+      </button>
+
+      {open && (
+        <div className="flag-dd-menu" role="listbox" ref={listRef} tabIndex={-1}>
+          {options.map((opt) => (
+            <button
+              type="button"
+              key={opt.code}
+              role="option"
+              aria-selected={opt.code === value}
+              className={`flag-dd-option ${opt.code === value ? "is-selected" : ""}`}
+              onClick={() => handleSelect(opt.code)}
+            >
+              <span className="flag-dd-option-flag">{opt.flag}</span>
+              <span className="flag-dd-option-name">{opt.name}</span>
+              <span className="flag-dd-option-dial">{opt.dial}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 function UserDashboard({ user, setUser }) {
   const navigate = useNavigate();
   const [active, setActive] = useState("dashboard"); // "dashboard" | "profile"
