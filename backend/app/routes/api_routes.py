@@ -18,7 +18,8 @@ from app.models.models import (
     ResponseMessage,
     Prescription,
     Tip,
-    ChatSession
+    ChatSession,
+    PasswordResetToken
 )
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
@@ -293,6 +294,123 @@ def login():
             "role": user.role
         }
     }), 200
+
+
+# -----------------------------
+# FORGOT PASSWORD
+# -----------------------------
+@api_bp.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    data = request.get_json() or {}
+
+    email = data.get("email")
+    phone = data.get("phone")
+
+    if email:
+        email = email.strip().lower()
+    if phone:
+        phone = "".join(str(phone).split())
+
+    if not email and not phone:
+        return jsonify({"error": "Email or phone is required"}), 400
+
+    # ✅ Anti-enumeration default response (always return this if request is well-formed)
+    generic_msg = "If an account exists for that email/phone, reset instructions have been sent."
+
+    try:
+        user = None
+        if email:
+            user = User.query.filter(User.email == email).first()
+        elif phone:
+            user = User.query.filter(User.phone == phone).first()
+
+        # If user doesn't exist, still return 200 generic
+        if not user:
+            return jsonify({"message": generic_msg}), 200
+
+        # Mint + store token (hash only)
+        obj, raw_token = PasswordResetToken.mint(
+            user_id=user.id,
+            ttl_minutes=30,
+            request_ip=request.headers.get("X-Forwarded-For", request.remote_addr),
+            user_agent=request.headers.get("User-Agent"),
+        )
+
+        db.session.add(obj)
+        db.session.commit()
+
+        # For now, return reset link ONLY in development to help you test without email/SMS.
+        # In production: send raw_token via email/SMS and do NOT return it.
+        is_dev = os.getenv("FLASK_ENV") == "development" or os.getenv("ENV") in ("dev", "development")
+
+        resp = {"message": generic_msg}
+
+        if is_dev:
+            # if you have a frontend url env, use it; fallback to localhost
+            frontend_base = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173")
+            resp["debug_reset_link"] = f"{frontend_base}/reset-password?token={raw_token}"
+            resp["debug_token"] = raw_token  # optional; remove if you only want the link
+
+        return jsonify(resp), 200
+
+    except Exception as e:
+        db.session.rollback()
+        traceback.print_exc()
+        # Still return generic 200 to preserve anti-enumeration + not leak server errors
+        return jsonify({"message": generic_msg}), 200
+
+
+# -----------------------------
+# RESET PASSWORD
+# -----------------------------
+@api_bp.route("/reset-password", methods=["POST"])
+def reset_password():
+    data = request.get_json() or {}
+
+    token = data.get("token")
+    password = data.get("password")
+
+    token = token.strip() if isinstance(token, str) else None
+
+    if not token or not password:
+        return jsonify({"error": "Token and new password are required"}), 400
+
+    if len(password) < 8:
+        return jsonify({"error": "Password must be at least 8 characters"}), 400
+
+    try:
+        token_hash = PasswordResetToken._hash_token(token)
+
+        prt = PasswordResetToken.query.filter(
+            PasswordResetToken.token_hash == token_hash
+        ).first()
+
+        if not prt:
+            return jsonify({"error": "Invalid or expired reset token"}), 400
+
+        if not prt.is_valid():
+            return jsonify({"error": "Invalid or expired reset token"}), 400
+
+        user = User.query.get(prt.user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Update password
+        user.password = generate_password_hash(password)
+
+        # Mark token as used
+        prt.used = True
+        prt.used_at = datetime.utcnow()
+
+        db.session.commit()
+
+        return jsonify({"message": "Password updated successfully."}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        traceback.print_exc()
+        return jsonify({"error": "Password reset failed"}), 500
+
 
 
 # 💊 PRESCRIPTIONS
