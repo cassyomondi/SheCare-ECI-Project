@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 import os
 import hashlib
+from app.utils.mailer import send_email
 from datetime import timedelta, datetime
 from app.utils.db import db
 from app.models.models import (
@@ -316,7 +317,6 @@ def forgot_password():
     if not email and not phone:
         return jsonify({"error": "Email or phone is required"}), 400
 
-    # ✅ Anti-enumeration default response (always return this if request is well-formed)
     generic_msg = "If an account exists for that email/phone, reset instructions have been sent."
 
     try:
@@ -326,11 +326,9 @@ def forgot_password():
         elif phone:
             user = User.query.filter(User.phone == phone).first()
 
-        # If user doesn't exist, still return 200 generic
         if not user:
             return jsonify({"message": generic_msg}), 200
 
-        # Mint + store token (hash only)
         obj, raw_token = PasswordResetToken.mint(
             user_id=user.id,
             ttl_minutes=30,
@@ -341,25 +339,39 @@ def forgot_password():
         db.session.add(obj)
         db.session.commit()
 
-        # For now, return reset link ONLY in development to help you test without email/SMS.
-        # In production: send raw_token via email/SMS and do NOT return it.
+        # ✅ SEND EMAIL HERE
+        frontend_base = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173")
+        reset_link = f"{frontend_base}/reset-password?token={raw_token}"
+
+        if email and user.email:
+            html = f"""
+            <p>Hello,</p>
+            <p>We received a request to reset your SheCare password.</p>
+            <p><a href="{reset_link}">Reset your password</a></p>
+            <p>This link expires in 30 minutes.</p>
+            <p>If you didn’t request this, ignore this email.</p>
+            """
+
+            send_email(
+                to_email=user.email,
+                subject="Reset your SheCare password",
+                html=html
+            )
+
+        # DEV DEBUG ONLY
         is_dev = os.getenv("FLASK_ENV") == "development" or os.getenv("ENV") in ("dev", "development")
 
         resp = {"message": generic_msg}
-
         if is_dev:
-            # if you have a frontend url env, use it; fallback to localhost
-            frontend_base = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173")
-            resp["debug_reset_link"] = f"{frontend_base}/reset-password?token={raw_token}"
-            resp["debug_token"] = raw_token  # optional; remove if you only want the link
+            resp["debug_reset_link"] = reset_link
 
         return jsonify(resp), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
         traceback.print_exc()
-        # Still return generic 200 to preserve anti-enumeration + not leak server errors
         return jsonify({"message": generic_msg}), 200
+
 
 
 # -----------------------------
