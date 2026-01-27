@@ -599,15 +599,40 @@ function UserDashboard({ user, setUser }) {
 
                 <div className="sd-field">
                   <label className="sd-label">Phone number</label>
-                  <input
-                    className="sd-input"
-                    value={profile.phone}
-                    onChange={onProfileChange("phone")}
-                    placeholder="Phone"
-                    inputMode="tel"
-                    autoComplete="tel"
-                  />
+
+                  <div className="sd-phoneRow">
+                    <FlagSelect
+                      value={profile.country}
+                      options={COUNTRY_OPTIONS}
+                      onChange={onCountryChange}
+                    />
+
+                    <div className="sd-phoneInputWrap">
+                      <span className="sd-phonePrefixFixed">{getCountryByCode(profile.country).dial}</span>
+
+                      <input
+                        className="sd-input sd-phoneLocalInput"
+                        value={profile.phone_local}
+                        onChange={onProfileChange("phone_local")}
+                        placeholder="Phone number"
+                        inputMode="tel"
+                        autoComplete="tel"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Optional inline validation feedback */}
+                  {(() => {
+                    const c = getCountryByCode(profile.country);
+                    const digits = cleanPhone(profile.phone_local).replace(/[^\d]/g, "");
+                    if (!digits) return <div className="sd-inlineError">Phone number is required.</div>;
+                    if (digits.length < (c.minLocalDigits ?? 8)) {
+                      return <div className="sd-inlineError">Phone number is too short.</div>;
+                    }
+                    return null;
+                  })()}
                 </div>
+
 
                 <div className="sd-field">
                   <label className="sd-label">New password</label>
