@@ -168,11 +168,15 @@ function UserDashboard({ user, setUser }) {
   const isDirty = useMemo(() => {
     if (!initialProfile) return false;
 
+    const phoneNow = `${getCountryByCode(profile.country).dial}${cleanPhone(profile.phone_local)}`;
+    const phoneInitial = `${getCountryByCode(initialProfile.country).dial}${cleanPhone(initialProfile.phone_local)}`;
+
     const changedBasics =
       clean(profile.first_name) !== clean(initialProfile.first_name) ||
       clean(profile.last_name) !== clean(initialProfile.last_name) ||
       clean(profile.email).toLowerCase() !== clean(initialProfile.email).toLowerCase() ||
-      cleanPhone(profile.phone) !== cleanPhone(initialProfile.phone);
+      phoneNow !== phoneInitial;
+
 
     const changingPassword = clean(profile.password).length > 0;
 
