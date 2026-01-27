@@ -130,11 +130,13 @@ function UserDashboard({ user, setUser }) {
     first_name: "",
     last_name: "",
     email: "",
-    phone: "",
+    country: "KE",     
+    phone_local: "",   
     current_password: "",
-    password: "", // new password
+    password: "",
     confirm_password: "",
   });
+
 
   const [initialProfile, setInitialProfile] = useState(null);
   const [saving, setSaving] = useState(false);
