@@ -1,5 +1,5 @@
 // UserDashboard.jsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/dashboard.css";
@@ -24,11 +24,12 @@ const COUNTRY_OPTIONS = [
 ];
 
 const getCountryByCode = (code) =>
-  COUNTRY_OPTIONS.find((c) => c.code === code) || COUNTRY_OPTIONS.find((c) => c.code === "KE") || COUNTRY_OPTIONS[0];
+  COUNTRY_OPTIONS.find((c) => c.code === code) ||
+  COUNTRY_OPTIONS.find((c) => c.code === "KE") ||
+  COUNTRY_OPTIONS[0];
 
 const parseE164Phone = (rawPhone) => {
   const p = (rawPhone || "").replace(/\s+/g, "");
-  // match the longest dial prefix first
   const sorted = [...COUNTRY_OPTIONS].sort((a, b) => b.dial.length - a.dial.length);
 
   for (const c of sorted) {
@@ -107,7 +108,6 @@ function FlagSelect({ value, onChange, options }) {
   );
 }
 
-
 function UserDashboard({ user, setUser }) {
   const navigate = useNavigate();
   const [active, setActive] = useState("dashboard"); // "dashboard" | "profile"
@@ -122,7 +122,6 @@ function UserDashboard({ user, setUser }) {
   const clean = (v) => (typeof v === "string" ? v.trim() : "");
   const cleanPhone = (v) => (typeof v === "string" ? v.replace(/\s+/g, "") : "");
 
-
   // -------------------------
   // PROFILE FORM STATE
   // -------------------------
@@ -130,13 +129,12 @@ function UserDashboard({ user, setUser }) {
     first_name: "",
     last_name: "",
     email: "",
-    country: "KE",     
-    phone_local: "",   
+    country: "KE",
+    phone_local: "",
     current_password: "",
-    password: "",
+    password: "", // new password
     confirm_password: "",
   });
-
 
   const [initialProfile, setInitialProfile] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -164,7 +162,6 @@ function UserDashboard({ user, setUser }) {
     setInitialProfile(hydrated);
   }, [user]);
 
-
   const isDirty = useMemo(() => {
     if (!initialProfile) return false;
 
@@ -177,15 +174,12 @@ function UserDashboard({ user, setUser }) {
       clean(profile.email).toLowerCase() !== clean(initialProfile.email).toLowerCase() ||
       phoneNow !== phoneInitial;
 
-
     const changingPassword = clean(profile.password).length > 0;
 
     return changedBasics || changingPassword;
   }, [profile, initialProfile]);
 
-
   const passwordNeedsConfirm = clean(profile.password).length > 0;
-
 
   const canSave = useMemo(() => {
     if (!isDirty || saving) return false;
@@ -211,10 +205,8 @@ function UserDashboard({ user, setUser }) {
     if (!localDigits) return false;
     if (localDigits.length < (c.minLocalDigits ?? 8)) return false;
 
-
     return true;
   }, [isDirty, saving, profile]);
-
 
   const onProfileChange = (field) => (e) => {
     setProfileError("");
@@ -230,13 +222,11 @@ function UserDashboard({ user, setUser }) {
     setProfile((p) => ({ ...p, [field]: value }));
   };
 
-
   const onCountryChange = (code) => {
     setProfileError("");
     setProfileSuccess("");
     setProfile((p) => ({ ...p, country: code }));
   };
-
 
   const saveProfile = async () => {
     setProfileError("");
@@ -254,24 +244,22 @@ function UserDashboard({ user, setUser }) {
       const first_name = clean(profile.first_name);
       const last_name = clean(profile.last_name);
       const email = clean(profile.email).toLowerCase();
+
       const c = getCountryByCode(profile.country);
       const localDigits = cleanPhone(profile.phone_local).replace(/[^\d]/g, "");
       const phone = `${c.dial}${localDigits}`;
 
-
       const new_password = clean(profile.password);
       const current_password = clean(profile.current_password);
 
-      // Only send non-empty fields (prevents blanks reaching backend)
       const payload = {};
       if (first_name) payload.first_name = first_name;
       if (last_name) payload.last_name = last_name;
       if (email) payload.email = email;
       if (phone) payload.phone = phone;
 
-      // If password is being changed, send current + new password (trimmed)
       if (new_password) {
-        payload.current_password = current_password; // canSave guarantees it's present
+        payload.current_password = current_password;
         payload.new_password = new_password;
       }
 
@@ -294,7 +282,6 @@ function UserDashboard({ user, setUser }) {
         confirm_password: "",
       };
 
-
       setProfile(reset);
       setInitialProfile(reset);
       setProfileSuccess("Profile updated successfully.");
@@ -304,7 +291,6 @@ function UserDashboard({ user, setUser }) {
       setSaving(false);
     }
   };
-
 
   // -------------------------
   // NAV / LAYOUT
@@ -511,35 +497,49 @@ function UserDashboard({ user, setUser }) {
                 <div className="sd-steps">
                   <div className="sd-step">
                     <div className="sd-stepNum">1</div>
-                    <div className="sd-stepText">Tap the <strong>Chat with SheCare on WhatsApp</strong> button below.</div>
+                    <div className="sd-stepText">
+                      Tap the <strong>Chat with SheCare on WhatsApp</strong> button below.
+                    </div>
                   </div>
 
                   <div className="sd-step">
                     <div className="sd-stepNum">2</div>
-                    <div className="sd-stepText">When WhatsApp opens, send <strong>Hi</strong> to start the chatbot.</div>
+                    <div className="sd-stepText">
+                      When WhatsApp opens, send <strong>Hi</strong> to start the chatbot.
+                    </div>
                   </div>
 
                   <div className="sd-step">
                     <div className="sd-stepNum">3</div>
-                    <div className="sd-stepText">SheCare will reply with a menu of options you can choose from.</div>
+                    <div className="sd-stepText">
+                      SheCare will reply with a menu of options you can choose from.
+                    </div>
                   </div>
 
                   <div className="sd-step">
                     <div className="sd-stepNum">4</div>
-                    <div className="sd-stepText">Reply with the <strong>number</strong> of the option you want (for example: <strong>1</strong>).</div>
+                    <div className="sd-stepText">
+                      Reply with the <strong>number</strong> of the option you want (for example: <strong>1</strong>).
+                    </div>
                   </div>
 
                   <div className="sd-step">
                     <div className="sd-stepNum">5</div>
-                    <div className="sd-stepText">Continue replying to get guidance, clinic suggestions, or daily tips.</div>
+                    <div className="sd-stepText">
+                      Continue replying to get guidance, clinic suggestions, or daily tips.
+                    </div>
                   </div>
                 </div>
               </div>
 
-
               {/* WHATSAPP CTA (Desktop / non-mobile) */}
               <div className="sd-center">
-                <a className="sd-whatsappBtn" href="https://wa.me/+14155238886" target="_blank" rel="noopener noreferrer">
+                <a
+                  className="sd-whatsappBtn"
+                  href="https://wa.me/+14155238886"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <span className="sd-waIcon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
                       <path
@@ -601,11 +601,7 @@ function UserDashboard({ user, setUser }) {
                   <label className="sd-label">Phone number</label>
 
                   <div className="sd-phoneRow">
-                    <FlagSelect
-                      value={profile.country}
-                      options={COUNTRY_OPTIONS}
-                      onChange={onCountryChange}
-                    />
+                    <FlagSelect value={profile.country} options={COUNTRY_OPTIONS} onChange={onCountryChange} />
 
                     <div className="sd-phoneInputWrap">
                       <span className="sd-phonePrefixFixed">{getCountryByCode(profile.country).dial}</span>
@@ -621,18 +617,14 @@ function UserDashboard({ user, setUser }) {
                     </div>
                   </div>
 
-                  {/* Optional inline validation feedback */}
                   {(() => {
                     const c = getCountryByCode(profile.country);
                     const digits = cleanPhone(profile.phone_local).replace(/[^\d]/g, "");
                     if (!digits) return <div className="sd-inlineError">Phone number is required.</div>;
-                    if (digits.length < (c.minLocalDigits ?? 8)) {
-                      return <div className="sd-inlineError">Phone number is too short.</div>;
-                    }
+                    if (digits.length < (c.minLocalDigits ?? 8)) return <div className="sd-inlineError">Phone number is too short.</div>;
                     return null;
                   })()}
                 </div>
-
 
                 <div className="sd-field">
                   <label className="sd-label">New password</label>
@@ -662,7 +654,6 @@ function UserDashboard({ user, setUser }) {
                       {!clean(profile.current_password) && (
                         <div className="sd-inlineError">Enter your current password to change it.</div>
                       )}
-
                     </div>
 
                     <div className="sd-field">
@@ -680,6 +671,7 @@ function UserDashboard({ user, setUser }) {
                         clean(profile.confirm_password) !== clean(profile.password) && (
                           <div className="sd-inlineError">Passwords do not match.</div>
                         )}
+
                       {clean(profile.password).length > 0 && clean(profile.password).length < 8 && (
                         <div className="sd-inlineError">Password must be at least 8 characters.</div>
                       )}
