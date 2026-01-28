@@ -10,6 +10,7 @@ from flask import Blueprint, request
 from twilio.twiml.messaging_response import MessagingResponse
 from datetime import datetime
 import random
+import re
 
 from ..helpers.symptomchecker import symptomchecker
 from ..helpers.clinicfinder import find_nearby_clinics
@@ -43,6 +44,37 @@ def get_first_name_for_user(user: User) -> str:
         return ""
 
 
+SHECARE_ALIASES = {"shecare", "she care"}
+
+GREETINGS = {
+    "hi", "hello", "hey",
+    "mambo", "habari", "niaje",
+    "jambo", "hujambo"
+}
+
+def normalize_text(s: str) -> str:
+    s = (s or "").lower().strip()
+    s = re.sub(r"[^\w\s]", " ", s)     # remove punctuation
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
+def is_greeting_or_greeting_shecare(raw: str) -> bool:
+    n = normalize_text(raw)
+
+    # exact greeting
+    if n in GREETINGS:
+        return True
+
+    # greeting + shecare
+    parts = n.split()
+    if len(parts) >= 2 and parts[0] in GREETINGS:
+        rest = " ".join(parts[1:])
+        if rest in SHECARE_ALIASES:
+            return True
+
+    return False
+
+
 DASHBOARD_URL = os.getenv("FRONTEND_DASHBOARD_URL")
 
 if not DASHBOARD_URL:
@@ -57,7 +89,7 @@ def whatsapp_webhook():
     data = request.form
     user_phone = data.get("From", "").replace("whatsapp:", "").strip()
     user_message = data.get("Body", "").strip()
-    normalized = user_message.lower()
+    normalized = normalize_text(user_message)
     num_media = int(data.get("NumMedia", 0))
 
     response = MessagingResponse()
@@ -131,16 +163,15 @@ def whatsapp_webhook():
     log_chat(user_phone, normalized, "user")
 
     ai_reply = ""
-    greetings = ["hi", "hello", "hey", "mambo", "habari", "niaje", "jambo", "hujambo"]
+
 
     # --- 6️⃣ Handle Main Menu ---
     if session.session_state == "main_menu":
         print(f"🔎 Main menu input: '{normalized}'")
 
-        if normalized in greetings:
+        if is_greeting_or_greeting_shecare(user_message):
             first_name = get_first_name_for_user(user)
             hello_name = first_name if first_name else "there"
-
             ai_reply = (
                 f"Hey {hello_name}, \n\n"
                 "Welcome to SheCare — your safe space for women’s health support.\n\n"
