@@ -16,7 +16,7 @@ from ..helpers.clinicfinder import find_nearby_clinics
 from ..helpers.prescriptionuploader import prescription_uploader
 from ..helpers.healthtip_agent import generate_health_tip
 
-from ..models import db, User, UserMessage, ResponseMessage, ChatSession, ChatMemory
+from ..models import db, User, Participant, UserMessage, ResponseMessage, ChatSession, ChatMemory
 
 
 whatsapp_bp = Blueprint("whatsapp_bp", __name__)
@@ -29,6 +29,19 @@ FALLBACK_TIPS = [
     "Take short walks and stretch to reduce stress.",
     "Stay positive — your mental health matters too!",
 ]
+
+
+def get_first_name_for_user(user: User) -> str:
+    """
+    Returns participant.first_name if available, else fallback.
+    """
+    try:
+        participant = Participant.query.filter_by(user_id=user.id).first()
+        first_name = (participant.first_name or "").strip() if participant else ""
+        return first_name
+    except Exception:
+        return ""
+
 
 
 @whatsapp_bp.route("/", methods=["POST"])
@@ -116,8 +129,11 @@ def whatsapp_webhook():
         print(f"🔎 Main menu input: '{normalized}'")
 
         if normalized in greetings:
+            first_name = get_first_name_for_user(user)
+            hello_name = first_name if first_name else "there"
+
             ai_reply = (
-                "Hey there, \n\n"
+                f"Hey {hello_name}, \n\n"
                 "Welcome to SheCare — your safe space for women’s health support.\n\n"
                 "Whether you’re feeling unwell, need to find a nearby clinic, want to upload a prescription, or just want a little health inspiration — I’ve got you. \n"
                 "Here’s how you can begin:\n\n"
