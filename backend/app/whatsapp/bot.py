@@ -131,7 +131,7 @@ def whatsapp_webhook():
     log_chat(user_phone, normalized, "user")
 
     ai_reply = ""
-    greetings = ["hi", "hello", "hey", "mambo", "habari", "niaje"]
+    greetings = ["hi", "hello", "hey", "mambo", "habari", "niaje", "jambo", "hujambo"]
 
     # --- 6️⃣ Handle Main Menu ---
     if session.session_state == "main_menu":
