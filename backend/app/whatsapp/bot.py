@@ -43,6 +43,13 @@ def get_first_name_for_user(user: User) -> str:
         return ""
 
 
+DASHBOARD_URL = os.getenv("FRONTEND_DASHBOARD_URL")
+
+if not DASHBOARD_URL:
+    frontend_base = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173").rstrip("/")
+    DASHBOARD_URL = f"{frontend_base}/user-dashboard"
+
+
 
 @whatsapp_bp.route("/", methods=["POST"])
 def whatsapp_webhook():
@@ -87,8 +94,10 @@ def whatsapp_webhook():
             "1️⃣ Check symptoms\n"
             "2️⃣ Find nearby clinics\n"
             "3️⃣ Upload prescription\n"
-            "4️⃣ Get daily health tips\n\n"
+            "4️⃣ Get daily health tips\n"
+            "5️⃣ Account / Dashboard\n\n"
             "👉 Reply with a number to continue."
+
         )
 
         log_chat(user_phone, ai_reply, "bot")
@@ -141,8 +150,10 @@ def whatsapp_webhook():
                 "2️⃣ Find nearby clinics\n"
                 "3️⃣ Upload prescription\n"
                 "4️⃣ Get daily health tips\n"
+                "5️⃣ Account / Dashboard\n"
                 "0️⃣ Help / Menu\n\n"
                 "Reply with the number of what you’d like to do!"
+
             )
 
         elif normalized == "1":
@@ -165,15 +176,24 @@ def whatsapp_webhook():
                 print(f"⚠️ Health tip generation failed: {e}")
                 ai_reply = f"💡 Tip: {random.choice(FALLBACK_TIPS)}"
 
+        elif normalized == "5" or normalized in ["dashboard", "account", "profile", "settings"]:
+            ai_reply = (
+                "🔐 To manage your account details (name, email, phone, password), open your dashboard here:\n\n"
+                f"{DASHBOARD_URL}\n\n"
+                "If you want to come back here afterwards, just say *Hi*."
+            )
+
         elif normalized in ["0", "help", "menu"]:
             ai_reply = (
-                "Here’s how you can use SheCare:\n"
-                "1️⃣ Check symptoms\n"
-                "2️⃣ Find clinics\n"
-                "3️⃣ Upload prescription\n"
-                "4️⃣ Daily tips\n"
-                "0️⃣ Help / Menu"
-            )
+            "Here’s how you can use SheCare:\n"
+            "1️⃣ Check symptoms\n"
+            "2️⃣ Find clinics\n"
+            "3️⃣ Upload prescription\n"
+            "4️⃣ Daily tips\n"
+            "5️⃣ Account / Dashboard\n"
+            "0️⃣ Help / Menu"
+        )
+
 
         else:
             ai_reply = "⚠️ I didn’t understand that.\nPlease reply with a number (1–4)."
