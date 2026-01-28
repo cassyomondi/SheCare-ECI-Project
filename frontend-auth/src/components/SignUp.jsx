@@ -177,7 +177,14 @@ function SignUp({ onSwitch, setUser }) {
 
       setUser(meRes.data);
       resetForm();
-      navigate("/user-dashboard");
+
+      const waLink = import.meta.env.VITE_WHATSAPP_LINK;
+      if (!waLink) {
+        navigate("/user-dashboard");
+        return;
+      }
+
+      window.location.assign(waLink);
     } catch (err) {
       setApiError(err.response?.data?.error || "Signup failed");
     } finally {
