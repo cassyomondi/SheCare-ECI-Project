@@ -16,10 +16,7 @@ function SignIn({ onSwitch, setUser }) {
     }
   }, [apiError]);
 
-  const initialValues = {
-    emailOrPhone: "",
-    password: "",
-  };
+  const initialValues = { emailOrPhone: "", password: "" };
 
   const validationSchema = Yup.object({
     emailOrPhone: Yup.string()
@@ -27,13 +24,14 @@ function SignIn({ onSwitch, setUser }) {
       .test("email-or-phone", "Enter a valid email or phone number", (value) => {
         if (!value) return false;
         const v = value.trim();
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || /^\+?\d{10,15}$/.test(v);
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || /^\+?\d{10,15}$/.test(v.replace(/\s+/g, ""));
       }),
     password: Yup.string().required("Password is required"),
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     setApiError("");
+
     try {
       const input = values.emailOrPhone.trim();
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
@@ -44,10 +42,7 @@ function SignIn({ onSwitch, setUser }) {
         password: values.password,
       };
 
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/login`,
-        payload
-      );
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/login`, payload);
 
       const token = res.data?.access_token;
       if (!token) {
@@ -57,14 +52,23 @@ function SignIn({ onSwitch, setUser }) {
 
       localStorage.setItem("token", token);
 
+      // hydrate user (optional but good to keep consistent state)
       const meRes = await axios.get(`${import.meta.env.VITE_API_URL}/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       setUser(meRes.data);
-
       resetForm();
-      navigate("/user-dashboard");
+
+      // ✅ Redirect to WhatsApp
+      const waLink = import.meta.env.VITE_WHATSAPP_LINK;
+      if (!waLink) {
+        // fallback if env missing
+        navigate("/user-dashboard");
+        return;
+      }
+
+      window.location.assign(waLink);
     } catch (err) {
       setApiError(err.response?.data?.error || "Login failed");
     } finally {
@@ -78,11 +82,7 @@ function SignIn({ onSwitch, setUser }) {
       <h2 className="auth-title">Sign In to talk to SheCare on WhatsApp</h2>
       {apiError && <div className="auth-error-banner">{apiError}</div>}
 
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
+      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
         {({ isSubmitting, submitCount }) => (
           <Form className="auth-form">
             <Field
@@ -93,13 +93,7 @@ function SignIn({ onSwitch, setUser }) {
               autoComplete="username"
               inputMode="email"
             />
-            {submitCount > 0 && (
-              <ErrorMessage
-                name="emailOrPhone"
-                component="div"
-                className="auth-error"
-              />
-            )}
+            {submitCount > 0 && <ErrorMessage name="emailOrPhone" component="div" className="auth-error" />}
 
             <Field
               type="password"
@@ -108,29 +102,15 @@ function SignIn({ onSwitch, setUser }) {
               className="auth-input"
               autoComplete="current-password"
             />
-            {submitCount > 0 && (
-              <ErrorMessage
-                name="password"
-                component="div"
-                className="auth-error"
-              />
-            )}
+            {submitCount > 0 && <ErrorMessage name="password" component="div" className="auth-error" />}
 
             <div className="auth-row">
-              <button
-                type="button"
-                className="auth-link link-btn"
-                onClick={() => navigate("/forgot-password")}
-              >
+              <button type="button" className="auth-link link-btn" onClick={() => navigate("/forgot-password")}>
                 Forgot password?
               </button>
             </div>
 
-            <button
-              type="submit"
-              className="auth-submit"
-              disabled={isSubmitting}
-            >
+            <button type="submit" className="auth-submit" disabled={isSubmitting}>
               {isSubmitting ? "Signing in..." : "Sign In"}
             </button>
           </Form>
