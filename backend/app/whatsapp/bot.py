@@ -196,7 +196,7 @@ def whatsapp_webhook():
 
 
         else:
-            ai_reply = "⚠️ I didn’t understand that.\nPlease reply with a number (1–4)."
+            ai_reply = "⚠️ I didn’t understand that.\nPlease reply with a number (1–5)."
 
     # --- 7️⃣ Handle Symptom Checker ---
     elif session.session_state == "symptom_input":
