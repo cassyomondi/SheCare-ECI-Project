@@ -83,7 +83,8 @@ if not DASHBOARD_URL:
 
 
 
-@whatsapp_bp.route("/", methods=["POST"])
+@whatsapp_bp.route("", methods=["POST"])   # <-- handles /whatsapp
+@whatsapp_bp.route("/", methods=["POST"])  # <-- handles /whatsapp/
 def whatsapp_webhook():
     print("✅ WhatsApp webhook triggered")
     data = request.form
