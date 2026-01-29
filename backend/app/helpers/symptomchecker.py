@@ -5,15 +5,33 @@ from ..models import db, User, ChatSession, UserMessage, ResponseMessage
 import os
 from dotenv import load_dotenv
 
+from .gemini_client import gemini_generate  # ✅ add this
+
 load_dotenv()
 
 # Initialize OpenAI client (explicit API key for reliability)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
+def _is_openai_quota_or_rate_limit_error(e: Exception) -> bool:
+    """
+    Detects common OpenAI quota/rate limit failures (429, insufficient_quota, etc.)
+    Works across different exception shapes by checking the error string.
+    """
+    msg = str(e).lower()
+    return (
+        "insufficient_quota" in msg
+        or "exceeded your current quota" in msg
+        or "rate limit" in msg
+        or "429" in msg
+        or "too many requests" in msg
+    )
+
+
 def symptomchecker(user_phone, symptom_query):
     """
     Handles user symptom queries with context persistence.
+    Falls back to Gemini if OpenAI quota/rate limit is exceeded.
     """
     try:
         # 1️⃣ Find or create the user
@@ -39,30 +57,52 @@ def symptomchecker(user_phone, symptom_query):
         )
 
         context = "\n".join(
-            [f"User: {m.message}\nAI: {m.response.response if m.response else ''}" for m in reversed(last_messages)]
+            [
+                f"User: {m.message}\nAI: {m.response.response if m.response else ''}"
+                for m in reversed(last_messages)
+            ]
         )
 
-        # 4️⃣ Prepare the prompt
+        # 4️⃣ Prepare the prompt (used by both OpenAI + Gemini)
         prompt = f"""
-        You are SheCare, an AI health assistant that helps users understand symptoms safely.
-        User history:\n{context}\n
-        New user message: "{symptom_query}"
-        Provide a friendly, clear explanation and suggested next steps (e.g., rest, hydration, consult a doctor, etc.).
-        """
+You are SheCare, an AI health assistant that helps users understand symptoms safely.
 
-        # 5️⃣ Send to OpenAI
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a kind, safe, and informative health assistant."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.7,
-        )
+User history:
+{context}
 
-        ai_reply = response.choices[0].message.content.strip()
+New user message: "{symptom_query}"
 
-        # 6️⃣ Save message + response
+Give a friendly, clear explanation and suggested next steps (e.g., rest, hydration, consult a doctor).
+Do not diagnose. If symptoms sound severe or urgent, advise seeking immediate medical care.
+""".strip()
+
+        ai_reply = None
+
+        # 5️⃣ Try OpenAI first
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are a kind, safe, and informative health assistant."},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.7,
+            )
+            ai_reply = response.choices[0].message.content.strip()
+
+        except Exception as e:
+            # If quota/rate limit -> fallback to Gemini
+            if _is_openai_quota_or_rate_limit_error(e):
+                print("⚠️ OpenAI quota/rate limit hit. Falling back to Gemini...")
+                ai_reply = gemini_generate(prompt)
+            else:
+                # Not a quota error -> re-raise so outer handler catches it
+                raise
+
+        if not ai_reply:
+            ai_reply = "⚠️ I had trouble checking that symptom. Please try again later."
+
+        # 6️⃣ Save message + response (save regardless of provider)
         new_response = ResponseMessage(response=ai_reply, timestamp=datetime.utcnow())
         db.session.add(new_response)
         db.session.commit()
