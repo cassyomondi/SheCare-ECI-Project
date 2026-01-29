@@ -20,6 +20,7 @@ from ..helpers.symptomchecker import symptomchecker
 from ..helpers.clinicfinder import find_nearby_clinics
 from ..helpers.prescriptionuploader import prescription_uploader
 from ..helpers.healthtip_agent import generate_health_tip
+from ..helpers.free_chat_agent import free_chat_agent  # ✅ NEW
 
 from ..models import (
     db,
@@ -294,7 +295,25 @@ def whatsapp_webhook():
             )
 
         else:
-            ai_reply = "⚠️ I didn’t understand that.\nPlease reply with a number (1–5)."
+            # ✅ NEW: treat non-numeric input as a follow-up conversation
+            try:
+                ai_reply = free_chat_agent(
+                    user_phone=user_phone,
+                    user_message=user_message,  # use raw message (best for AI)
+                    user=user,
+                    user_id=user.id,
+                )
+
+                # Reinforce menu availability after the follow-up
+                ai_reply = (
+                    f"{ai_reply}\n\n"
+                    "Reply with a number anytime:\n"
+                    "1️⃣ Symptoms  2️⃣ Clinics  3️⃣ Prescription  4️⃣ Tips  5️⃣ Dashboard\n"
+                    "0️⃣ Help / Menu"
+                )
+            except Exception as e:
+                print(f"⚠️ free_chat_agent failed: {e}")
+                ai_reply = "⚠️ Sorry, I couldn’t process that. Reply 0 to see the menu."
 
     # --- 7️⃣ Handle Symptom Checker ---
     elif session.session_state == "symptom_input":
