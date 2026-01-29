@@ -2,6 +2,7 @@
 
 import io
 import os
+import time
 from datetime import datetime
 
 import requests
@@ -44,9 +45,11 @@ def prescription_uploader(user_id, media_url, media_type):
         if not account_sid or not auth_token:
             return False, "⚠️ Server is missing Twilio credentials. Please try again later."
 
-        res = requests.get(media_url, auth=(account_sid, auth_token), timeout=20)
+        t0 = time.time()
+        res = requests.get(media_url, auth=(account_sid, auth_token), timeout=25)
         res.raise_for_status()
         image_data = res.content
+        print(f"⏱ prescription download: {time.time() - t0:.2f}s")
 
         # --- 2) OCR ---
         try:
@@ -54,7 +57,10 @@ def prescription_uploader(user_id, media_url, media_type):
         except Exception:
             return False, "⚠️ I couldn't open that file as an image. Please upload a clear photo of the prescription."
 
+        t1 = time.time()
         extracted_text = (pytesseract.image_to_string(image) or "").strip()
+        print(f"⏱ prescription OCR: {time.time() - t1:.2f}s")
+
         if not extracted_text:
             return False, (
                 "⚠️ I couldn't read any text from the prescription image. "
@@ -82,6 +88,7 @@ Do not claim certainty if the OCR looks messy.
         ai_interpretation = ""
 
         # --- 4) Try OpenAI first ---
+        t2 = time.time()
         try:
             completion = client.chat.completions.create(
                 model="gpt-4o-mini",
@@ -105,6 +112,8 @@ Do not claim certainty if the OCR looks messy.
             else:
                 raise
 
+        print(f"⏱ prescription AI: {time.time() - t2:.2f}s")
+
         if not (ai_interpretation or "").strip():
             ai_interpretation = (
                 "⚠️ I extracted some text but couldn't interpret it confidently. "
@@ -114,8 +123,8 @@ Do not claim certainty if the OCR looks messy.
         # --- 5) Save to DB ---
         new_prescription = Prescription(
             user_id=user_id,
-            uploaded=image_data,          # raw bytes
-            response=ai_interpretation,   # interpreted result
+            uploaded=image_data,  # raw bytes
+            response=ai_interpretation,  # interpreted result
             timestamp=datetime.utcnow(),
         )
         db.session.add(new_prescription)

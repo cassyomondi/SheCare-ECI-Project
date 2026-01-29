@@ -1,24 +1,35 @@
+# backend/app/routes/bot.py
+
 import os
+import random
+import re
+import threading
+from datetime import datetime
+
 from dotenv import load_dotenv
+from flask import Blueprint, request, current_app
+from twilio.rest import Client as TwilioClient
+from twilio.twiml.messaging_response import MessagingResponse
 
 # ✅ Ensure .env is loaded before any helper imports (so OpenAI, etc. have keys)
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 dotenv_path = os.path.join(base_dir, ".env")
 load_dotenv(dotenv_path)
 
-from flask import Blueprint, request
-from twilio.twiml.messaging_response import MessagingResponse
-from datetime import datetime
-import random
-import re
-
 from ..helpers.symptomchecker import symptomchecker
 from ..helpers.clinicfinder import find_nearby_clinics
 from ..helpers.prescriptionuploader import prescription_uploader
 from ..helpers.healthtip_agent import generate_health_tip
 
-from ..models import db, User, Participant, UserMessage, ResponseMessage, ChatSession, ChatMemory
-
+from ..models import (
+    db,
+    User,
+    Participant,
+    UserMessage,
+    ResponseMessage,
+    ChatSession,
+    ChatMemory,
+)
 
 whatsapp_bp = Blueprint("whatsapp_bp", __name__)
 
@@ -47,16 +58,23 @@ def get_first_name_for_user(user: User) -> str:
 SHECARE_ALIASES = {"shecare", "she care"}
 
 GREETINGS = {
-    "hi", "hello", "hey",
-    "mambo", "habari", "niaje",
-    "jambo", "hujambo"
+    "hi",
+    "hello",
+    "hey",
+    "mambo",
+    "habari",
+    "niaje",
+    "jambo",
+    "hujambo",
 }
+
 
 def normalize_text(s: str) -> str:
     s = (s or "").lower().strip()
-    s = re.sub(r"[^\w\s]", " ", s)     # remove punctuation
+    s = re.sub(r"[^\w\s]", " ", s)  # remove punctuation
     s = re.sub(r"\s+", " ", s).strip()
     return s
+
 
 def is_greeting_or_greeting_shecare(raw: str) -> bool:
     n = normalize_text(raw)
@@ -76,14 +94,57 @@ def is_greeting_or_greeting_shecare(raw: str) -> bool:
 
 
 DASHBOARD_URL = os.getenv("FRONTEND_DASHBOARD_URL")
-
 if not DASHBOARD_URL:
     frontend_base = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173").rstrip("/")
     DASHBOARD_URL = f"{frontend_base}/user-dashboard"
 
 
+def send_whatsapp_message(to_phone: str, body: str):
+    """
+    Sends a WhatsApp message using Twilio REST API.
+    Use this for async follow-up messages after the webhook has already responded.
+    """
+    account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+    auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+    from_phone = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
 
-@whatsapp_bp.route("", methods=["POST"])   # <-- handles /whatsapp
+    if not account_sid or not auth_token:
+        print("⚠️ Missing Twilio credentials; cannot send async WhatsApp message.")
+        return
+
+    client = TwilioClient(account_sid, auth_token)
+    client.messages.create(
+        from_=from_phone,
+        to=f"whatsapp:{to_phone}",
+        body=body,
+    )
+
+
+def process_prescription_async(app, user_id: int, user_phone: str, media_url: str, media_type: str):
+    """
+    Heavy work (download + OCR + AI) runs here so Twilio webhook returns fast.
+    Needs Flask app context because we use SQLAlchemy db/session.
+    Then we send the final interpretation as a new WhatsApp message.
+    """
+    with app.app_context():
+        try:
+            success, ai_reply = prescription_uploader(user_id, media_url, media_type)
+            send_whatsapp_message(user_phone, ai_reply)
+        except Exception as e:
+            print("⚠️ Async prescription processing failed:", e)
+            send_whatsapp_message(
+                user_phone,
+                "⚠️ Sorry, I couldn’t process that prescription. Please try again with a clearer photo.",
+            )
+        finally:
+            # ✅ Good hygiene for threads when using scoped sessions
+            try:
+                db.session.remove()
+            except Exception:
+                pass
+
+
+@whatsapp_bp.route("", methods=["POST"])  # <-- handles /whatsapp
 @whatsapp_bp.route("/", methods=["POST"])  # <-- handles /whatsapp/
 def whatsapp_webhook():
     print("✅ WhatsApp webhook triggered")
@@ -130,7 +191,6 @@ def whatsapp_webhook():
             "4️⃣ Get daily health tips\n"
             "5️⃣ Account / Dashboard\n\n"
             "👉 Reply with a number to continue."
-
         )
 
         log_chat(user_phone, ai_reply, "bot")
@@ -139,22 +199,31 @@ def whatsapp_webhook():
         print("🤖 Sent welcome + main menu message")
         return str(response), 200, {"Content-Type": "application/xml"}
 
-    # --- 4️⃣ Handle Prescription Upload ---
+    # --- 4️⃣ Handle Prescription Upload (FAST ACK + async processing) ---
     if num_media > 0:
         media_url = data.get("MediaUrl0")
         media_type = data.get("MediaContentType0")
         print(f"📸 Prescription upload detected: {media_url} ({media_type})")
 
-        success, ai_reply = prescription_uploader(user.id, media_url, media_type)
+        # ✅ Respond fast to Twilio so it doesn't time out
+        ack = "✅ Got it. I’m reading your prescription now — I’ll reply shortly."
+        message.body(ack)
 
-        response_msg = ResponseMessage(response=ai_reply, timestamp=datetime.utcnow())
-        db.session.add(response_msg)
-        db.session.commit()
+        # Log bot ACK
+        log_chat(user_phone, ack, "bot")
 
-        log_chat(user_phone, ai_reply, "bot")
+        # ✅ Capture the real Flask app instance (not the proxy)
+        app = current_app._get_current_object()
 
-        message.body(ai_reply)
-        print("💾 Prescription upload handled" if success else "⚠️ Upload failed")
+        # ✅ Heavy processing in background; final response sent via Twilio REST
+        t = threading.Thread(
+            target=process_prescription_async,
+            args=(app, user.id, user_phone, media_url, media_type),
+            daemon=True,
+        )
+        t.start()
+
+        print("💾 Prescription upload acknowledged; processing async...")
         return str(response), 200, {"Content-Type": "application/xml"}
 
     # --- 5️⃣ Save user message ---
@@ -164,7 +233,6 @@ def whatsapp_webhook():
     log_chat(user_phone, normalized, "user")
 
     ai_reply = ""
-
 
     # --- 6️⃣ Handle Main Menu ---
     if session.session_state == "main_menu":
@@ -185,7 +253,6 @@ def whatsapp_webhook():
                 "5️⃣ Account / Dashboard\n"
                 "0️⃣ Help / Menu\n\n"
                 "Reply with the number of what you’d like to do!"
-
             )
 
         elif normalized == "1":
@@ -217,15 +284,14 @@ def whatsapp_webhook():
 
         elif normalized in ["0", "help", "menu"]:
             ai_reply = (
-            "Here’s how you can use SheCare:\n"
-            "1️⃣ Check symptoms\n"
-            "2️⃣ Find clinics\n"
-            "3️⃣ Upload prescription\n"
-            "4️⃣ Daily tips\n"
-            "5️⃣ Account / Dashboard\n"
-            "0️⃣ Help / Menu"
-        )
-
+                "Here’s how you can use SheCare:\n"
+                "1️⃣ Check symptoms\n"
+                "2️⃣ Find clinics\n"
+                "3️⃣ Upload prescription\n"
+                "4️⃣ Daily tips\n"
+                "5️⃣ Account / Dashboard\n"
+                "0️⃣ Help / Menu"
+            )
 
         else:
             ai_reply = "⚠️ I didn’t understand that.\nPlease reply with a number (1–5)."
@@ -251,8 +317,8 @@ def whatsapp_webhook():
             clinics = find_nearby_clinics(user_message)
             ai_reply = (
                 "🩺 Clinics near you:\n\n" + "\n\n".join(clinics)
-                if clinics else
-                "⚕️ Sorry, I couldn’t find any clinics near that location."
+                if clinics
+                else "⚕️ Sorry, I couldn’t find any clinics near that location."
             )
             session.session_state = "main_menu"
             db.session.commit()
