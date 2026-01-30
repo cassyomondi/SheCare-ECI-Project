@@ -13,8 +13,12 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
+    const finishLoading = () =>
+      setTimeout(() => setLoading(false), 20000); // 👈 3s delay
+
     if (!token) {
-      setLoading(false);
+      finishLoading();
       return;
     }
 
@@ -24,8 +28,9 @@ function App() {
       })
       .then((res) => setUser(res.data))
       .catch(() => localStorage.removeItem("token"))
-      .finally(() => setLoading(false));
+      .finally(finishLoading);
   }, []);
+
 
   const handleSetUser = (userData) => {
     setUser(userData);

@@ -44,7 +44,7 @@ body {
   height: 100%;
   width: 40%;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.9);
+  background: #00c2a8;
   animation: app-loader-slide 1s ease-in-out infinite;
 }
 
