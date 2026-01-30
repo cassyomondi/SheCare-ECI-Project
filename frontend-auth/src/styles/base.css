@@ -23,6 +23,15 @@ body {
   display: grid;
   place-items: center;
   padding: 24px;
+  /* ✅ fade support */
+  opacity: 1;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.app-loader--fadeOut {
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
 }
 
 .app-loader__label {
