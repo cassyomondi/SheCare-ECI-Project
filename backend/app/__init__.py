@@ -62,6 +62,19 @@ def _is_openai_quota_or_rate_limit_error(e: Exception) -> bool:
     )
 
 
+def _get_required_env(name: str) -> str:
+    """
+    Fetch an environment variable and fail fast if missing.
+
+    Why: avoids silently falling back to dev defaults in production
+    (e.g. connecting to localhost with dummy credentials).
+    """
+    value = os.getenv(name)
+    if not value or not value.strip():
+        raise RuntimeError(f"Missing required environment variable: {name}")
+    return value.strip()
+
+
 # -------------------------------
 # App Factory
 # -------------------------------
@@ -69,11 +82,11 @@ def create_app():
     """Unified SheCare backend (AI + Twilio + Core + API + Admin Auth + Health Tips)"""
     app = Flask(__name__)
 
-    # Configuration
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-        "DATABASE_URL", "postgresql://postgres:password@localhost/shecare_db"
-    )
+    # Configuration (fail-fast in production if DATABASE_URL is missing)
+    app.config["SQLALCHEMY_DATABASE_URI"] = _get_required_env("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    # You may choose to also fail-fast on these; leaving defaults for now
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "supersecretkey")
 
     # Initialize extensions
@@ -93,18 +106,21 @@ def create_app():
     # -------------------------------
     try:
         from app.routes.twilio_routes import twilio_bp
+
         app.register_blueprint(twilio_bp)
     except Exception as e:
         print("Could not load Twilio routes:", e)
 
     try:
         from app.whatsapp.bot import whatsapp_bp
+
         app.register_blueprint(whatsapp_bp, url_prefix="/whatsapp")
     except Exception as e:
         print("Could not load WhatsApp AI bot:", e)
 
     try:
         from app.routes.api_routes import api_bp
+
         app.register_blueprint(api_bp)
         print("API routes registered successfully.")
     except Exception as e:
@@ -112,14 +128,16 @@ def create_app():
 
     try:
         from app.routes.admin_routes import admin_bp
+
         app.register_blueprint(admin_bp)
         print("Admin routes registered successfully.")
     except Exception as e:
         print("Could not load Admin routes:", e)
 
-    # ✅ NEW: Internal cron / tasks routes
+    # Internal cron / tasks routes
     try:
         from app.routes.tasks_routes import tasks_bp
+
         app.register_blueprint(tasks_bp)
         print("Tasks routes registered successfully.")
     except Exception as e:
