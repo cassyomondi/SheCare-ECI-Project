@@ -5,20 +5,31 @@ import UserDashboard from "./pages/UserDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import axios from "axios";
-import LoadingScreen from "./components/LoadingScreen"; // ✅ add
+import LoadingScreen from "./components/LoadingScreen";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  // Loader control
+  const [loading, setLoading] = useState(true);       // whether loader is mounted
+  const [fadeLoader, setFadeLoader] = useState(false); // whether loader is fading out
 
   useEffect(() => {
+    const FADE_MS = 180;
+
+    const done = () => {
+      // trigger fade animation
+      setFadeLoader(true);
+
+      // unmount loader after fade finishes
+      window.setTimeout(() => {
+        setLoading(false);
+      }, FADE_MS);
+    };
+
     const token = localStorage.getItem("token");
-
-    const finishLoading = () =>
-      setTimeout(() => setLoading(false), 20000); // 👈 3s delay
-
     if (!token) {
-      finishLoading();
+      done();
       return;
     }
 
@@ -28,15 +39,16 @@ function App() {
       })
       .then((res) => setUser(res.data))
       .catch(() => localStorage.removeItem("token"))
-      .finally(finishLoading);
+      .finally(done);
   }, []);
-
 
   const handleSetUser = (userData) => {
     setUser(userData);
   };
 
-  if (loading) return <LoadingScreen label="Preparing SheCare..." />; // ✅ replace
+  if (loading) {
+    return <LoadingScreen label="Preparing SheCare..." fadingOut={fadeLoader} />;
+  }
 
   return (
     <Router>
@@ -46,7 +58,13 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="/user-dashboard"
-          element={user ? <UserDashboard user={user} setUser={handleSetUser} /> : <Navigate to="/" />}
+          element={
+            user ? (
+              <UserDashboard user={user} setUser={handleSetUser} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
