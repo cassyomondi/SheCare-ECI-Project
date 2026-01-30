@@ -11,7 +11,7 @@ from flask import Blueprint, request, current_app
 from twilio.rest import Client as TwilioClient
 from twilio.twiml.messaging_response import MessagingResponse
 
-# ✅ Ensure .env is loaded before any helper imports (so OpenAI, etc. have keys)
+# Ensure .env is loaded before any helper imports (so OpenAI, etc. have keys)
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 dotenv_path = os.path.join(base_dir, ".env")
 load_dotenv(dotenv_path)
@@ -34,7 +34,22 @@ from ..models import (
 
 whatsapp_bp = Blueprint("whatsapp_bp", __name__)
 
-# 💡 Random fallback health tips
+
+def safe_print(*parts):
+    """
+    Passenger on some hosts logs with ASCII encoding.
+    This prevents UnicodeEncodeError by stripping non-ASCII from logs.
+    """
+    try:
+        msg = " ".join("" if p is None else str(p) for p in parts)
+        msg = msg.encode("ascii", "ignore").decode("ascii", errors="ignore")
+        print(msg)
+    except Exception:
+        # Never allow logging itself to crash the webhook
+        pass
+
+
+# Random fallback health tips
 FALLBACK_TIPS = [
     "Stay hydrated, rest well, and take care of your body every day!",
     "Eat balanced meals and include fruits and vegetables.",
@@ -110,7 +125,7 @@ def send_whatsapp_message(to_phone: str, body: str):
     from_phone = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
 
     if not account_sid or not auth_token:
-        print("⚠️ Missing Twilio credentials; cannot send async WhatsApp message.")
+        safe_print("Missing Twilio credentials; cannot send async WhatsApp message.")
         return
 
     client = TwilioClient(account_sid, auth_token)
@@ -132,7 +147,7 @@ def process_prescription_async(app, user_id: int, user_phone: str, media_url: st
             success, ai_reply = prescription_uploader(user_id, media_url, media_type)
             send_whatsapp_message(user_phone, ai_reply)
         except Exception as e:
-            print("⚠️ Async prescription processing failed:", e)
+            safe_print("Async prescription processing failed:", repr(e))
             send_whatsapp_message(
                 user_phone,
                 "⚠️ Sorry, I couldn’t process that prescription. Please try again with a clearer photo.",
@@ -150,10 +165,8 @@ def process_symptom_async(app, user_phone: str, user_id: int, raw_message: str):
     """
     with app.app_context():
         try:
-            # Use normalized symptom text (same routing/cleaning style as before)
             reply = symptomchecker(user_phone, normalize_text(raw_message))
 
-            # Optional menu hint
             reply = (
                 f"{reply}\n\n"
                 "Reply with a number anytime:\n"
@@ -164,7 +177,7 @@ def process_symptom_async(app, user_phone: str, user_id: int, raw_message: str):
             send_whatsapp_message(user_phone, reply)
             log_chat(user_phone, reply, "bot")
         except Exception as e:
-            print("⚠️ Async symptom processing failed:", e)
+            safe_print("Async symptom processing failed:", repr(e))
             send_whatsapp_message(
                 user_phone,
                 "⚠️ Sorry, I had trouble processing that. Please try again, or reply 0 to see the menu.",
@@ -189,7 +202,6 @@ def process_free_chat_async(app, user_phone: str, user: User, raw_message: str):
                 user_id=user.id,
             )
 
-            # Reinforce menu availability after the follow-up
             reply = (
                 f"{reply}\n\n"
                 "Reply with a number anytime:\n"
@@ -200,7 +212,7 @@ def process_free_chat_async(app, user_phone: str, user: User, raw_message: str):
             send_whatsapp_message(user_phone, reply)
             log_chat(user_phone, reply, "bot")
         except Exception as e:
-            print("⚠️ Async free-chat processing failed:", e)
+            safe_print("Async free-chat processing failed:", repr(e))
             send_whatsapp_message(
                 user_phone,
                 "⚠️ Sorry, I had trouble responding. Please try again, or reply 0 to see the menu.",
@@ -235,7 +247,7 @@ def process_clinic_async(app, user_phone: str, raw_message: str):
             send_whatsapp_message(user_phone, reply)
             log_chat(user_phone, reply, "bot")
         except Exception as e:
-            print("⚠️ Async clinic processing failed:", e)
+            safe_print("Async clinic processing failed:", repr(e))
             send_whatsapp_message(
                 user_phone,
                 "⚠️ Sorry, I couldn’t find clinics right now. Please try again, or reply 0 to see the menu.",
@@ -247,10 +259,10 @@ def process_clinic_async(app, user_phone: str, raw_message: str):
                 pass
 
 
-@whatsapp_bp.route("", methods=["POST"])  # <-- handles /whatsapp
-@whatsapp_bp.route("/", methods=["POST"])  # <-- handles /whatsapp/
+@whatsapp_bp.route("", methods=["POST"])   # handles /whatsapp
+@whatsapp_bp.route("/", methods=["POST"])  # handles /whatsapp/
 def whatsapp_webhook():
-    print("✅ WhatsApp webhook triggered")
+    safe_print("WhatsApp webhook triggered")
     data = request.form
     user_phone = data.get("From", "").replace("whatsapp:", "").strip()
     user_message = data.get("Body", "").strip()
@@ -260,7 +272,7 @@ def whatsapp_webhook():
     response = MessagingResponse()
     message = response.message()
 
-    # --- 1️⃣ Find or create user ---
+    # 1) Find or create user
     user = User.query.filter_by(phone=user_phone).first()
     new_user = False
     if not user:
@@ -268,9 +280,9 @@ def whatsapp_webhook():
         db.session.add(user)
         db.session.commit()
         new_user = True
-        print(f"🆕 New user created: {user_phone}")
+        safe_print("New user created:", user_phone)
 
-    # --- 2️⃣ Manage chat session ---
+    # 2) Manage chat session
     session = ChatSession.query.filter_by(user_id=user.id, is_active=True).first()
     if not session:
         session = ChatSession(
@@ -280,9 +292,9 @@ def whatsapp_webhook():
         )
         db.session.add(session)
         db.session.commit()
-        print(f"🆕 New chat session started for {user_phone}")
+        safe_print("New chat session started for", user_phone)
 
-    # --- 3️⃣ Auto Greet New Users ---
+    # 3) Auto Greet New Users
     if new_user:
         ai_greeting = symptomchecker(user_phone, "Greet the user warmly and introduce SheCare.")
         ai_reply = (
@@ -298,14 +310,14 @@ def whatsapp_webhook():
 
         log_chat(user_phone, ai_reply, "bot")
         message.body(ai_reply)
-        print("🤖 Sent welcome + main menu message")
+        safe_print("Sent welcome + main menu message")
         return str(response), 200, {"Content-Type": "application/xml"}
 
-    # --- 4️⃣ Handle Prescription Upload (FAST ACK + async processing) ---
+    # 4) Handle Prescription Upload (FAST ACK + async processing)
     if num_media > 0:
         media_url = data.get("MediaUrl0")
         media_type = data.get("MediaContentType0")
-        print(f"📸 Prescription upload detected: {media_url} ({media_type})")
+        safe_print("Prescription upload detected. media_type=", media_type)
 
         ack = "✅ Got it. I’m reading your prescription now — I’ll reply shortly."
         message.body(ack)
@@ -320,21 +332,22 @@ def whatsapp_webhook():
         )
         t.start()
 
-        print("💾 Prescription upload acknowledged; processing async...")
+        safe_print("Prescription upload acknowledged; processing async...")
         return str(response), 200, {"Content-Type": "application/xml"}
 
-    # --- 5️⃣ Save user message ---
+    # 5) Save user message
     user_msg = UserMessage(user_id=user.id, message=normalized, timestamp=datetime.utcnow())
     db.session.add(user_msg)
     db.session.commit()
+
     # Log raw message for better context (AI follow-ups)
     log_chat(user_phone, user_message, "user")
 
     ai_reply = ""
 
-    # --- 6️⃣ Handle Main Menu ---
+    # 6) Handle Main Menu
     if session.session_state == "main_menu":
-        print(f"🔎 Main menu input: '{normalized}'")
+        safe_print("Main menu input received. len=", len(normalized or ""))
 
         if is_greeting_or_greeting_shecare(user_message):
             first_name = get_first_name_for_user(user)
@@ -370,7 +383,7 @@ def whatsapp_webhook():
             try:
                 ai_reply = f"💡 Tip: {generate_health_tip(user)}"
             except Exception as e:
-                print(f"⚠️ Health tip generation failed: {e}")
+                safe_print("Health tip generation failed:", repr(e))
                 ai_reply = f"💡 Tip: {random.choice(FALLBACK_TIPS)}"
 
         elif normalized == "5" or normalized in ["dashboard", "account", "profile", "settings"]:
@@ -392,7 +405,6 @@ def whatsapp_webhook():
             )
 
         else:
-            # ✅ NEW: fast ACK, then process free chat async to avoid Twilio timeouts
             ack = "✅ Got it — I’m checking that now. I’ll reply shortly."
             message.body(ack)
             log_chat(user_phone, ack, "bot")
@@ -405,17 +417,16 @@ def whatsapp_webhook():
             )
             t.start()
 
-            print("💾 Free-chat acknowledged; processing async...")
+            safe_print("Free-chat acknowledged; processing async...")
             return str(response), 200, {"Content-Type": "application/xml"}
 
-    # --- 7️⃣ Handle Symptom Checker ---
+    # 7) Handle Symptom Checker
     elif session.session_state == "symptom_input":
         if normalized in ["menu", "0", "back"]:
             session.session_state = "main_menu"
             db.session.commit()
             ai_reply = "🔙 Back to menu — reply with a number."
         else:
-            # ✅ NEW: fast ACK, then process symptom async to avoid Twilio timeouts
             ack = "✅ Got it — I’m checking that now. I’ll reply shortly."
             message.body(ack)
             log_chat(user_phone, ack, "bot")
@@ -431,17 +442,16 @@ def whatsapp_webhook():
             )
             t.start()
 
-            print("💾 Symptom acknowledged; processing async...")
+            safe_print("Symptom acknowledged; processing async...")
             return str(response), 200, {"Content-Type": "application/xml"}
 
-    # --- 8️⃣ Handle Clinic Finder ---
+    # 8) Handle Clinic Finder
     elif session.session_state == "clinic_finder":
         if normalized in ["menu", "0", "back"]:
             session.session_state = "main_menu"
             db.session.commit()
             ai_reply = "🔙 Back to menu — reply with a number."
         else:
-            # ✅ NEW: fast ACK, then process clinic async to avoid Twilio timeouts
             ack = "✅ Got it — I’m finding clinics near you. I’ll reply shortly."
             message.body(ack)
             log_chat(user_phone, ack, "bot")
@@ -457,10 +467,10 @@ def whatsapp_webhook():
             )
             t.start()
 
-            print("💾 Clinic lookup acknowledged; processing async...")
+            safe_print("Clinic lookup acknowledged; processing async...")
             return str(response), 200, {"Content-Type": "application/xml"}
 
-    # --- 9️⃣ Save AI response ---
+    # 9) Save AI response
     if not ai_reply:
         ai_reply = "⚠️ Sorry, I didn’t get that. Please try again."
 
@@ -474,17 +484,21 @@ def whatsapp_webhook():
     log_chat(user_phone, ai_reply, "bot")
 
     message.body(ai_reply)
-    print("🤖 Sending reply:", ai_reply)
+    safe_print("Sending reply. len=", len(ai_reply or ""))
 
     return str(response), 200, {"Content-Type": "application/xml"}
 
 
-# --- 🔹 Helper: Log Chat Memory ---
+# Helper: Log Chat Memory
 def log_chat(phone, message, sender):
-    user = User.query.filter_by(phone=phone).first()
-    if not user:
-        return
+    try:
+        user = User.query.filter_by(phone=phone).first()
+        if not user:
+            return
 
-    log = ChatMemory(user_id=user.id, message=message, sender=sender)
-    db.session.add(log)
-    db.session.commit()
+        log = ChatMemory(user_id=user.id, message=message, sender=sender)
+        db.session.add(log)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        safe_print("log_chat failed:", repr(e))
