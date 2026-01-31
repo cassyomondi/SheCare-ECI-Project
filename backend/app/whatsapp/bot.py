@@ -74,6 +74,31 @@ GREETINGS = {
     "gm", "ga", "ge",
 }
 
+GREETING_REGEXES = [
+    r"^(h+i+)$",                 # hi, hiiii
+    r"^(he+y+)$",                # hey, heyyy
+    r"^(hell+o+)$",              # hello, hellooo
+    r"^(hi+ya+)$",               # hiya
+    r"^(yo+)$",                  # yo, yooo
+    r"^(sup+)$",                 # sup, suppp
+    r"^(what'?s\s*up)$",         # what's up / whats up
+    r"^(good\s*morning)$",
+    r"^(good\s*afternoon)$",
+    r"^(good\s*evening)$",
+    r"^(morn+ing)$",             # morninggg
+    r"^(gm+)$",                  # gm, gmm
+    r"^(habari(\s+yako)?)$",     # habari / habari yako
+    r"^(mambo(\s+vipi)?)$",      # mambo / mambo vipi
+    r"^(niaje+)$",               # niajeee
+    r"^(jambo+)$",
+    r"^(hujambo+)$",
+    r"^(sasa+)$",
+    r"^(vipi+)$",
+    r"^(sema+)$",
+    r"^(salama+)$",
+    r"^(uko\s*aje)$",
+    r"^(uko\s*je)$",
+]
 
 def normalize_text(s: str) -> str:
     s = (s or "").lower().strip()
