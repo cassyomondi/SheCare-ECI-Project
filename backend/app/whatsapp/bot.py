@@ -67,14 +67,11 @@ def get_first_name_for_user(user: User) -> str:
 SHECARE_ALIASES = {"shecare", "she care"}
 
 GREETINGS = {
-    "hi",
-    "hello",
-    "hey",
-    "mambo",
-    "habari",
-    "niaje",
-    "jambo",
-    "hujambo",
+    "hi", "hello", "hey",
+    "mambo", "habari", "niaje", "jambo", "hujambo",
+    "sasa", "vipi", "sema", "salama", "uko aje", "ukoje",
+    "morning", "afternoon", "evening",
+    "gm", "ga", "ge",
 }
 
 
