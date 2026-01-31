@@ -64,6 +64,13 @@ def get_first_name_for_user(user: User) -> str:
         return ""
 
 
+def normalize_text(s: str) -> str:
+    s = (s or "").lower().strip()
+    s = re.sub(r"[^\w\s]", " ", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
+
 SHECARE_ALIASES = {"shecare", "she care"}
 
 GREETINGS = {
@@ -141,11 +148,6 @@ def is_probable_greeting(raw: str) -> bool:
 
     return False
 
-def normalize_text(s: str) -> str:
-    s = (s or "").lower().strip()
-    s = re.sub(r"[^\w\s]", " ", s)
-    s = re.sub(r"\s+", " ", s).strip()
-    return s
 
 
 def is_greeting_or_greeting_shecare(raw: str) -> bool:
