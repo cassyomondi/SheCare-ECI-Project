@@ -102,6 +102,44 @@ GREETING_REGEXES = [
 
 _GREETING_RE = re.compile(r"|".join(f"(?:{p})" for p in GREETING_REGEXES), re.IGNORECASE)
 
+def is_probable_greeting(raw: str) -> bool:
+    if not raw:
+        return False
+
+    raw_l = raw.lower().strip()
+
+    # 1) Emoji-only / emoji-leading greetings
+    if any(e in raw for e in ["👋", "🙋", "🙋‍♀️", "🙋‍♂️"]):
+        # If the message is short, treat it as a greeting.
+        if len(raw_l) <= 20:
+            return True
+
+    n = normalize_text(raw)  # your normalizer removes punctuation etc.
+
+    if not n:
+        return False
+
+    # 2) Very short messages that match greeting patterns
+    # e.g. "heyyy", "gm", "good morning"
+    if len(n) <= 30 and _GREETING_RE.fullmatch(n):
+        return True
+
+    # 3) Token-based: if the message starts with a greetingy first token
+    parts = n.split()
+    first = parts[0]
+
+    # Examples: "hey", "heyyy", "hiii", "mambo", "habari"
+    if first in GREETINGS or _GREETING_RE.fullmatch(first):
+        return True
+
+    # 4) Multi-word greetings like "good morning", "habari yako", etc.
+    first_two = " ".join(parts[:2]) if len(parts) >= 2 else ""
+    first_three = " ".join(parts[:3]) if len(parts) >= 3 else ""
+
+    if _GREETING_RE.fullmatch(first_two) or _GREETING_RE.fullmatch(first_three):
+        return True
+
+    return False
 
 def normalize_text(s: str) -> str:
     s = (s or "").lower().strip()
