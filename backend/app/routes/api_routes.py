@@ -342,6 +342,8 @@ def forgot_password():
         # ✅ SEND EMAIL HERE
         frontend_base = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173")
         reset_link = f"{frontend_base}/reset-password?token={raw_token}"
+        logo_url = "https://shecare-nu.vercel.app/images/logo.png"  # adjust if your logo lives elsewhere
+
 
         if email and user.email:
             html = f"""
