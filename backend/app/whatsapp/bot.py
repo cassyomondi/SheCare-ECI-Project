@@ -150,14 +150,21 @@ def normalize_text(s: str) -> str:
 
 def is_greeting_or_greeting_shecare(raw: str) -> bool:
     n = normalize_text(raw)
-
-    if n in GREETINGS:
-        return True
+    if not n:
+        return False
 
     parts = n.split()
-    if len(parts) >= 2 and parts[0] in GREETINGS:
+
+    # If it's basically a greeting, accept it
+    if is_probable_greeting(raw):
+        return True
+
+    # Also accept "greeting + shecare" even if greeting is unusual but matches regex
+    if len(parts) >= 2:
+        first = parts[0]
         rest = " ".join(parts[1:])
-        if rest in SHECARE_ALIASES:
+
+        if (first in GREETINGS or _GREETING_RE.fullmatch(first)) and (rest in SHECARE_ALIASES):
             return True
 
     return False
