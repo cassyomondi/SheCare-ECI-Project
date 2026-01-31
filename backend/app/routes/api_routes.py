@@ -347,18 +347,76 @@ def forgot_password():
 
         if email and user.email:
             html = f"""
-            <p>Hello,</p>
-            <p>We received a request to reset your SheCare password.</p>
-            <p><a href="{reset_link}">Reset your password</a></p>
-            <p>This link expires in 30 minutes.</p>
-            <p>If you didn’t request this, ignore this email.</p>
-            """
+                <!doctype html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+                    <title>SheCare Password Reset</title>
+                </head>
+                <body style="margin:0; padding:0; background:#f6f7fb; font-family: Arial, Helvetica, sans-serif;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f6f7fb; padding: 32px 12px;">
+                    <tr>
+                        <td align="center">
+                        <!-- Card -->
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                                style="max-width: 560px; background:#ffffff; border-radius: 12px; overflow:hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.06);">
+                            <tr>
+                            <td style="padding: 28px 24px 10px 24px; text-align:center;">
+                                <img src="{logo_url}" alt="SheCare" width="68" height="68"
+                                    style="display:block; margin:0 auto 12px auto; border-radius: 10px;" />
+                                <div style="font-size:20px; font-weight:800; color:#111827; margin-bottom: 8px;">
+                                SheCare Password Reset
+                                </div>
+                            </td>
+                            </tr>
 
-            send_email(
-                to_email=user.email,
-                subject="Reset your SheCare password",
-                html=html
-            )
+                            <tr>
+                            <td style="padding: 10px 24px 24px 24px; color:#374151; font-size:14px; line-height:1.6;">
+                                <p style="margin: 0 0 12px 0;">Hello,</p>
+                                <p style="margin: 0 0 12px 0;">We received a request to reset your SheCare password.</p>
+
+                                <!-- Button -->
+                                <div style="margin: 18px 0 18px 0; text-align:center;">
+                                <a href="{reset_link}"
+                                    style="display:inline-block; padding: 12px 18px; text-decoration:none; border-radius: 10px;
+                                            font-weight:700; font-size:14px; background:#2563eb; color:#ffffff;">
+                                    Reset your password
+                                </a>
+                                </div>
+
+                                <p style="margin: 0 0 12px 0;">This link expires in 30 minutes.</p>
+                                <p style="margin: 0 0 16px 0;">If you didn’t request this, ignore this email.</p>
+
+                                <hr style="border:none; border-top:1px solid #e5e7eb; margin: 18px 0;" />
+
+                                <!-- Fallback link -->
+                                <p style="margin: 0; font-size:12px; color:#6b7280;">
+                                If the button doesn’t work, copy and paste this link into your browser:
+                                </p>
+                                <p style="margin: 6px 0 0 0; font-size:12px; word-break:break-all;">
+                                <a href="{reset_link}" style="color:#2563eb; text-decoration:underline;">{reset_link}</a>
+                                </p>
+                            </td>
+                            </tr>
+                        </table>
+
+                        <!-- Footer -->
+                        <div style="max-width:560px; margin: 12px auto 0 auto; text-align:center; color:#9ca3af; font-size:12px;">
+                            © {datetime.utcnow().year} SheCare. All rights reserved.
+                        </div>
+                        </td>
+                    </tr>
+                    </table>
+                </body>
+                </html>
+                    """
+
+        send_email(
+            to_email=user.email,
+            subject="Reset your SheCare password",
+            html=html
+        )
 
         # DEV DEBUG ONLY
         is_dev = os.getenv("FLASK_ENV") == "development" or os.getenv("ENV") in ("dev", "development")
