@@ -100,6 +100,9 @@ GREETING_REGEXES = [
     r"^(uko\s*je)$",
 ]
 
+_GREETING_RE = re.compile(r"|".join(f"(?:{p})" for p in GREETING_REGEXES), re.IGNORECASE)
+
+
 def normalize_text(s: str) -> str:
     s = (s or "").lower().strip()
     s = re.sub(r"[^\w\s]", " ", s)
